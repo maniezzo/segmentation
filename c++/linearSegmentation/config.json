@@ -1,6 +1,7 @@
 {
-	"basedir" : "..\\..\\..\\data\\",
-	"dsName"  : "M6\\GBPUSD",
+	"basedir" : "..\\..\\data\\",
+	"dsName"  : "home\\test",
 	"maxIter" : 500,
-	"maxTime" : 300
+	"maxTime" : 300,
+   "idcost"  : 8,    "commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC"
 }

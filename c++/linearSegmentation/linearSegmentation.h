@@ -12,6 +12,7 @@
 #include <algorithm> // for_each
 #include <iomanip>   // setprecision
 #include <utility>   // for std::pair
+#include <cmath>     // for log function
 
 using namespace std;
 
@@ -27,8 +28,10 @@ int getSegmentId(int x0, int x1, vector<tuple<int, int, double, double, double>>
 int get_line_intersection(double p0_x, double p0_y, double p1_x, double p1_y,
 double p2_x, double p2_y, double p3_x, double p3_y, double* i_x, double* i_y);
 void compressTableau(vector<tuple<int, int, double, double, double>> lstOLS);
-void readConfig();
+int readConfig();
 vector<int>  DAG_SSSP(int tinit, int tend, int, vector<tuple<int, int, double, double, double>> lstOLS);
 vector<int> reconstructSolution(vector<tuple<int, int, double, double, double>> lstOLS, vector<int> minsegm, int tinit, int tend);
 void sortBasedOnAnother(std::vector<int>& v1, std::vector<int>& v2);
 bool checkFeas(vector<int> sol, vector<tuple<int, int, double, double, double>> lstOLS, double expCost);
+double calculateRSS(const std::vector<double>& y, const std::vector<double>& y_pred);
+tuple<int, int, double, double, double> costAIC(int low, int up, vector<double> y);

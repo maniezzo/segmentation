@@ -1,17 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Google Drive\\Ongoing\\segmentation\\code\\c\u002B\u002B\\linearSegmentation\\",
+  "WorkspaceRootPath": "C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{75537351-3421-4163-B67A-042C97B0EE41}|linearSegmentation.vcxproj|C:\\Google Drive\\Ongoing\\segmentation\\code\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{75537351-3421-4163-B67A-042C97B0EE41}|linearSegmentation.vcxproj|C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{75537351-3421-4163-B67A-042C97B0EE41}|linearSegmentation.vcxproj|solutionrelative:linearSegmentation.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{75537351-3421-4163-B67A-042C97B0EE41}|linearSegmentation.vcxproj|C:\\Google Drive\\Ongoing\\segmentation\\code\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{75537351-3421-4163-B67A-042C97B0EE41}|linearSegmentation.vcxproj|C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{75537351-3421-4163-B67A-042C97B0EE41}|linearSegmentation.vcxproj|solutionrelative:linearSegmentation.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\include\\vector||{3B902123-F8A7-4915-9F01-361F908088D0}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -21,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -29,25 +26,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "vector",
-              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\include\\vector",
-              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\include\\vector",
-              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\include\\vector",
-              "RelativeToolTip": "..\\..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\include\\vector",
-              "ViewState": "AQIAAFUHAAAAAAAAAAD4v2AHAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-05-23T10:22:20.78Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "linearSegmentation.cpp",
-              "DocumentMoniker": "C:\\Google Drive\\Ongoing\\segmentation\\code\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.cpp",
+              "DocumentMoniker": "C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.cpp",
               "RelativeDocumentMoniker": "linearSegmentation.cpp",
-              "ToolTip": "C:\\Google Drive\\Ongoing\\segmentation\\code\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.cpp",
+              "ToolTip": "C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.cpp",
               "RelativeToolTip": "linearSegmentation.cpp",
-              "ViewState": "AQIAAPwEAAAAAAAAAAD4vwsFAAAAAAAA",
+              "ViewState": "AgIAAKMDAAAAAAAAAAAUwKUDAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-02-07T14:59:11.033Z",
               "EditorCaption": ""
@@ -56,13 +41,14 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "linearSegmentation.h",
-              "DocumentMoniker": "C:\\Google Drive\\Ongoing\\segmentation\\code\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.h",
+              "DocumentMoniker": "C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.h",
               "RelativeDocumentMoniker": "linearSegmentation.h",
-              "ToolTip": "C:\\Google Drive\\Ongoing\\segmentation\\code\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.h",
+              "ToolTip": "C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.h",
               "RelativeToolTip": "linearSegmentation.h",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAAA0AAAAVAAAA",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAACUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-05-09T11:10:44.442Z"
+              "WhenOpened": "2024-05-09T11:10:44.442Z",
+              "EditorCaption": ""
             }
           ]
         }

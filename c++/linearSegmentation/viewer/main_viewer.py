@@ -17,11 +17,11 @@ if __name__ == "__main__":
    dataFiles = ["test","BTC-USD","IBatt_Min","PTemp_C_Avg","PTemp_C_Max","V_in_chg_Avg","Vapor_Pressure_Avg","ThermTemp1_Avg","WTemp_C2_Avg","SDI_Temp_1m","WS_ms_Avg","WTemp_C1_Avg","Vapor_Pressure_Avg_2"]
    idFile = 0
    name = dataFiles[idFile]
-   df = pd.read_csv(f"..//..//..//..//data//home//{name}.csv");
+   df = pd.read_csv(f"..//..//..//data//home//{name}.csv");
    y = df[name].values
    x = np.arange(len(y))
 
-   dfSol = pd.read_csv(f"..//{name}_segments.csv")
+   dfSol = pd.read_csv(f"..//..//..//data//home//{name}_segments.csv")
    lstOLS = dfSol.values
    costf = dfSol.columns[-1]
 

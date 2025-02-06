@@ -484,6 +484,39 @@ tuple<int, int, double, double, double> costQRMSEn(int low, int up, vector<doubl
    return { low, up, m, q, costQRMSEn };
 }
 
+// Function to calculate residual sum of squares (RSS)
+double calculateRSS(const std::vector<double>& y, const std::vector<double>& y_pred) 
+{  double rss = 0.0;
+   for (size_t i = 0; i < y.size(); ++i) {
+      rss += (y[i] - y_pred[i]) * (y[i] - y_pred[i]);
+   }
+   return rss;
+}
+
+// cost as AIC
+tuple<int, int, double, double, double> costAIC(int low, int up, vector<double> y) 
+{  int num_params = 2;
+   int i, n;
+   double m, q, r, sumres2 = 0;
+   vector<int> x;
+   vector<double> ypred, residuals;
+
+   n = y.size();
+   for (i = 0; i < n; i++)
+      x.push_back(low + i);
+
+   tie(m, q) = linearRegression(x, y);  // corrisponde a y_pred
+   for (i = 0; i < n; i++)
+   {  ypred.push_back(m * x[i] + q);
+      r = y[i] - ypred[i];
+      residuals.push_back(r);
+      sumres2 += r * r;
+   }
+
+   double aic = n * std::log(sumres2 / n) + 2 * num_params;
+   return { low, up, m, q, aic};
+}
+
 // computes all feasible runs
 vector<tuple<int, int, double, double, double>> computeRuns(int minlag, vector<double> y,int idcost)
 {  int low,up,n,i,cont=0;
@@ -501,14 +534,15 @@ vector<tuple<int, int, double, double, double>> computeRuns(int minlag, vector<d
 
          switch (idcost)
          {
-            case 0 : tup = costR2(low, up, ytup); break;
-            case 1 : tup = costMSE(low, up, ytup); break;
-            case 2 : tup = costChi2(low, up, ytup); break; // low, up, m, q, cost, low and up included
-            case 3 : tup = costSER(low, up, ytup); break;
-            case 4 : tup = costVar(low, up, ytup); break;
-            case 5 : tup = costRMSE(low, up, ytup); break;
-            case 6 : tup = costQRMSE(low, up, ytup); break;
+            case 0 : tup = costR2(low, up, ytup);     break;
+            case 1 : tup = costMSE(low, up, ytup);    break;
+            case 2 : tup = costChi2(low, up, ytup);   break; // low, up, m, q, cost, low and up included
+            case 3 : tup = costSER(low, up, ytup);    break;
+            case 4 : tup = costVar(low, up, ytup);    break;
+            case 5 : tup = costRMSE(low, up, ytup);   break;
+            case 6 : tup = costQRMSE(low, up, ytup);  break;
             case 7 : tup = costQRMSEn(low, up, ytup); break;
+            case 8 : tup = costAIC(low, up, ytup);    break;
             default: cout << "------- ERROR IN computeRuns COST FUNCTION ----------";
          }
          lstOLS.push_back(tup);
@@ -901,7 +935,7 @@ void postProcess(vector<tuple<int, int, double, double, double>>& lstOLS, vector
       i2 = idLine[i+1];
       if(x11>x20)
       {
-         if (x21 - x10 < 2*minlag+1)
+         if ( (x21 - x10 < 2*minlag+1) )
          {  x[11] = 0;
             x[i2] = 0;
             j = getSegmentId(x10, x21, lstOLS);
@@ -914,26 +948,33 @@ void postProcess(vector<tuple<int, int, double, double, double>>& lstOLS, vector
          else // need to redefine endpoints
          {  imin = x10 + minlag; // earliest cutpoint (init 2nd segment)
             imax = x21 - minlag + 1; // latest cutpoint
-            double mincost = DBL_MAX;
-            int    minj = -1;
-            for (j = imin; j < imax; j++)  // try all feasible cutss and keep the best one
-            {  segm1 = getSegmentId(x10, j-1, lstOLS);
-               segm2 = getSegmentId(j, x21, lstOLS);
-               cost = get<4>(lstOLS[segm1]) + get<4>(lstOLS[segm2]);
-               if (cost < mincost)
-               {  mincost = cost;
-                  minj    = j;
+            if(imin<=imax) 
+            {
+               double mincost = DBL_MAX;
+               int    minj = -1;
+               for (j = imin; j < imax; j++)  // try all feasible cutss and keep the best one
+               {  segm1 = getSegmentId(x10, j-1, lstOLS);
+                  segm2 = getSegmentId(j, x21, lstOLS);
+                  cost = get<4>(lstOLS[segm1]) + get<4>(lstOLS[segm2]);
+                  if (cost < mincost)
+                  {  mincost = cost;
+                     minj    = j;
+                  }
                }
+               segm1 = getSegmentId(x10, minj-1, lstOLS);
+               segm2 = getSegmentId(minj, x21, lstOLS);
+               x[i1] = 0;
+               x[i2] = 0;
+               x[segm1] = 1;
+               x[segm2] = 1;
+               idLine[i]   = segm1;
+               idLine[i+1] = segm2;
+               cout << "-- overlapping segments " << i1 << " and " << i2 << " substituted by " << segm1 << " and " << segm2 << endl;
             }
-            segm1 = getSegmentId(x10, minj-1, lstOLS);
-            segm2 = getSegmentId(minj, x21, lstOLS);
-            x[i1] = 0;
-            x[i2] = 0;
-            x[segm1] = 1;
-            x[segm2] = 1;
-            idLine[i]   = segm1;
-            idLine[i+1] = segm2;
-            cout << "-- overlapping segments " << i1 << " and " << i2 << " substituted by " << segm1 << " and " << segm2 << endl;
+            else
+            {  // imin<<=>imax
+               
+            }
          }
       }
    }
@@ -941,7 +982,7 @@ void postProcess(vector<tuple<int, int, double, double, double>>& lstOLS, vector
    idLine.erase(std::remove(idLine.begin(), idLine.end(), -1), idLine.end());
 }
 
-// gets the segment id given its andpoint coords. Sequential, can be improved
+// gets the segment id given its endpoint coords. Sequential, can be improved
 int getSegmentId(int x0, int x1, vector<tuple<int, int, double, double, double>> lstOLS)
 {  int j,n;
 
@@ -1027,9 +1068,9 @@ void compressTableau(vector<tuple<int, int, double, double, double>> lstOLS)
 }
 
 // datafile etc.
-void readConfig()
+int readConfig()
 {
-   int i, j;
+   int i, j, idcost;
    string line;
 
    //cout << "Running from " << exePath() << endl;
@@ -1044,12 +1085,14 @@ void readConfig()
    dsName  = JSV["dsName"].ToString();
    maxIter = JSV["maxIter"].ToInt();
    maxTime = JSV["maxTime"].ToInt();
+   idcost  = JSV["idcost"].ToInt();
    cout << baseDir << endl;
    cout << dsName << endl;
+   return idcost;
 }
 
 int main(int argc, char** argv)
-{  bool     fLagrangian = true;
+{  bool     fLagrangian = false;
    int      solstat, n_brk=-1;
    double   objval=-1, tCpuOpt, cost = 0;
 
@@ -1067,15 +1110,14 @@ int main(int argc, char** argv)
    clock_t       tstart, truns, tMIP;
 
    std::cout << std::fixed; // prevent scientific notation output
-   readConfig();
+   idcost = readConfig();   // cost function:  R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC
 
    double alpha = 0.05;
    string dataFile = baseDir + dsName + ".csv";
    string segmentFileName = baseDir + dsName + "_runs.csv";
 
-   idcost = 6; // cost function:  R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn
    string costFunc;
-   ofstream dsFile(dsName + "_segments.csv");
+   ofstream dsFile(baseDir + dsName + "_segments.csv");
    vector<int> ids;
    vector<double> y;
    vector<tuple<int, int, double, double, double>> lstOLS;
@@ -1096,6 +1138,7 @@ int main(int argc, char** argv)
       case 5: costFunc = "costRMSE"; break;
       case 6: costFunc = "costQRMSE"; break;
       case 7: costFunc = "costQRMSEn"; break;
+      case 8: costFunc = "costAIC"; break;
       default: cout << "ERROR 1" << endl;
    }
    n = lstOLS.size();
