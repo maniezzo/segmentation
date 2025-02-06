@@ -1,0 +1,4 @@
+G:\My Drive\Ongoing\time series segmentation\code\c++\linearSegmentation\x64\Debug\linearSegmentation.exe
+E:\My Drive\Ongoing\time series segmentation\code\c++\linearSegmentation\x64\Debug\linearSegmentation.exe
+C:\Google Drive\Ongoing\time series segmentation\code\c++\linearSegmentation\x64\Debug\linearSegmentation.exe
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\x64\Debug\linearSegmentation.exe

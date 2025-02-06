@@ -1,0 +1,56 @@
+﻿  linearSegmentation.cpp
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(58,17): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(55,1): warning C4102: 'l0': unreferenced label
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(32,8): warning C4101: 'i': unreferenced local variable
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(80,19): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(81,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(143,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(165,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(197,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(222,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(248,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(288,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(322,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(355,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(379,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(403,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(433,10): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(434,10): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(487,10): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(488,10): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(549,10): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(589,21): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(676,19): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(861,19): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\tuple(143,47): warning C4244: 'initializing': conversion from 'double' to '_Ty', possible loss of data
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\tuple(143,47): warning C4244:         with
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\tuple(143,47): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\tuple(143,47): warning C4244:             _Ty=int
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\tuple(143,47): warning C4244:         ]
+  (compiling source file 'linearSegmentation.cpp')
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\tuple(143,47):
+  the template instantiation context (the oldest one first) is
+  	C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(913,19):
+  	see reference to function template instantiation 'std::tuple<int,int,double,double,double>::tuple<double&,int&,double&,double&,double&,0>(_This2,int &,double &,double &,double &) noexcept' being compiled
+          with
+          [
+              _This2=double &
+          ]
+  		C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\linearSegmentation.cpp(913,17):
+  		see the first reference to 'std::tuple<int,int,double,double,double>::tuple' in 'postProcess'
+  	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\tuple(361,16):
+  	see reference to function template instantiation 'std::tuple<int,int,double,double,double>::tuple<std::_Exact_args_t,double&,int&,double&,double&,double&,0>(_Tag,_This2,int &,double &,double &,double &)' being compiled
+          with
+          [
+              _Tag=std::_Exact_args_t,
+              _This2=double &
+          ]
+  	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\tuple(315,102):
+  	see reference to function template instantiation 'std::_Tuple_val<_This>::_Tuple_val<double&>(_Other)' being compiled
+          with
+          [
+              _This=int,
+              _Other=double &
+          ]
+  
+  linearSegmentation.vcxproj -> C:\AAAToBackup\ricerche\Predictive Analytics\time series segmentation\code\c++\linearSegmentation\x64\Debug\linearSegmentation.exe

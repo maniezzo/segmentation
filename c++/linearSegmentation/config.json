@@ -1,0 +1,6 @@
+{
+	"basedir" : "..\\..\\..\\data\\",
+	"dsName"  : "M6\\GBPUSD",
+	"maxIter" : 500,
+	"maxTime" : 300
+}
