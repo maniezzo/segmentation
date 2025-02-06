@@ -514,6 +514,10 @@ tuple<int, int, double, double, double> costAIC(int low, int up, vector<double> 
    }
 
    double aic = n * std::log(sumres2 / n) + 2 * num_params;
+
+   // here it becomes AICc
+   if(n<40)
+      aic = aic + (2*num_params*num_params+2*num_params)/(n-num_params+1);
    return { low, up, m, q, aic};
 }
 
@@ -935,6 +939,13 @@ void postProcess(vector<tuple<int, int, double, double, double>>& lstOLS, vector
       i2 = idLine[i+1];
       if(x11>x20)
       {
+         if(x11>=x21)
+         {  // i contiene completamente i+1. La si copia su i+1
+            cout << "-- overlapping segments " << idLine[i] << " and " << idLine[i+1] << " keeping " << idLine[i] << endl;
+            idLine[i+1] = idLine[i];
+            idLine[i]   = -1;
+            continue;
+         }
          if ( (x21 - x10 < 2*minlag+1) )
          {  x[11] = 0;
             x[i2] = 0;
@@ -973,13 +984,17 @@ void postProcess(vector<tuple<int, int, double, double, double>>& lstOLS, vector
             }
             else
             {  // imin<<=>imax
-               
+               cout << "unmanaged case"<<endl;
             }
          }
       }
    }
    // removing the -1
    idLine.erase(std::remove(idLine.begin(), idLine.end(), -1), idLine.end());
+   for (i = 0; i < n; i++)
+      x[i] = 0;
+   for (i=0;i<idLine.size();i++)
+      x[idLine[i]] = 1.0; // segment is in the solution
 }
 
 // gets the segment id given its endpoint coords. Sequential, can be improved

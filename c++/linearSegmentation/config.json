@@ -1,7 +1,7 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "home\\test",
+	"dsName"  : "home\\PTemp_C_Max",
 	"maxIter" : 500,
 	"maxTime" : 300,
-   "idcost"  : 8,    "commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC"
+    "idcost"  : 8,    "commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC"
 }

@@ -6,6 +6,7 @@ import chow_test
 git clone https://github.com/jtloong/chow-test.git
 cd chow-test
 pip install .
+remove chow-test directory
 In your Python code you can import it as:
 import chow_test
 The function has four parameters, and be used to find either the f-value or p-value of your Chow test.
@@ -15,7 +16,7 @@ chow_test.p_value(y1, x1, y2, x2)
 '''
 if __name__ == "__main__":
    dataFiles = ["test","BTC-USD","IBatt_Min","PTemp_C_Avg","PTemp_C_Max","V_in_chg_Avg","Vapor_Pressure_Avg","ThermTemp1_Avg","WTemp_C2_Avg","SDI_Temp_1m","WS_ms_Avg","WTemp_C1_Avg","Vapor_Pressure_Avg_2"]
-   idFile = 0
+   idFile = 4
    name = dataFiles[idFile]
    df = pd.read_csv(f"..//..//..//data//home//{name}.csv");
    y = df[name].values
