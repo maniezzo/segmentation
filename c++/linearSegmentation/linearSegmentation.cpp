@@ -1,4 +1,4 @@
-#include "linearSegmentation.h"
+﻿#include "linearSegmentation.h"
 #include "json.h"
 
 
@@ -493,7 +493,7 @@ double calculateRSS(const std::vector<double>& y, const std::vector<double>& y_p
    return rss;
 }
 
-// cost as AIC
+// cost as AIC, akaike information criterion
 tuple<int, int, double, double, double> costAIC(int low, int up, vector<double> y) 
 {  int num_params = 2;
    int i, n;
@@ -519,6 +519,39 @@ tuple<int, int, double, double, double> costAIC(int low, int up, vector<double> 
    if(n<40)
       aic = aic + (2*num_params*num_params+2*num_params)/(n-num_params+1);
    return { low, up, m, q, aic};
+}
+
+// cost as BIC, bayesian information criterion
+tuple<int, int, double, double, double> costBIC(int low, int up, vector<double> y) 
+{  int num_params = 2;
+   int i, n;
+   double m, q, r, sumres2 = 0;
+   vector<int> x;
+   vector<double> ypred, residuals;
+
+   n = y.size();
+   for (i = 0; i < n; i++)
+      x.push_back(low + i);
+
+   tie(m, q) = linearRegression(x, y);  // corrisponde a y_pred
+   for (i = 0; i < n; i++)
+   {  ypred.push_back(m * x[i] + q);
+      r = y[i] - ypred[i];
+      residuals.push_back(r);
+      sumres2 += r * r;
+   }
+
+   // Assuming Gaussian noise model: log-likelihood is proportional to -n/2 * log(RSS/n)
+   double logLikelihood = -0.5 * n * log(sumres2 / n);
+
+   // BIC formula, BIC = k*ln(n) - 2*ln(L)
+   double bic = num_params * log(n) - 2 * logLikelihood;
+
+   // here it becomes BICc
+   if(n<40)
+      bic = bic + num_params*(num_params+1)/(n-num_params-1);
+
+   return { low, up, m, q, bic};
 }
 
 // computes all feasible runs
@@ -547,6 +580,7 @@ vector<tuple<int, int, double, double, double>> computeRuns(int minlag, vector<d
             case 6 : tup = costQRMSE(low, up, ytup);  break;
             case 7 : tup = costQRMSEn(low, up, ytup); break;
             case 8 : tup = costAIC(low, up, ytup);    break;
+            case 9 : tup = costBIC(low, up, ytup);    break;
             default: cout << "------- ERROR IN computeRuns COST FUNCTION ----------";
          }
          lstOLS.push_back(tup);
@@ -1154,6 +1188,7 @@ int main(int argc, char** argv)
       case 6: costFunc = "costQRMSE"; break;
       case 7: costFunc = "costQRMSEn"; break;
       case 8: costFunc = "costAIC"; break;
+      case 9: costFunc = "costBIC"; break;
       default: cout << "ERROR 1" << endl;
    }
    n = lstOLS.size();

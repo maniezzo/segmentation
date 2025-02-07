@@ -32,7 +32,7 @@
               "RelativeDocumentMoniker": "linearSegmentation.cpp",
               "ToolTip": "C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.cpp",
               "RelativeToolTip": "linearSegmentation.cpp",
-              "ViewState": "AgIAAPgBAAAAAAAAAAAqwAcCAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADECAAAAAAAAAAAkwEoCAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-02-07T14:59:11.033Z",
               "EditorCaption": ""
@@ -45,9 +45,10 @@
               "RelativeDocumentMoniker": "linearSegmentation.h",
               "ToolTip": "C:\\git\\segmentation\\c\u002B\u002B\\linearSegmentation\\linearSegmentation.h",
               "RelativeToolTip": "linearSegmentation.h",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAACUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAACUAAABTAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-05-09T11:10:44.442Z"
+              "WhenOpened": "2024-05-09T11:10:44.442Z",
+              "EditorCaption": ""
             }
           ]
         }

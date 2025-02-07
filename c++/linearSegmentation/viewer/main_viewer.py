@@ -15,6 +15,9 @@ or
 chow_test.p_value(y1, x1, y2, x2)
 '''
 if __name__ == "__main__":
+   plt.ion()  # Turn on interactive mode
+   #mpl.use('Qt5Agg')
+   print(mpl.get_backend())
    dataFiles = ["test","BTC-USD","IBatt_Min","PTemp_C_Avg","PTemp_C_Max","V_in_chg_Avg","Vapor_Pressure_Avg","ThermTemp1_Avg","WTemp_C2_Avg","SDI_Temp_1m","WS_ms_Avg","WTemp_C1_Avg","Vapor_Pressure_Avg_2"]
    idFile = 4
    name = dataFiles[idFile]

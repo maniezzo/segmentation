@@ -35,3 +35,4 @@ void sortBasedOnAnother(std::vector<int>& v1, std::vector<int>& v2);
 bool checkFeas(vector<int> sol, vector<tuple<int, int, double, double, double>> lstOLS, double expCost);
 double calculateRSS(const std::vector<double>& y, const std::vector<double>& y_pred);
 tuple<int, int, double, double, double> costAIC(int low, int up, vector<double> y);
+tuple<int, int, double, double, double> costBIC(int low, int up, vector<double> y);
