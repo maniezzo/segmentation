@@ -1,0 +1,56 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: mathematicsMain.aux
+Reallocating 'name_of_file' (item size: 1) to 17 items.
+The style file: Definitions/mdpi.bst
+Reallocating 'name_of_file' (item size: 1) to 20 items.
+Database file #1: mathematicsMain.bib
+Warning--I didn't find a database entry for "ref-journal"
+Warning--I didn't find a database entry for "ref-book1"
+Warning--I didn't find a database entry for "ref-book2"
+Warning--I didn't find a database entry for "ref-unpublish"
+Warning--I didn't find a database entry for "ref-url"
+Warning--I didn't find a database entry for "ref-proceeding"
+Warning--I didn't find a database entry for "ref-thesis"
+You've used 8 entries,
+            2887 wiz_defined-function locations,
+            625 strings with 5408 characters,
+and the built_in function-call counts, 3273 in all, are:
+= -- 305
+> -- 181
+< -- 4
++ -- 80
+- -- 47
+* -- 260
+:= -- 495
+add.period$ -- 28
+call.type$ -- 8
+change.case$ -- 8
+chr.to.int$ -- 8
+cite$ -- 9
+duplicate$ -- 152
+empty$ -- 272
+format.name$ -- 64
+if$ -- 717
+int.to.chr$ -- 1
+int.to.str$ -- 8
+missing$ -- 7
+newline$ -- 46
+num.names$ -- 23
+pop$ -- 86
+preamble$ -- 0
+purify$ -- 8
+quote$ -- 0
+skip$ -- 96
+stack$ -- 0
+substring$ -- 130
+swap$ -- 37
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 53
+warning$ -- 0
+while$ -- 26
+width$ -- 0
+write$ -- 111
+(There were 7 warnings)
