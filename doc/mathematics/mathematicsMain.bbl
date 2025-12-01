@@ -1,0 +1,53 @@
+\begin{thebibliography}{999}
+
+\bibitem[Lovri{\'c} et~al.(2014)Lovri{\'c}, Milanovi{\'c}, and
+  Stamenkovi{\'c}]{LMS14}
+Lovri{\'c}, M.; Milanovi{\'c}, M.; Stamenkovi{\'c}, M.
+\newblock Algorithmic Methods for Segmentation of Time Series: An Overview.
+\newblock {\em Journal of Contemporary Economic and Business Issues} {\bf
+  2014}, {\em 1},~31--53.
+
+\bibitem[Aminikhanghahi and Cook(2017)]{AC17}
+Aminikhanghahi, S.; Cook, D.J.
+\newblock A Survey of Methods for Time Series Change Point Detection.
+\newblock {\em Knowledge and Information Systems} {\bf 2017}, {\em
+  51},~339--367.
+\newblock {\url{https://doi.org/10.1007/s10115-016-0987-z}}.
+
+\bibitem[Truong et~al.(2020)Truong, Oudre, and Vayatis]{TOV20}
+Truong, C.; Oudre, L.; Vayatis, N.
+\newblock Selective Review of Offline Change Point Detection Methods.
+\newblock {\em Signal Processing} {\bf 2020}, {\em 167},~107299.
+\newblock {\url{https://doi.org/10.1016/j.sigpro.2019.107299}}.
+
+\bibitem[Keogh et~al.(2002)Keogh, Chu, Hart, and Pazzani]{KCHP02}
+Keogh, E.J.; Chu, S.; Hart, D.M.; Pazzani, M.J.
+\newblock Segmenting Time Series: A Survey and Novel Approach.
+\newblock \url{https://api.semanticscholar.org/CorpusID:8365617},  2002.
+\newblock Accessed 2025-12-01.
+
+\bibitem[Fischetti et~al.(2009)Fischetti, Lodi, and Salvagnin]{FLS09}
+Fischetti, M.; Lodi, A.; Salvagnin, D.
+\newblock Just {MIP} It! In {\em Matheuristics}; Maniezzo, V.; St{\"u}tzle, T.;
+  Vo{\ss}, S., Eds.; Springer,  2009; Vol.~10, {\em Annals of Information
+  Systems}, pp. 1--20.
+
+\bibitem[Maniezzo et~al.(2021)Maniezzo, Boschetti, and St{\"u}tzle]{the_book}
+Maniezzo, V.; Boschetti, M.A.; St{\"u}tzle, T.
+\newblock {\em Matheuristics: Algorithms and Implementations}; EURO Advanced
+  Tutorials on Operations Research, Springer,  2021.
+\newblock {\url{https://doi.org/10.1007/978-3-030-64219-4}}.
+
+\bibitem[sma()]{smartlagoon}
+The Smartlagoon Project.
+\newblock \url{https://www.smartlagoon.eu/}.
+\newblock Accessed December 2023.
+
+\bibitem[Keogh et~al.(2001)Keogh, Chu, Hart, and Pazzani]{KCHP01}
+Keogh, E.J.; Chu, S.; Hart, D.M.; Pazzani, M.J.
+\newblock An Online Algorithm for Segmenting Time Series.
+\newblock In Proceedings of the Proceedings of the 2001 IEEE International
+  Conference on Data Mining, San Jose, CA, USA,  2001; pp. 289--296.
+\newblock {\url{https://doi.org/10.1109/ICDM.2001.989541}}.
+
+\end{thebibliography}
