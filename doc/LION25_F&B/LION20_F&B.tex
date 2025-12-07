@@ -6,7 +6,8 @@
 \usepackage{amsmath}         % for matrices in equations
 \usepackage{bm}              % bold greeks
 \usepackage{xfrac}           % slanted fractions
-\usepackage[algo2e,linesnumbered,ruled]{algorithm2e}
+%\usepackage{algorithm} % <-- needed for standard algorithm float
+\usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage [autostyle, english = american]{csquotes} % left and right opening quotes with "
 \MakeOuterQuote{"}
 
@@ -140,8 +141,7 @@ Beam Search \cite{B08}
             set $E^k = E^k\cup X$;\tcp*[f]{node expanded}
          }
 
-         \tcp*[f]{extract the subset $L^t_k \in T_k$}\\
-         \ForEach{node $X \in T_k$}{
+         \ForEach(\tcp*[f]{extract the subset $L^t_k \in T_k$}){node $X \in T_k$}{
             \uIf{$\left|T_k\right| \leq \delta$}{
                set $L^t_k = T_k$;
             }
@@ -152,8 +152,8 @@ Beam Search \cite{B08}
 
          \lIf{$ntNodes > maxtnodes$}{\bf break} \label{FaB:algo:goto}
       }
-      \If(\tcp*[f]{best sol. not improved for two iterations}){$noimpr = 2$}{
-         $\textbf{stop}$\;
+      \lIf(\tcp*[f]{sol. not improved for two iterations}){$noimpr = 2$}{
+         $\textbf{stop}$
       }
 
    }
