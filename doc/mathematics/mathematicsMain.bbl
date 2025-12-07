@@ -26,6 +26,14 @@ Keogh, E.J.; Chu, S.; Hart, D.M.; Pazzani, M.J.
 \newblock \url{https://api.semanticscholar.org/CorpusID:8365617},  2002.
 \newblock Accessed 2025-12-01.
 
+\bibitem[Prokhorov et~al.(2025)Prokhorov, Radchenko, Semenov, and
+  Skrobotov]{PRSS25}
+Prokhorov, A.; Radchenko, P.; Semenov, A.; Skrobotov, A.
+\newblock Change-Point Detection in Time Series Using Mixed Integer Programming
+  {\bf 2025}.
+\newblock  \href{http://arxiv.org/abs/2408.05665}{{\normalfont
+  [arXiv:econ.EM/2408.05665]}}.
+
 \bibitem[Fischetti et~al.(2009)Fischetti, Lodi, and Salvagnin]{FLS09}
 Fischetti, M.; Lodi, A.; Salvagnin, D.
 \newblock Just {MIP} It! In {\em Matheuristics}; Maniezzo, V.; St{\"u}tzle, T.;

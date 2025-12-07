@@ -1,0 +1,20 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{BMM08}
+Bartolini, E., Maniezzo, V., Mingozzi, A.: An adaptive memory-based approach
+  based on partial enumeration. In: Maniezzo, V., Battiti, R., Watson, J.P.
+  (eds.) LION 2, LNCS 5313, pp. 12--24. Springer (2008)
+
+\bibitem{B08}
+Blum, C.: Beam-{ACO} for simple assembly line balancing. {INFORMS} Journal on
+  Computing  \textbf{20}(4),  618--627 (2008)
+
+\bibitem{the_book}
+Maniezzo, V., Boschetti, M.A., St{\"u}tzle, T.: Matheuristics: Algorithms and
+  Implementations. EURO Advanced Tutorials on Operations Research, Springer
+  (2021). \doi{10.1007/978-3-030-64219-4}
+
+\end{thebibliography}

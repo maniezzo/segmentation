@@ -1,0 +1,173 @@
+\documentclass[runningheads]{llncs}
+%
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{amsfonts,amssymb}
+\usepackage{amsmath}         % for matrices in equations
+\usepackage{bm}              % bold greeks
+\usepackage{xfrac}           % slanted fractions
+\usepackage[algo2e,linesnumbered,ruled]{algorithm2e}
+\usepackage [autostyle, english = american]{csquotes} % left and right opening quotes with "
+\MakeOuterQuote{"}
+
+
+% all the following for multiline commands in algorithm2e
+\newcommand{\nosemic}{\SetEndCharOfAlgoLine{\relax}}% Drop semi-colon ;
+\newcommand{\dosemic}{\SetEndCharOfAlgoLine{\string;}}% Reinstate
+\newcommand{\pushline}{\Indp}% Indent
+\newcommand{\popline}{\Indm\dosemic}% Undent
+\newcommand{\mb}[1]{\text{\boldmath$#1$}}
+\newcommand{\gb}[1]{\!\!\text{\boldmath$#1$}\!\!}
+
+\allowdisplaybreaks
+\raggedbottom
+
+%
+\begin{document}
+%
+\title{Fore-and-Back for Changepoint Analysis}
+%
+%\titlerunning{F&B for changepoint anaysis}
+\author{Vittorio Maniezzo\inst{1}\orcidID{0000-0002-1220-1235}}
+%
+\authorrunning{V. Maniezzo}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{University of Bologna, Cesena, Italy
+\email{vittorio.maniezzo@unibo.it}\\
+\url{https://www.unibo.it/sitoweb/vittorio.maniezzo/en}}
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+The abstract should briefly summarize the contents of the paper in
+150--250 words.
+
+\keywords{Changepoint analysis \and matheuristics \and Fore-and-Back.}
+\end{abstract}
+%
+%
+%
+\section{Introduction}	\label{sec:introducion}
+Please note that the first paragraph of a section or subsection is
+not indented. The first paragraph that follows a table, figure,
+equation etc. does not need an indent, either.
+
+Subsequent paragraphs, however, are indented.
+
+\subsubsection{Sample Heading (Third Level)} Only two levels of
+headings should be numbered. Lower level headings remain unnumbered;
+they are formatted as run-in headings.
+
+\paragraph{Sample Heading (Fourth Level)}
+The contribution should contain no more than four levels of
+headings. Table~\ref{tab1} gives a summary of all heading levels.
+
+\begin{table}
+\caption{Table captions should be placed above the
+tables.}\label{tab1}
+\begin{tabular}{|l|l|l|}
+\hline
+Heading level &  Example & Font size and style\\
+\hline
+Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
+1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
+2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
+3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
+4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
+\hline
+\end{tabular}
+\end{table}
+
+
+Please try to avoid rasterized images for line-art diagrams and
+schemas. Whenever possible, use vector graphics instead (see
+Fig.~\ref{fig1}).
+
+\begin{figure}
+\includegraphics[width=\textwidth]{fig1.eps}
+\caption{A figure caption is always placed below the illustration.
+Please note that short captions are centered, while long ones are
+justified by the macro package automatically.} \label{fig1}
+\end{figure}
+
+For citations of references, we prefer the use of square brackets
+and consecutive numbers. Citations using labels or the author/year
+convention are also acceptable.
+
+\section{Changepoint analysis} 	\label{sec:changepoints}
+Letteratura etc. \cite{the_book}
+
+\section{Fore-and-Back for changepoint analysis}	\label{sec:forenback}
+Fore-and-back \cite{BMM08,the_book} is an extension of {\em Beam Search} (BS) that can improve its effectiveness. Fore-and-Back, when run with no limits on computational resources, becomes an exact solution method. However, by design, it is mainly concerned with heuristic solving, trying to quickly get high quality solutions with little attention paid to optimality proofs.
+
+A significant characteristic of this method is that, despite being a primal only method, it is able to compute bounds to the cost of completing partial solutions, therefore to discard partial solutions from expansion and ultimately to reduce the search space.
+
+Beam Search \cite{B08}
+
+\begin{algorithm}
+   \SetKwInOut{Input}{Input}
+   \SetKwInOut{Output}{Output}
+   \SetKw{KwGoTo}{go to}
+
+   \underline{function Fore-and-Back($\delta$, $maxn$, $maxtnodes$)}\;
+   \Input{$\delta$, beam width, $maxn$, max total num of nodes, $maxtnodes$, max num of nodes per tree}
+   \Output{A feasible solution ${\bf x^*}$ of value $z_{best}$}
+
+   initialize $t=0$, $noimpr = 0$, $nNodes=0$, $z_{best}=\infty$\label{FaB:algo:init}\;
+   \While(\tcp*[f]{Alternate forward and backward trees}){$nNodes \leq maxn$}{
+      $t=t+1$; $noimpr = noimpr+1$;\
+
+      let $L^t_0 = L_{n+1}^t = \{ \emptyset \}$, $ntNodes$=0\label{FaB:algo:outer_loop}\;
+      \ForEach{level $h=1,...,n$}{ \label{FaB:algo:forhloop}
+         set $T_h=\{\emptyset\}$;
+         \tcp*[f]{generate the node set $T_h$}\\
+         \eIf{$t$ is odd}
+         {set $k=h$; $k1=h-1$;}
+         {set $k=n-h+1$; $k1=n-h+2$;}
+
+         \ForEach{node $X \in L^t_{k-1}$}{
+            \ForEach{component $s \in S_k$}{
+               let $X' = X \cup \{ s \}$\;
+               \If{$X'$ meets conditions $i)$ and $ii)$}{
+                  set $T_k = T_k \cup X'$\;
+                  $ntNodes = ntNodes+1$;\\
+                  $nNodes = nNodes+1$;\\
+                  \If(\tcp*[f]{feasible solution}){$h = n$ and $c(X') < z_{best}$}{set $z_{best} = c(X')$, $noimpr = 0$ and ${\bf x^*} = X'$;}
+               }
+            }
+            set $E^k = E^k\cup X$;\tcp*[f]{node expanded}
+         }
+
+         \tcp*[f]{extract the subset $L^t_k \in T_k$}\\
+         \ForEach{node $X \in T_k$}{
+            \uIf{$\left|T_k\right| \leq \delta$}{
+               set $L^t_k = T_k$;
+            }
+            \Else{
+               let $L^t_k$ contain only the $\delta$ least cost partial solutions of $T_k$\;
+            }
+         }
+
+         \lIf{$ntNodes > maxtnodes$}{\bf break} \label{FaB:algo:goto}
+      }
+      \If(\tcp*[f]{best sol. not improved for two iterations}){$noimpr = 2$}{
+         $\textbf{stop}$\;
+      }
+
+   }
+   \caption{Algorithm Fore-and-Back}
+   \label{FaB:peudocode}
+\end{algorithm}
+
+\section{Computational results}		\label{sec:computational}
+Computational results
+
+\section{Conclusions}		\label{sec:conclusions}
+The conlusions
+
+
+\bibliographystyle{splncs04}
+\bibliography{LION20_F&B}
+\end{document}

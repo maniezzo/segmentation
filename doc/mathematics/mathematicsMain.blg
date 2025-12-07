@@ -5,52 +5,46 @@ Reallocating 'name_of_file' (item size: 1) to 17 items.
 The style file: Definitions/mdpi.bst
 Reallocating 'name_of_file' (item size: 1) to 20 items.
 Database file #1: mathematicsMain.bib
-Warning--I didn't find a database entry for "ref-journal"
-Warning--I didn't find a database entry for "ref-book1"
-Warning--I didn't find a database entry for "ref-book2"
-Warning--I didn't find a database entry for "ref-unpublish"
-Warning--I didn't find a database entry for "ref-url"
-Warning--I didn't find a database entry for "ref-proceeding"
-Warning--I didn't find a database entry for "ref-thesis"
-You've used 8 entries,
+Warning--empty journal in PRSS25
+You've used 9 entries,
             2887 wiz_defined-function locations,
-            625 strings with 5408 characters,
-and the built_in function-call counts, 3273 in all, are:
-= -- 305
-> -- 181
+            627 strings with 5551 characters,
+and the built_in function-call counts, 3650 in all, are:
+= -- 332
+> -- 211
 < -- 4
-+ -- 80
-- -- 47
-* -- 260
-:= -- 495
-add.period$ -- 28
-call.type$ -- 8
-change.case$ -- 8
-chr.to.int$ -- 8
-cite$ -- 9
-duplicate$ -- 152
-empty$ -- 272
-format.name$ -- 64
-if$ -- 717
++ -- 93
+- -- 55
+* -- 302
+:= -- 553
+add.period$ -- 31
+call.type$ -- 9
+change.case$ -- 9
+chr.to.int$ -- 9
+cite$ -- 11
+duplicate$ -- 170
+empty$ -- 299
+format.name$ -- 74
+if$ -- 792
 int.to.chr$ -- 1
-int.to.str$ -- 8
-missing$ -- 7
-newline$ -- 46
-num.names$ -- 23
-pop$ -- 86
+int.to.str$ -- 9
+missing$ -- 8
+newline$ -- 51
+num.names$ -- 26
+pop$ -- 100
 preamble$ -- 0
-purify$ -- 8
+purify$ -- 9
 quote$ -- 0
-skip$ -- 96
+skip$ -- 107
 stack$ -- 0
-substring$ -- 130
-swap$ -- 37
+substring$ -- 132
+swap$ -- 39
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 53
-warning$ -- 0
-while$ -- 26
+type$ -- 60
+warning$ -- 1
+while$ -- 28
 width$ -- 0
-write$ -- 111
-(There were 7 warnings)
+write$ -- 122
+(There was 1 warning)
