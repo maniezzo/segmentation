@@ -513,7 +513,7 @@ tuple<int, int, double, double, double> costAIC(int low, int up, vector<double> 
       sumres2 += r * r;
    }
 
-   double aic = n * std::log(sumres2 / n) + 2 * num_params;
+   double aic = n * log(sumres2 / n) + 2 * num_params;
 
    // here it becomes AICc
    if(n<40)
