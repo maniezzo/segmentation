@@ -114,7 +114,7 @@ void bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges)
                    " tot " << totc << endl;
       nedges++;
    }
-   cout << "F&B (nbrk) "<< dsName << " cost: " << std::setprecision(5) << totc << " n_brk " << nedges-1 << " t.cpu " << ttot << endl;
+   cout << "F&B (Bellman-Ford) "<< dsName << " cost: " << std::setprecision(5) << totc << " n_brk " << nedges-1 << " t.cpu " << ttot << endl;
 }
 
 int run_BF(vector<tuple<int, int, double, double, double>> lstOLS, int maxNumEdges)
