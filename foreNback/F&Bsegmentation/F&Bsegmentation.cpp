@@ -10,15 +10,122 @@ int main()
 
    std::cout << std::fixed;
    readConfig();
+   zub = DBL_MAX;
 
    int idDataSet = 0;
    string dataFile        = baseDir + dsName + ".csv";
    string segmentFileName = baseDir + dsName + "_runs.csv";
+   vector<int> X;
+   n = readData(dataFile,X,Y);
+   FminHeaps.resize(n);
+   FminHeaps[0].push({0, 0, 0.0f, 0});
+   BminHeaps.resize(n);
+   BminHeaps[n-1].push({0, 0, 0.0f, 0});
    readSegments(segmentFileName,lstOLS);
    if(get<0>(lstOLS[0]) != 0) cout << ">>>> ERROR <<<< dataseries not starting at t=0. Disposable results." << endl;
 
    DAG_SSSP(lstOLS);
    run_BF(lstOLS, maxNumEdges);
+   forward();
+   backward();
+}
+
+// forward pass
+void forward()
+{  int i,j,t,k;
+   Node seed;
+   double lb;  // lower bound to completion
+
+   for(i=0;i<n;i++)
+   {  for(k=0;k<delta;k++)
+      {  if(FminHeaps[i].empty())
+            continue;
+         seed = FminHeaps[i].top();
+         FminHeaps[i].pop();   // removes after assigning
+
+         if(i==n-1 || BminHeaps[i+1].empty())
+            lb = 0;
+         else
+            lb = BminHeaps[i+1].top().cost;
+
+         if(seed.cost + lb >= zub)
+         {  nFathomed++;
+            continue;
+         }
+
+         if(seed.nSegm < maxNumEdges)
+            for(t=seed.t2+minLength;t<n;t++)
+               generateFoffspring(seed.t2,t,seed.nSegm,seed.cost);
+      }
+   }
+   return;
+}
+
+// backward pass
+void backward()
+{  int i,j,t,k;
+   Node seed;
+   double lb;  // lower bound to completion
+
+   for (i=n-1;i<<n>=0;i--)
+   {  for(k=0;k<delta;k++)
+      {  if(BminHeaps[i].empty())
+            continue;
+         seed = BminHeaps[i].top();
+         BminHeaps[i].pop();   // removes after assigning
+
+         if(i==1 || FminHeaps[i-1].empty())
+            lb = 0;
+         else
+            lb = FminHeaps[i-1].top().cost;
+
+         if(seed.cost + lb >= zub)
+         {  nFathomed++;
+            continue;
+         }
+
+         if(seed.nSegm < maxNumEdges)
+            for (t=seed.t2-minLength;t>=0;t--)
+               generateBoffspring(seed.t2,t,seed.nSegm,seed.cost);
+      }
+   }
+   return;
+}
+
+// forward offspring generation
+void generateFoffspring(int t1, int t2, int nSegm, double cost)
+{  int i;
+   double c,m,q,z;
+
+   tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
+   z = cost+get<4>(res);
+   if (t2==(n-1) && z<zub)
+   {  zub = z;
+      cout << "F) New zub: "<< zub << endl;
+   }
+   Node nd = {t1,t2,z,nSegm+1};
+   FminHeaps[t2].push(nd);
+   //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm << endl;
+
+   return;
+}
+
+// backward offspring generation
+void generateBoffspring(int t2, int t1, int nSegm, double cost)
+{  int i;
+   double c,m,q,z;
+
+   tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
+   z = cost+get<4>(res);
+   if (t2==(n-1) && z<zub)
+   {  zub = z;
+      cout << "B) New zub: "<< zub << endl;
+   }
+   Node nd = {t2,t1,z,nSegm+1};
+   BminHeaps[t2].push(nd);
+   //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm << endl;
+
+   return;
 }
 
 // single source on a DAG
@@ -117,6 +224,7 @@ void bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges)
    cout << "F&B (Bellman-Ford) "<< dsName << " cost: " << std::setprecision(5) << totc << " n_brk " << nedges-1 << " t.cpu " << ttot << endl;
 }
 
+// imposta poi lancia bellman fors
 int run_BF(vector<tuple<int, int, double, double, double>> lstOLS, int maxNumEdges)
 {  int i;
    int numEdges = lstOLS.size();
@@ -178,6 +286,111 @@ void reconstructBF(vector<double> costs, vector<Edge>& edges, int numv, int maxN
 
 }
 
+// cost as quasi RMSE
+tuple<int, int, double, double, double> costQRMSE(int t1, int t2)
+{  int i, n;
+   double m, q, r, sumres2 = 0, sumchi = 0;
+   vector<int> x;
+   vector<double> y;
+   vector<double> ypred, residuals;
+
+   n = t2-t1;
+   for (i = t1; i < t2; i++)
+   {  x.push_back(i);
+      y.push_back(Y[i]);
+   }
+
+   tie(m, q) = linearRegression(x, y);
+   for (i = 0; i < n; i++)
+   {
+      ypred.push_back(m * x[i] + q);
+      r = y[i] - ypred[i];
+      residuals.push_back(r);
+      sumres2 += r * r;
+   }
+   double costQRMSE = sumres2 / sqrt(n);
+   return { t1, t2, m, q, costQRMSE };
+}
+
+// OLS line through vector of points
+tuple<double, double> linearRegression(vector<int> x, vector<double> y)
+{
+   int n, i;
+   double sum_x = 0, sum_x2 = 0, sum_y = 0, sum_xy = 0, m, q;
+
+   n = x.size();
+
+   for (i = 0; i < n; i++)
+   {
+      sum_x  = sum_x + x[i];
+      sum_x2 = sum_x2 + x[i] * x[i];
+      sum_y  = sum_y + y[i];
+      sum_xy = sum_xy + x[i] * y[i];
+   }
+
+   m = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x * sum_x);
+   q = (sum_y - m * sum_x) / n;
+
+   return { m,q };
+}
+
+// datafile etc.
+void readConfig()
+{  int i,j;
+   string line;
+
+   cout << "Running from " << exePath() << endl;
+
+   ifstream fconf("config.json");
+   stringstream buffer;
+   buffer << fconf.rdbuf();
+   line = buffer.str();
+   json::Value JSV = json::Deserialize(line);
+
+   baseDir   = JSV["basedir"].ToString();
+   dsName    = JSV["dsName"].ToString();
+   maxNumEdges = JSV["maxNumEdges"];
+   delta     = JSV["delta"];
+   minLength = JSV["minLength"];
+   cout << baseDir << endl;
+   cout << dsName << endl;
+}
+
+// legge l'istanza
+int readData(string dataFileName, vector<int>& X, vector<double>& Y)
+{
+   int i, cont, id;
+   double d;
+   string line;
+   vector<string> elem;
+
+   // leggo i punti
+   ifstream f;
+   string dataSetFile = dataFileName;
+   cout << "Opening datafile " << dataSetFile << endl;
+   f.open(dataSetFile);
+   if (f.is_open())
+   {
+      getline(f, line);  // headers
+      cout << line << endl;
+      elem = split(line, ',');
+
+      while (getline(f, line))
+      {  cont = 0;
+         elem = split(line, ',');
+         id   = stoi(elem[0]);
+         X.push_back(id);
+         d    = stod(elem[1]);
+         Y.push_back(d); // i valori della serie
+l0:      cont++;
+      }
+      f.close();
+      n = Y.size();  // number of input records
+   }
+   else cout << "Cannot open dataset input file\n";
+   return n;
+}
+
 // legge i segmenti precalcolati
 void readSegments(string segmentFileName, vector<tuple<int, int, double, double, double>> & lstOLS)
 {  int i,j,n=0,cont=0;
@@ -217,6 +430,17 @@ void readSegments(string segmentFileName, vector<tuple<int, int, double, double,
    else cout << "Cannot open segment input file\n";
 }
 
+// trova il path del direttorio da cui si e' lanciato l'eseguibile
+string exePath()
+{
+   wchar_t buffer[MAX_PATH];
+   GetModuleFileName(NULL, buffer, MAX_PATH);
+   wstring ws(buffer);
+   string s = string(ws.begin(), ws.end());
+   string::size_type pos = s.find_last_of("\\/");
+   return s.substr(0, pos);
+}
+
 // split di una stringa in un array di elementi delimitati da separatori
 vector<string> split(string str, char sep)
 {
@@ -228,116 +452,4 @@ vector<string> split(string str, char sep)
       tokens.push_back(str.substr(start, end - start));
    }
    return tokens;
-}
-
-int readData(string dataFileName, vector<int>& X, vector<double>& Y)
-{
-   int i, cont, id, n = 0;
-   double d;
-   string line;
-   vector<string> elem;
-
-   // leggo i punti
-   ifstream f;
-   string dataSetFile = dataFileName;
-   cout << "Opening datafile " << dataSetFile << endl;
-   f.open(dataSetFile);
-   if (f.is_open())
-   {
-      getline(f, line);  // headers
-      cout << line << endl;
-      elem = split(line, ',');
-
-      while (getline(f, line))
-      {
-         cont = 0;
-         elem = split(line, ',');
-         id = stoi(elem[0]);
-         X.push_back(id);
-         d = stod(elem[1]);
-         Y.push_back(d);
-      l0:      cont++;
-      }
-      f.close();
-      n = Y.size();  // number of input records
-   }
-   else cout << "Cannot open dataset input file\n";
-   return n;
-}
-
-// cost as quasi RMSE
-tuple<int, int, double, double, double> costQRMSE(int low, int up, vector<double> y)
-{
-   int i, n;
-   double m, q, r, sumres2 = 0, sumchi = 0;
-   vector<int> x;
-   vector<double> ypred, residuals;
-
-   n = y.size();
-   for (i = 0; i < n; i++)
-      x.push_back(low + i);
-
-   tie(m, q) = linearRegression(x, y);
-   for (i = 0; i < n; i++)
-   {
-      ypred.push_back(m * x[i] + q);
-      r = y[i] - ypred[i];
-      residuals.push_back(r);
-      sumres2 += r * r;
-   }
-   double costQRMSE = sumres2 / sqrt(n);
-   return { low, up, m, q, costQRMSE };
-}
-
-// OLS line through vector of points
-tuple<double, double> linearRegression(vector<int> x, vector<double> y)
-{
-   int n, i;
-   double sum_x = 0, sum_x2 = 0, sum_y = 0, sum_xy = 0, m, q;
-
-   n = x.size();
-
-   for (i = 0; i < n; i++)
-   {
-      sum_x = sum_x + x[i];
-      sum_x2 = sum_x2 + x[i] * x[i];
-      sum_y = sum_y + y[i];
-      sum_xy = sum_xy + x[i] * y[i];
-   }
-
-   m = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x * sum_x);
-   q = (sum_y - m * sum_x) / n;
-
-   return { m,q };
-}
-
-// datafile etc.
-void readConfig()
-{  int i,j;
-   string line;
-
-   cout << "Running from " << exePath() << endl;
-
-   ifstream fconf("config.json");
-   stringstream buffer;
-   buffer << fconf.rdbuf();
-   line = buffer.str();
-   json::Value JSV = json::Deserialize(line);
-
-   baseDir = JSV["basedir"].ToString();
-   dsName  = JSV["dsName"].ToString();
-   maxNumEdges = JSV["maxNumEdges"];
-   cout << baseDir << endl;
-   cout << dsName << endl;
-}
-
-// trova il path del direttorio da cui si e' lanciato l'eseguibile
-string exePath()
-{
-   wchar_t buffer[MAX_PATH];
-   GetModuleFileName(NULL, buffer, MAX_PATH);
-   wstring ws(buffer);
-   string s = string(ws.begin(), ws.end());
-   string::size_type pos = s.find_last_of("\\/");
-   return s.substr(0, pos);
 }
