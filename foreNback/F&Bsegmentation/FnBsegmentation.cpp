@@ -26,22 +26,15 @@ void FnBsegmentation::run_FnB()
 // forward pass
 void FnBsegmentation::forward()
 {  int i,j,t,k;
-   NodeST seed;
-   double lb;  // lower bound to completion
+   Stage seed;
+   double z,lb;  // lower bound to completion
 
    for(i=0;i<n;i++)
    {  for(k=0;k<delta;k++)
-      {  if(Fstage[i].empty())
-            continue;
-         seed = Fstage[i].top();
-         Fstage[i].pop();   // removes after assigning
+      {  z  = Fstage[i].queryMinCost(0).second;
+         lb = Bstage[i].queryMinCost(0).second;
 
-         if(i==n-1 || Bstage[i+1].empty())
-            lb = 0;
-         else
-            lb = BminHeaps[i+1].top().cost;
-
-         if(seed.cost + lb >= zub)
+         if(z + lb >= zub)
          {  nFathomed++;
             continue;
          }

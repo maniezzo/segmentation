@@ -8,56 +8,101 @@ On insertion, update prefix minimums.
 On query, use upper_bound(threshold) to find the largest num <= threshold and return its prefix minimum.
 */
 
-void Stage::insert(int num, int cost) 
-{  auto it = data.lower_bound(num);
+// Insert a new (num, cost) pair
+void Stage::insert(int num, double cost) {
+   auto it = data.lower_bound(num);
 
-   if (it != data.end() && it->first == num) 
-   {  // If same num exists, keep the smaller cost
-      if (cost < it->second.first) 
+   if (it != data.end() && it->first == num) {
+      if (cost < it->second.first)
          it->second.first = cost;
-      else 
-         return; // No update needed
-   } 
-   else // Insert new entry with temporary prefix min
-      it = data.insert(it, {num, {cost, cost}});
+      else
+         return;
+   } else {
+      it = data.insert(it, {num, {cost, {cost, num}}});
+   }
 
-   // Update prefix minimums from this point onwards
-   int prevMin = (it==data.begin()) ? (std::numeric_limits<int>::max)()
-      : std::prev(it)->second.second;
-   it->second.second = (std::min)(prevMin, it->second.first);
+   double prevMinCost = (it==data.begin()) ? std::numeric_limits<double>::infinity()
+      : std::prev(it)->second.second.first;
+   int prevMinNum = (it==data.begin()) ? -1
+      : std::prev(it)->second.second.second;
 
-   // Propagate updates forward if needed
+   if (it->second.first < prevMinCost) {
+      it->second.second = {it->second.first, num};
+   } else {
+      it->second.second = {prevMinCost, prevMinNum};
+   }
+
    auto nextIt = std::next(it);
-   while (nextIt!=data.end()&&nextIt->second.second>(std::min)(it->second.second, nextIt->second.first)) 
-   {  nextIt->second.second = (std::min)(it->second.second, nextIt->second.first);
+   while (nextIt != data.end() &&
+      nextIt->second.second.first>(std::min)(it->second.second.first, nextIt->second.first)) {
+      if (nextIt->second.first < it->second.second.first)
+         nextIt->second.second = {nextIt->second.first, nextIt->first};
+      else
+         nextIt->second.second = it->second.second;
       ++nextIt;
    }
 }
 
-int  Stage::queryMinCost(int threshold) 
-   const {
-      auto it = data.upper_bound(threshold);
-      if (it == data.begin()) 
-         return -1; // No num <= threshold
+// Query the minimum cost and its num for all entries <= threshold
+std::pair<int,double> Stage::queryMinCost(double threshold) const {
+   auto it = data.upper_bound(threshold);
+   if (it == data.begin())
+      return {-1, -1}; // No num <= threshold
 
-      --it; // Largest num <= threshold
-      return it->second.second;
+   --it;
+   return it->second.second; // returns {minCost, minNum}
+}
+
+// pop the least cost element, retrieves its data and erases it
+std::pair<int,double> Stage::popMinCost(double threshold) 
+{
+   auto it = data.upper_bound(threshold);
+   if (it == data.begin())
+      return {-1, -1}; // No num <= threshold
+
+   --it;
+   // This is the prefix minimum info at this point
+   int minNum   = it->second.second.second;
+   double minCost = it->second.second.first;
+
+   // Find the actual entry with key = minNum
+   auto targetIt = data.find(minNum);
+   if (targetIt == data.end())
+      return {-1, -1}; // Shouldn't happen
+
+   // Save result
+   std::pair<int,double> result{minNum, targetIt->second.first};
+
+   // Erase the element
+   data.erase(targetIt);
+
+   // Recompute prefix minima from scratch (simpler, safe)
+   double runningMin = std::numeric_limits<double>::infinity();
+   int runningNum = -1;
+   for (auto &kv : data) {
+      if (kv.second.first < runningMin) {
+         runningMin = kv.second.first;
+         runningNum = kv.first;
+      }
+      kv.second.second = {runningMin, runningNum};
    }
 
-void Stage::mainNode() 
-{
-   Stage store;
-   store.insert(10, 50);
-   store.insert(5, 70);
-   store.insert(3, 40);
-   store.insert(8, 60);
-   store.insert(5, 30); // Updates cost for num=5
-   store.insert(5, 20); // Updates cost for num=5
-   store.insert(5, 10); // Updates cost for num=5
+   return result;
+}
 
-   std::cout << "Min cost with num <= 4: " << store.queryMinCost(4) << "\n";  // 40
-   std::cout << "Min cost with num <= 5: " << store.queryMinCost(5) << "\n";  // 30
-   std::cout << "Min cost with num <= 9: " << store.queryMinCost(9) << "\n";  // 30
-   std::cout << "Min cost with num <= 10: " << store.queryMinCost(10) << "\n"; // 30
-   std::cout << "Min cost with num <= 2: " << store.queryMinCost(2) << "\n";  // -1
+void Stage::mainNode() 
+{  Stage s;
+
+   // Insert some test data
+   s.insert(5, 10);
+   s.insert(8, 7);
+   s.insert(12, 15);
+   s.insert(3, 20);
+   s.insert(10, 5);
+
+   // Query with different thresholds
+   auto varb = s.queryMinCost(12);
+   std::cout << "Threshold 12 -> minNum=" << varb.first << ", minCost=" << varb.second << "\n";
+
+   return;
 }
