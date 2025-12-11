@@ -1,7 +1,7 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "M3\\N1883",
-	"maxNumEdges" : 25,
-	"minLength"   :  5, "minLengthComment": "minimal segment length",
+	"dsName"  : "home\\test",
+	"maxNumEdges" : 7,
+	"minLength"   : 5, "minLengthComment": "minimal segment length",
 	"delta"   : 3, "deltaComment": "width of the beam"
 }

@@ -3,6 +3,13 @@
 
 void FnBsegmentation::run_FnB()
 {  int i;
+
+   // optimal solution with no constraint on the number of arcs (but with minLength)
+   DAG_SSSP();
+
+   // optimal solution with one constraint on the number of arcs and with minLength
+   run_BF();
+
    Stage N;
    N.mainNode();
    Fstage.resize(n);
@@ -101,43 +108,110 @@ void FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost)
 }
 
 // single source on a DAG
-void FnBsegmentation::DAG_SSSP(vector<tuple<int, int, double, double, double>> lstOLS)
-{  int i,j,n,t,currInit,maxt,maxstart;
+void FnBsegmentation::DAG_SSSP()
+{  int i,j,t,currInit,maxt,maxstart;
    double c;
-   vector<int> initSegm;   // indice in lstOLS inizio indici segmenti con inizio al tempo i
-   vector<int> sol;
+   tuple<int, int, double, double, double> tup;
+   vector<tuple<int, int, double, double, double>> lstOLS; // t1,t2,m,q,cost of the segment
+   vector<tuple<int, int, double, double, double>> sol;
 
-   n = lstOLS.size();
-   currInit = -1;
-   tstart = clock();
+   maxt     = n;
+   maxstart = maxt - minLength;
+   lstOLS.resize(maxt+1);
+   tstart   = clock();
 
-   for (i = 0; i < n; i++)
-      if(get<0>(lstOLS[i]) > currInit)
-      {  initSegm.push_back(i);
-         currInit = get<0>(lstOLS[i]);
-      }
-
-   initSegm.push_back(i);
-   maxt = get<1>(lstOLS[n-1]);
-
-   vector<double> mincost(maxt+1,DBL_MAX);  // min cost for covering up to time t
-   vector<int> minsegm(maxt+1,-1); // id last segment producing cost mincost[t]
-   maxstart = get<0>(lstOLS[n-1]);
+   lstOLS[0] = tuple<int, int, double, double, double>(0,0,0,0,0);
+   vector<double> mincost(maxt+1,DBL_MAX); // min cost for covering up to time t
+   mincost[0] = 0;
 
    for (t=0;t<=maxstart;t++)
-      for(i=initSegm[t];i<initSegm[t+1];i++)
-      {  j = get<1>(lstOLS[i]);
-         c = (t>0 ? mincost[t-1] : 0) + get<4>(lstOLS[i]);
-         if (mincost[j] > c)
-         {  mincost[j] = c;
-            minsegm[j] = i;
+   {  for(j=t+minLength;j<maxt+1;j++)
+      {  if(t>0 && t<minLength) continue;
+         tup = costQRMSE(t,j);  // cosi' segmenti attaccati, se staccati da t a j-1
+         if (mincost[j] == DBL_MAX || mincost[j] > mincost[t] + get<4>(tup));
+         {  mincost[j] = mincost[t] + get<4>(tup);
+            lstOLS[j] = tup;
          }
       }
+   }
    tend = clock();
    ttot = (tend - tstart) / CLOCKS_PER_SEC;
 
-   sol = reconstructSolution(lstOLS,minsegm,maxt);
+   sol = reconstructSolution(lstOLS,maxt);
+   writeSolCsv(sol,"test_sol.csv");
    cout << "F&B (DAG) " << dsName << " cost: " << std::setprecision(5) << mincost[maxt] << " n_brk " << sol.size()-1 << " t.cpu " << ttot << endl;
+}
+
+int FnBsegmentation::writeSolCsv(vector<tuple<int, int, double, double, double>> lstOLS, string fileName) 
+{  int i;
+   ofstream outFile(fileName); // Open file for writing
+
+   if (!outFile) {
+      cout << "Error opening file!" << endl;
+      return 1;
+   }
+
+   outFile << "t1,t2,m,q,cost" << endl;
+   for (i=0;i<lstOLS.size();i++) 
+   {
+      outFile << get<0>(lstOLS[i]) << "," << 
+                 get<1>(lstOLS[i]) << "," << 
+                 get<2>(lstOLS[i]) << "," << 
+                 get<3>(lstOLS[i]) <<"," << 
+                 get<4>(lstOLS[i]) << endl;
+   }
+
+   outFile.close(); // Close the file
+   cout << "Solution written to " << fileName << endl;
+   return 0;
+}
+
+// ricostruisce la soluzione DAG
+vector<tuple<int, int, double, double, double>> FnBsegmentation::reconstructSolution(vector<tuple<int, int, double, double, double>> lstOLS, int maxt)
+{  int i,j,t;
+   double sum = 0;
+   vector<tuple<int, int, double, double, double>> sol;
+
+   t = maxt;
+   while(t>0)
+   {  i    = get<0>(lstOLS[t]);  // inizio segmento ottimo che arriva in t
+      sum += get<4>(lstOLS[t]);  // costo integrale
+      sol.push_back(lstOLS[t]);
+      cout << "Segm " << t << ") t1=" << get<0>(lstOLS[t]) << " t2= " << get<1>(lstOLS[t]) << 
+         " m= " << get<2>(lstOLS[t]) << " q= " << get<3>(lstOLS[t]) <<" costo " << get<4>(lstOLS[t]) <<endl;
+      t = i;
+   }
+   cout << "Costo complessivo " << sum << endl;
+   return sol;
+}
+
+// imposta poi lancia bellman fors
+int FnBsegmentation::run_BF()
+{  int cont;
+   int numEdges = 0;
+   int numv     = n; // partono da 0
+   vector<Edge> edges;
+   vector<tuple<int, int, double, double, double>> lstOLS;
+
+   cout << "For each edge:" << endl;
+   cont=0;
+   for (int t1 = 0; t1 < n-minLength; ++t1) 
+   {  if(t1>0 && t1<minLength) continue;
+      for (int t2 = t1+minLength; t2 < n; ++t2) 
+      {  if(t2<n-1 && t2 > n-minLength) continue;
+         Edge edge;
+         edge.end1 = t1;
+         edge.end2 = t2;
+         lstOLS.push_back(costQRMSE(t1,t2));
+         edge.cost = get<4>(lstOLS[cont]);
+         edge.segm = cont++;
+         edges.push_back(edge);
+      }
+   }
+
+   bellmanFord(edges, numv, maxNumEdges);
+
+   return 0;
 }
 
 // Bellman-Ford algorithm with bounded number of edges
@@ -164,13 +238,14 @@ void FnBsegmentation::bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges
          w = edges[j].cost;
 
          du = 0;
-         if(u>0) du = cost0[u-1]; // il nuovo segm parte 1 dopo la fine del precedente
+         if(u>0) du = cost0[u]; // il nuovo segm parte subito dopo la fine del precedente
+         //if(u>0) du = cost0[u-1]; // il nuovo segm parte 1 dopo la fine del precedente
          if (cost0[u] != DBL_MAX && (du + w) < cost1[v])
          {  cost1[v] = du + w;
             prev[v] = u;
             minsegm[v]  = edges[j].segm;
-            paths1[v] = (u==0 ? paths0[u] : paths0[u-1]);
-            paths1[v].push_back(j);
+            paths1[v] = (u==0 ? paths0[u] : paths0[u]);
+            paths1[v].push_back(j); // l'arco percorso per arrivare
          }
       }
       cost0 = cost1; // cost1 will be the cost0 at next iteration
@@ -194,47 +269,6 @@ void FnBsegmentation::bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges
       nedges++;
    }
    cout << "F&B (Bellman-Ford) "<< dsName << " cost: " << std::setprecision(5) << totc << " n_brk " << nedges-1 << " t.cpu " << ttot << endl;
-}
-
-// imposta poi lancia bellman fors
-int FnBsegmentation::run_BF(vector<tuple<int, int, double, double, double>> lstOLS, int maxNumEdges)
-{  int i;
-   int numEdges = lstOLS.size();
-   int numv = get<1>(lstOLS[numEdges-1])+1; // partono da 0
-   vector<Edge> edges;
-
-   cout << "For each edge:" << endl;
-   for (int i = 0; i < numEdges; ++i) {
-      Edge edge;
-      edge.end1 = get<0>(lstOLS[i]);
-      edge.end2 = get<1>(lstOLS[i]);
-      edge.segm = i;
-      edge.cost = get<4>(lstOLS[i]);
-      edges.push_back(edge);
-   }
-
-   bellmanFord(edges, numv, maxNumEdges);
-
-   return 0;
-}
-
-// ricostruisce la soluzione DAG
-vector<int> FnBsegmentation::reconstructSolution(vector<tuple<int, int, double, double, double>> lstOLS, vector<int> minsegm, int maxt)
-{  int i,j,t;
-   double sum = 0;
-   vector<int> sol;
-
-   t = maxt;
-   while(t>0)
-   {  i = minsegm[t];
-      sum += get<4>(lstOLS[i]);  // costo integrale
-      sol.push_back(i);
-      cout << "Segmento " << i << " " << get<0>(lstOLS[i]) << "-" << get<1>(lstOLS[i]) << " costo " << get<4>(lstOLS[i]) << endl;
-      j = get<1>(lstOLS[i]) - get<0>(lstOLS[i]) +1;
-      t -= j;
-   }
-   cout << "Costo complessivo " << sum << endl;
-   return sol;
 }
 
 // OUTDATED, UNUSED - ricostrusce la soluzione di bellman ford, DFS all'arovescia dalla fine
@@ -293,9 +327,9 @@ tuple<double, double> FnBsegmentation::linearRegression(vector<int> x, vector<do
 
    for (i = 0; i < n; i++)
    {
-      sum_x  = sum_x + x[i];
+      sum_x  = sum_x  + x[i];
       sum_x2 = sum_x2 + x[i] * x[i];
-      sum_y  = sum_y + y[i];
+      sum_y  = sum_y  + y[i];
       sum_xy = sum_xy + x[i] * y[i];
    }
 
