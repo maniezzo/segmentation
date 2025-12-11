@@ -9,18 +9,8 @@ private:
 
    struct Edge { int end1, end2, segm; double cost; }; // an edge in bellman ford
 
-   struct NodeST      // an old node of the search tree
-   {  int t1, t2;   // initial, final time point
-      double cost;  // segment cumulative cost   (current included)
-      int nSegm;    // number of segments so far (current included)
-
-      // For min-heap based on cost
-      bool operator>(const NodeST& pNode) const 
-      {  return cost>pNode.cost;
-      }
-   };
-
-   vector<Stage> Fstage, Bstage; // expansion stages
+   vector<Stage> Fstage, Bstage; // expansion stages, unexpanded nodes
+   vector<Stage> Fexpanded, Bexpanded; // expanded nodes
 
 
    void generateFoffspring(int t1, int t2, int nSegm, double cost);

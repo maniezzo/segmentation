@@ -9,8 +9,11 @@ private:
    std::map<int, std::pair<double, std::pair<double,int>>> data;
 
 public:
+   bool isEmpty() const {
+      return data.empty();
+   }
    void insert(int num, double cost);
-   std::pair<int,double> queryMinCost(double threshold) const;
-   std::pair<int,double> popMinCost(double threshold);
+   std::pair<double,int> queryMinCost(double threshold) const;
+   std::pair<double,int> popMinCost(double threshold);
    void mainNode();
 };

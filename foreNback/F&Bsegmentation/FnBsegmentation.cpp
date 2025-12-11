@@ -6,9 +6,11 @@ void FnBsegmentation::run_FnB()
    Stage N;
    N.mainNode();
    Fstage.resize(n);
-   for(i=1;i<n;i++) Fstage[i].insert(0, DBL_MAX);
+   Fexpanded.resize(n);
+   //for(i=1;i<n;i++) Fstage[i].insert(0, DBL_MAX);
    Fstage[0].insert(0, 0);
    Bstage.resize(n);
+   Bexpanded.resize(n);
    for(i=0;i<n-1;i++) Bstage[i].insert(0, DBL_MAX);
    Bstage[n-1].insert(0, 0);
 
@@ -25,23 +27,38 @@ void FnBsegmentation::run_FnB()
 
 // forward pass
 void FnBsegmentation::forward()
-{  int i,j,t,k;
+{  int i,j,t,k,nSegm;
    Stage seed;
    double z,lb;  // lower bound to completion
 
    for(i=0;i<n;i++)
-   {  for(k=0;k<delta;k++)
-      {  z  = Fstage[i].queryMinCost(0).second;
-         lb = Bstage[i].queryMinCost(0).second;
+   {  
+      if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength
+      for(k=0;k<delta;k++)
+      {  nSegm = Fstage[i].queryMinCost(maxNumEdges).second;  // num of segments up to stage i
+         z     = Fstage[i].queryMinCost(maxNumEdges).first;   // cost up to stage i
+
+         if(Fstage[i].isEmpty())
+            continue;
+         // remove from unexpanded and add to expanded
+         Fexpanded[i].insert(nSegm, z);
+         auto res = Fstage[i].popMinCost(maxNumEdges);
+         if (res.first!=z||res.second!=nSegm)
+            cout << ">>>> ERROR <<<< popping from Fstage inconsistent." << endl;
+
+         if (i<(n-minLength))
+            lb = Bstage[i+1].queryMinCost(0).second;
+         else
+            lb = 0;
 
          if(z + lb >= zub)
          {  nFathomed++;
             continue;
          }
 
-         if(seed.nSegm < maxNumEdges)
-            for(t=seed.t2+minLength;t<n;t++)
-               generateFoffspring(seed.t2,t,seed.nSegm,seed.cost);
+         if(nSegm < maxNumEdges)
+            for(t=i+minLength;t<n;t++)
+               generateFoffspring(i,t,nSegm,z);
       }
    }
    return;
@@ -50,31 +67,7 @@ void FnBsegmentation::forward()
 // backward pass
 void FnBsegmentation::backward()
 {  int i,j,t,k;
-   NodeST seed;
-   double lb;  // lower bound to completion
-
-   for (i=n-1;i<<n>=0;i--)
-   {  for(k=0;k<delta;k++)
-      {  if(BminHeaps[i].empty())
-            continue;
-         seed = BminHeaps[i].top();
-         BminHeaps[i].pop();   // removes after assigning
-
-         if(i==1 || FminHeaps[i-1].empty())
-            lb = 0;
-         else
-            lb = FminHeaps[i-1].top().cost;
-
-         if(seed.cost + lb >= zub)
-         {  nFathomed++;
-            continue;
-         }
-
-         if(seed.nSegm < maxNumEdges)
-            for (t=seed.t2-minLength;t>=0;t--)
-               generateBoffspring(seed.t2,t,seed.nSegm,seed.cost);
-      }
-   }
+  
    return;
 }
 
@@ -89,9 +82,9 @@ void FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost)
    {  zub = z;
       cout << "F) New zub: "<< zub << endl;
    }
-   NodeST nd = {t1,t2,z,nSegm+1};
-   Fstage[t2].push(nd);
-   //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm << endl;
+
+   Fstage[t2].insert(nSegm+1, cost+z);
+   //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
 
    return;
 }
@@ -103,14 +96,7 @@ void FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost)
 
    tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
    z = cost+get<4>(res);
-   if (t2==(n-1) && z<zub)
-   {  zub = z;
-      cout << "B) New zub: "<< zub << endl;
-   }
-   NodeST nd = {t2,t1,z,nSegm+1};
-   BminHeaps[t2].push(nd);
-   //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm << endl;
-
+  
    return;
 }
 

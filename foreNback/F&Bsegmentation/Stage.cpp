@@ -8,7 +8,7 @@ On insertion, update prefix minimums.
 On query, use upper_bound(threshold) to find the largest num <= threshold and return its prefix minimum.
 */
 
-// Insert a new (num, cost) pair
+// Insert a new (cost,num) pair
 void Stage::insert(int num, double cost) {
    auto it = data.lower_bound(num);
 
@@ -44,7 +44,7 @@ void Stage::insert(int num, double cost) {
 }
 
 // Query the minimum cost and its num for all entries <= threshold
-std::pair<int,double> Stage::queryMinCost(double threshold) const {
+std::pair<double,int> Stage::queryMinCost(double threshold) const {
    auto it = data.upper_bound(threshold);
    if (it == data.begin())
       return {-1, -1}; // No num <= threshold
@@ -54,7 +54,7 @@ std::pair<int,double> Stage::queryMinCost(double threshold) const {
 }
 
 // pop the least cost element, retrieves its data and erases it
-std::pair<int,double> Stage::popMinCost(double threshold) 
+std::pair<double,int> Stage::popMinCost(double threshold) 
 {
    auto it = data.upper_bound(threshold);
    if (it == data.begin())
@@ -71,12 +71,12 @@ std::pair<int,double> Stage::popMinCost(double threshold)
       return {-1, -1}; // Shouldn't happen
 
    // Save result
-   std::pair<int,double> result{minNum, targetIt->second.first};
+   std::pair<double,int> result{targetIt->second.first,minNum};
 
    // Erase the element
    data.erase(targetIt);
 
-   // Recompute prefix minima from scratch (simpler, safe)
+   // Recompute prefix minima from scratch
    double runningMin = std::numeric_limits<double>::infinity();
    int runningNum = -1;
    for (auto &kv : data) {
