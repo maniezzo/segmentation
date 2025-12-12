@@ -2,7 +2,6 @@ import numpy as np, pandas as pd
 import matplotlib.pyplot as plt
 
 def plotSol(dfsol,dfdata):
-   
    fig = plt.figure(figsize=(10,8))
    plt.plot(dfdata.iloc[:,1],marker='o',linewidth=0,color='red')
    for _, row in dfsol.iterrows():

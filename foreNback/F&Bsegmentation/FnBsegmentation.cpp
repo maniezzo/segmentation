@@ -1,8 +1,10 @@
 #include "FnBsegmentation.h"
 #include "Stage.h"
 
+// n number of points, maxt maximum time (=n-1)
 void FnBsegmentation::run_FnB()
 {  int i;
+   bool isImprovedF = true, isImprovedB = true;;
 
    // optimal solution with no constraint on the number of arcs (but with minLength)
    DAG_SSSP();
@@ -14,34 +16,28 @@ void FnBsegmentation::run_FnB()
    N.mainNode();
    Fstage.resize(n);
    Fexpanded.resize(n);
-   //for(i=1;i<n;i++) Fstage[i].insert(0, DBL_MAX);
    Fstage[0].insert(0, 0);
    Bstage.resize(n);
    Bexpanded.resize(n);
-   for(i=0;i<n-1;i++) Bstage[i].insert(0, DBL_MAX);
    Bstage[n-1].insert(0, 0);
 
-   forward();
-   //backward();
-   /*
-   readSegments(segmentFileName,lstOLS);
-   if(get<0>(lstOLS[0]) != 0) cout << ">>>> ERROR <<<< dataseries not starting at t=0. Disposable results." << endl;
-
-   DAG_SSSP(lstOLS);
-   run_BF(lstOLS, maxNumEdges);
-   */
+   while(isImprovedF || isImprovedB)
+   {  isImprovedF = forward();
+      isImprovedB = backward();
+   }
 }
 
 // forward pass
-void FnBsegmentation::forward()
+bool FnBsegmentation::forward()
 {  int i,j,t,k,nSegm;
    Stage seed;
    double z,lb;  // lower bound to completion
+   bool isImproved = false;
 
    for(i=0;i<n;i++)
-   {  
-      if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength
-      for(k=0;k<delta;k++)
+   {  if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength
+
+      for(k=0;k<delta;k++) // beam width
       {  nSegm = Fstage[i].queryMinCost(maxNumEdges).second;  // num of segments up to stage i
          z     = Fstage[i].queryMinCost(maxNumEdges).first;   // cost up to stage i
 
@@ -54,7 +50,7 @@ void FnBsegmentation::forward()
             cout << ">>>> ERROR <<<< popping from Fstage inconsistent." << endl;
 
          if (i<(n-minLength))
-            lb = Bstage[i+1].queryMinCost(0).second;
+            lb = Bstage[i+1].queryMinCost(maxNumEdges).first;
          else
             lb = 0;
 
@@ -65,49 +61,128 @@ void FnBsegmentation::forward()
 
          if(nSegm < maxNumEdges)
             for(t=i+minLength;t<n;t++)
-               generateFoffspring(i,t,nSegm,z);
+               isImproved = generateFoffspring(i,t,nSegm,z);
       }
    }
-   return;
+   return isImproved;
 }
 
 // backward pass
-void FnBsegmentation::backward()
-{  int i,j,t,k;
-  
-   return;
+bool FnBsegmentation::backward()
+{  int i,j,t,k,nSegm;
+   Stage seed;
+   double z,lb;  // lower bound to completion
+   bool isImproved = false;
+
+   int maxt = n-1;
+   for(i=maxt;i>=0;i--)
+   {  if (i<maxt && (maxt-i)<minLength) continue;  // non ho segmenti più corti di minLength
+
+      for(k=0;k<delta;k++) // beam width
+      {  nSegm = Bstage[i].queryMinCost(maxNumEdges).second;  // num of segments up to stage i
+         z     = Bstage[i].queryMinCost(maxNumEdges).first;   // cost up to stage i
+
+         if(Bstage[i].isEmpty())
+            continue;
+         // remove from unexpanded and add to expanded
+         Bexpanded[i].insert(nSegm, z);
+         auto res = Bstage[i].popMinCost(maxNumEdges);
+         if (res.first!=z||res.second!=nSegm)
+            cout << ">>>> ERROR <<<< popping from Fstage inconsistent." << endl;
+
+         if (i>minLength)
+            lb = Fstage[i-1].queryMinCost(maxNumEdges).first;
+         else
+            lb = 0;
+
+         if(z + lb >= zub)
+         {  nFathomed++;
+            continue;
+         }
+
+         if(nSegm < maxNumEdges)
+            for (t=i-minLength;t>=0;t--)
+               isImproved = generateBoffspring(i,t,nSegm,z); // backward, t<i
+      }
+   }
+   return isImproved;
 }
 
 // forward offspring generation
-void FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost)
+bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost)
 {  int i;
    double c,m,q,z;
+   bool isImproved = false;
 
    tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
    z = cost+get<4>(res);
    if (t2==(n-1) && z<zub)
    {  zub = z;
       cout << "F) New zub: "<< zub << endl;
+      isImproved = true;
    }
 
-   Fstage[t2].insert(nSegm+1, cost+z);
+   if(cost+z < zub)
+      Fstage[t2].insert(nSegm+1, cost+z);
+   else
+      nFathomed++;
    //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
 
-   return;
+   return isImproved;
 }
 
 // backward offspring generation
-void FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost)
+bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost)
 {  int i;
    double c,m,q,z;
+   bool isImproved = false;
 
    tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
    z = cost+get<4>(res);
-  
-   return;
+   if (t1==0 && z<zub)
+   {  zub = z;
+      cout << "B) New zub: "<< zub << endl;
+      isImproved = true;
+   }
+
+   if(cost+z < zub)
+      Bstage[t1].insert(nSegm+1, cost+z);
+   else
+      nFathomed++;
+   //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
+
+   return isImproved;
 }
 
-// single source on a DAG
+// matches the current partial solution against one from the opposite direction
+bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
+{  double lb; // cost of completion
+   bool hasMatch = false;
+
+   if (isForward)
+   {  lb = Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm).first;
+      if(lb==0) goto l0; // no feasible expansion
+      hasMatch = true;
+      if(z + lb < zub)
+      {  // new incumbent
+         zub = z + lb;
+         cout << "F) New zub: "<< zub << endl;
+      }
+   }
+   else
+   {  lb = Fexpanded[i-1].queryMinCost(maxNumEdges-numSegm).first;
+      if(lb==0) goto l0; // no feasible expansion
+      hasMatch = true;
+      if(z + lb < zub)
+      {  // new incumbent
+         zub = z + lb;
+         cout << "B) New zub: "<< zub << endl;
+      }
+   }
+l0:return hasMatch;
+}
+
+// single source on a DAG. n number of points, maxt maximum time (=n-1)
 void FnBsegmentation::DAG_SSSP()
 {  int i,j,t,currInit,maxt,maxstart;
    double c;
@@ -115,22 +190,23 @@ void FnBsegmentation::DAG_SSSP()
    vector<tuple<int, int, double, double, double>> lstOLS; // t1,t2,m,q,cost of the segment
    vector<tuple<int, int, double, double, double>> sol;
 
-   maxt     = n;
+   maxt     = n-1;
    maxstart = maxt - minLength;
-   lstOLS.resize(maxt+1);
+   lstOLS.resize(n);
    tstart   = clock();
 
    lstOLS[0] = tuple<int, int, double, double, double>(0,0,0,0,0);
-   vector<double> mincost(maxt+1,DBL_MAX); // min cost for covering up to time t
+   vector<double> mincost(n,DBL_MAX); // min cost for covering up to time t
    mincost[0] = 0;
 
    for (t=0;t<=maxstart;t++)
-   {  for(j=t+minLength;j<maxt+1;j++)
+   {  for(j=t+minLength;j<=maxt;j++)
       {  if(t>0 && t<minLength) continue;
          tup = costQRMSE(t,j);  // cosi' segmenti attaccati, se staccati da t a j-1
-         if (mincost[j] == DBL_MAX || mincost[j] > mincost[t] + get<4>(tup));
-         {  mincost[j] = mincost[t] + get<4>(tup);
-            lstOLS[j] = tup;
+         c   = get<4>(tup);
+         if (mincost[j]==DBL_MAX || mincost[j]>(mincost[t]+c))
+         {  mincost[j] = mincost[t] + c;
+            lstOLS[j]  = tup;
          }
       }
    }
@@ -140,30 +216,6 @@ void FnBsegmentation::DAG_SSSP()
    sol = reconstructSolution(lstOLS,maxt);
    writeSolCsv(sol,"test_sol.csv");
    cout << "F&B (DAG) " << dsName << " cost: " << std::setprecision(5) << mincost[maxt] << " n_brk " << sol.size()-1 << " t.cpu " << ttot << endl;
-}
-
-int FnBsegmentation::writeSolCsv(vector<tuple<int, int, double, double, double>> lstOLS, string fileName) 
-{  int i;
-   ofstream outFile(fileName); // Open file for writing
-
-   if (!outFile) {
-      cout << "Error opening file!" << endl;
-      return 1;
-   }
-
-   outFile << "t1,t2,m,q,cost" << endl;
-   for (i=0;i<lstOLS.size();i++) 
-   {
-      outFile << get<0>(lstOLS[i]) << "," << 
-                 get<1>(lstOLS[i]) << "," << 
-                 get<2>(lstOLS[i]) << "," << 
-                 get<3>(lstOLS[i]) <<"," << 
-                 get<4>(lstOLS[i]) << endl;
-   }
-
-   outFile.close(); // Close the file
-   cout << "Solution written to " << fileName << endl;
-   return 0;
 }
 
 // ricostruisce la soluzione DAG
@@ -185,13 +237,14 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::reconstructSolu
    return sol;
 }
 
-// imposta poi lancia bellman fors
+// imposta poi lancia bellman ford. n number of points, maxt maximum time (=n-1)
 int FnBsegmentation::run_BF()
 {  int cont;
    int numEdges = 0;
    int numv     = n; // partono da 0
    vector<Edge> edges;
    vector<tuple<int, int, double, double, double>> lstOLS;
+   vector<tuple<int, int, double, double, double>> sol;
 
    cout << "For each edge:" << endl;
    cont=0;
@@ -209,13 +262,13 @@ int FnBsegmentation::run_BF()
       }
    }
 
-   bellmanFord(edges, numv, maxNumEdges);
-
+   sol = bellmanFord(edges, numv, maxNumEdges);
+   writeSolCsv(sol, "test_sol.csv");
    return 0;
 }
 
 // Bellman-Ford algorithm with bounded number of edges
-void FnBsegmentation::bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges) 
+vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges) 
 {  int i,j,u,v,t;
    double w,du;
    vector<double> cost0(numv, DBL_MAX);
@@ -224,14 +277,16 @@ void FnBsegmentation::bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges
    vector<vector<int>> paths1(numv); // final paths after iteration update
    vector<int> prev(numv, -1);
    vector<int> minsegm(numv, -1);
+   vector<tuple<int, int, double, double, double>> sol;
+   tuple<int, int, double, double, double> tup;
 
    tstart = clock();
    for(i=0;i<numv;i++)
       paths0[i] = vector<int>();
    cost0[0] = 0;
 
-   // stages
-   for (i = 0; i < min(maxNumEdges,numv-1); ++i)
+   
+   for (i = 0; i < min(maxNumEdges,numv-1); ++i) // stages. last one would be for checking negative cycles
    {  for (j=0;j<edges.size();j++)
       {  u = edges[j].end1;
          v = edges[j].end2;
@@ -254,7 +309,7 @@ void FnBsegmentation::bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges
    tend = clock();
    ttot = (tend - tstart) / CLOCKS_PER_SEC;
 
-   // Check for negative weight cycles useless in DAG
+   // Check for negative weight cycles: useless in DAG
 
    // Print shortest path distances
    double totc = 0;
@@ -267,11 +322,14 @@ void FnBsegmentation::bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges
       " " << edges[paths1[numv - 1][i]].cost << 
       " tot " << totc << endl;
       nedges++;
+      tup = costQRMSE(edges[paths1[numv-1][i]].end1, edges[paths1[numv-1][i]].end2);
+      sol.push_back(tup);
    }
    cout << "F&B (Bellman-Ford) "<< dsName << " cost: " << std::setprecision(5) << totc << " n_brk " << nedges-1 << " t.cpu " << ttot << endl;
+   return sol;
 }
 
-// OUTDATED, UNUSED - ricostrusce la soluzione di bellman ford, DFS all'arovescia dalla fine
+// ricostrusce la soluzione di bellman ford, DFS all'arovescia dalla fine
 void FnBsegmentation::reconstructBF(vector<double> costs, vector<Edge>& edges, int numv, int maxNumEdges)
 {  int i,j,v;
    int tcurr, end1, depth;;
@@ -289,6 +347,31 @@ void FnBsegmentation::reconstructBF(vector<double> costs, vector<Edge>& edges, i
    //for(i=0;i<edges.size();i++)
    //   if(edges[i].end2==193)
    //      cout << i << "," << edges[i].end1<<"," << edges[i].end2<<"," << edges[i].cost<<endl;
+}
+
+// scrive una soluzione su file csv
+int FnBsegmentation::writeSolCsv(vector<tuple<int, int, double, double, double>> sol, string fileName) 
+{  int i;
+   ofstream outFile(fileName); // Open file for writing
+
+   if (!outFile) {
+      cout << "Error opening file!" << endl;
+      return 1;
+   }
+
+   outFile << "t1,t2,m,q,cost" << endl;
+   for (i=0;i<sol.size();i++) 
+   {
+      outFile << get<0>(sol[i]) << "," << 
+         get<1>(sol[i]) << "," << 
+         get<2>(sol[i]) << "," << 
+         get<3>(sol[i]) <<"," << 
+         get<4>(sol[i]) << endl;
+   }
+
+   outFile.close(); // Close the file
+   cout << "Solution written to " << fileName << endl;
+   return 0;
 }
 
 // cost as quasi RMSE

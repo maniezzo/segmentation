@@ -13,17 +13,18 @@ private:
    vector<Stage> Fexpanded, Bexpanded; // expanded nodes
 
 
-   void generateFoffspring(int t1, int t2, int nSegm, double cost);
-   void generateBoffspring(int t1, int t2, int nSegm, double cost);
+   bool forward();
+   bool backward();
+   bool generateFoffspring(int t1, int t2, int nSegm, double cost);
+   bool generateBoffspring(int t1, int t2, int nSegm, double cost);
+   bool match(bool isForward, int i, int numSegm, double z);
    tuple<double, double> linearRegression(vector<int> x, vector<double> y);
    tuple<int, int, double, double, double> costQRMSE(int t1, int t2);
    void DAG_SSSP();
    vector<tuple<int, int, double, double, double>> reconstructSolution(vector<tuple<int, int, double, double, double>> lstOLS, int);
    int run_BF();
    void reconstructBF(vector<double> costs, vector<Edge>& edges, int numv, int maxNumEdges);
-   void bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges);
-   void forward();
-   void backward();
+   vector<tuple<int, int, double, double, double>> bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges);
    int writeSolCsv(vector<tuple<int, int, double, double, double>> lstOLS, string fileName);
 
 public:
