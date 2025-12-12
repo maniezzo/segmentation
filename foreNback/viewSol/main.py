@@ -10,13 +10,13 @@ def plotSol(dfsol,dfdata):
       y = [m * t1 + q, m * t2 + q]
       plt.plot(x, y, marker='o', label=f'm={m}, q={q}')
    plt.legend()
-   plt.title("OLS fit")
+   plt.title(datafile)
    plt.show()
    return
 
 if __name__ == '__main__':
    solfile = "test_sol.csv"
-   datafile = "home//test.csv"
+   datafile = "M4//Q8030.csv"
    dfsol = pd.read_csv("..//F&Bsegmentation//"+solfile)
    dfdata = pd.read_csv("..//..//data//"+datafile)
    plotSol(dfsol,dfdata)

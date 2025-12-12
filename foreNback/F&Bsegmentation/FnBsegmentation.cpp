@@ -4,7 +4,10 @@
 // n number of points, maxt maximum time (=n-1)
 void FnBsegmentation::run_FnB()
 {  int i;
-   bool isImprovedF = true, isImprovedB = true;;
+   bool isImprovedF = true, isImprovedB = true;
+
+   Stage N;
+   N.mainNode();
 
    // optimal solution with no constraint on the number of arcs (but with minLength)
    DAG_SSSP();
@@ -12,19 +15,19 @@ void FnBsegmentation::run_FnB()
    // optimal solution with one constraint on the number of arcs and with minLength
    run_BF();
 
-   Stage N;
-   N.mainNode();
    Fstage.resize(n);
    Fexpanded.resize(n);
-   Fstage[0].insert(0, 0);
+   Fstage[0].insert(0, 0, {0});   // num,cost, [changepoints]
+
    Bstage.resize(n);
    Bexpanded.resize(n);
-   Bstage[n-1].insert(0, 0);
+   Bstage[n-1].insert(0, 0, {n-1}); // num,cost, [changepoints]
 
    while(isImprovedF || isImprovedB)
    {  isImprovedF = forward();
       isImprovedB = backward();
    }
+   reconstructFnBsolution();
 }
 
 // forward pass
@@ -32,25 +35,29 @@ bool FnBsegmentation::forward()
 {  int i,j,t,k,nSegm;
    Stage seed;
    double z,lb;  // lower bound to completion
-   bool isImproved = false;
+   bool isImproved = false, hasMatch;
+   vector<int> lstPoints;
 
    for(i=0;i<n;i++)
    {  if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength
 
       for(k=0;k<delta;k++) // beam width
-      {  nSegm = Fstage[i].queryMinCost(maxNumEdges).second;  // num of segments up to stage i
-         z     = Fstage[i].queryMinCost(maxNumEdges).first;   // cost up to stage i
+      {
+         z         = get<0>( Fstage[i].queryMinCost(maxNumEdges) ); // cost up to stage i
+         nSegm     = get<1>( Fstage[i].queryMinCost(maxNumEdges) ); // num of segments up to stage i
+         lstPoints = get<2>( Fstage[i].queryMinCost(maxNumEdges) ); // changepoints up to stage i
 
          if(Fstage[i].isEmpty())
             continue;
          // remove from unexpanded and add to expanded
-         Fexpanded[i].insert(nSegm, z);
+         Fexpanded[i].insert(nSegm, z, lstPoints);
          auto res = Fstage[i].popMinCost(maxNumEdges);
-         if (res.first!=z||res.second!=nSegm)
-            cout << ">>>> ERROR <<<< popping from Fstage inconsistent." << endl;
+
+         hasMatch = match(true, i, nSegm, z);
+         if(hasMatch) continue;
 
          if (i<(n-minLength))
-            lb = Bstage[i+1].queryMinCost(maxNumEdges).first;
+            lb = get<0>( Bstage[i+1].queryMinCost(maxNumEdges) ); // minimum of unexpanded
          else
             lb = 0;
 
@@ -61,7 +68,7 @@ bool FnBsegmentation::forward()
 
          if(nSegm < maxNumEdges)
             for(t=i+minLength;t<n;t++)
-               isImproved = generateFoffspring(i,t,nSegm,z);
+               isImproved = generateFoffspring(i,t,nSegm,z,lstPoints);
       }
    }
    return isImproved;
@@ -72,26 +79,30 @@ bool FnBsegmentation::backward()
 {  int i,j,t,k,nSegm;
    Stage seed;
    double z,lb;  // lower bound to completion
-   bool isImproved = false;
+   bool isImproved = false, hasMatch;
+   vector<int> lstPoints;
 
    int maxt = n-1;
    for(i=maxt;i>=0;i--)
    {  if (i<maxt && (maxt-i)<minLength) continue;  // non ho segmenti più corti di minLength
 
       for(k=0;k<delta;k++) // beam width
-      {  nSegm = Bstage[i].queryMinCost(maxNumEdges).second;  // num of segments up to stage i
-         z     = Bstage[i].queryMinCost(maxNumEdges).first;   // cost up to stage i
+      {  
+         z         = get<0>( Bstage[i].queryMinCost(maxNumEdges) ); // cost up to stage i
+         nSegm     = get<1>( Bstage[i].queryMinCost(maxNumEdges) ); // num of segments up to stage i
+         lstPoints = get<2>( Bstage[i].queryMinCost(maxNumEdges) ); // changepoints up to stage i
 
          if(Bstage[i].isEmpty())
             continue;
          // remove from unexpanded and add to expanded
-         Bexpanded[i].insert(nSegm, z);
+         Bexpanded[i].insert(nSegm, z, lstPoints);
          auto res = Bstage[i].popMinCost(maxNumEdges);
-         if (res.first!=z||res.second!=nSegm)
-            cout << ">>>> ERROR <<<< popping from Fstage inconsistent." << endl;
+
+         hasMatch = match(false, i, nSegm, z);
+         if(hasMatch) continue;
 
          if (i>minLength)
-            lb = Fstage[i-1].queryMinCost(maxNumEdges).first;
+            lb = get<0>( Fstage[i-1].queryMinCost(maxNumEdges) ); // minimum of unexpanded
          else
             lb = 0;
 
@@ -102,28 +113,30 @@ bool FnBsegmentation::backward()
 
          if(nSegm < maxNumEdges)
             for (t=i-minLength;t>=0;t--)
-               isImproved = generateBoffspring(i,t,nSegm,z); // backward, t<i
+               isImproved = generateBoffspring(i,t,nSegm,z,lstPoints); // backward, t<i
       }
    }
    return isImproved;
 }
 
 // forward offspring generation
-bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost)
-{  int i;
-   double c,m,q,z;
+bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost, vector<int> lstPoints)
+{  double c,m,q,z;
    bool isImproved = false;
 
    tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
    z = cost+get<4>(res);
+   lstPoints.push_back(t2);
+
    if (t2==(n-1) && z<zub)
    {  zub = z;
+      changepoints = lstPoints;
       cout << "F) New zub: "<< zub << endl;
       isImproved = true;
    }
 
    if(cost+z < zub)
-      Fstage[t2].insert(nSegm+1, cost+z);
+      Fstage[t2].insert(nSegm+1, z, lstPoints);
    else
       nFathomed++;
    //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
@@ -132,21 +145,24 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost)
 }
 
 // backward offspring generation
-bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost)
+bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost, vector<int> lstPoints)
 {  int i;
    double c,m,q,z;
    bool isImproved = false;
 
    tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
    z = cost+get<4>(res);
+   lstPoints.insert(lstPoints.begin(), t1);
+
    if (t1==0 && z<zub)
    {  zub = z;
+      changepoints = lstPoints;
       cout << "B) New zub: "<< zub << endl;
       isImproved = true;
    }
 
    if(cost+z < zub)
-      Bstage[t1].insert(nSegm+1, cost+z);
+      Bstage[t1].insert(nSegm+1, z,lstPoints);
    else
       nFathomed++;
    //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
@@ -159,27 +175,58 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
 {  double lb; // cost of completion
    bool hasMatch = false;
 
+   int maxt = n-1;
    if (isForward)
-   {  lb = Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm).first;
-      if(lb==0) goto l0; // no feasible expansion
-      hasMatch = true;
-      if(z + lb < zub)
-      {  // new incumbent
-         zub = z + lb;
-         cout << "F) New zub: "<< zub << endl;
+      if(i<maxt)
+      {  lb = get<0>( Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm) );
+         if(lb==0) goto l0; // no feasible expansion
+         hasMatch = true;
+         if(z + lb < zub)
+         {  // new incumbent
+            zub = z + lb;
+            changepoints = get<2>(Fexpanded[i].queryMinCost(numSegm));
+            vector<int> vb = get<2>(Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm));
+            changepoints.insert(changepoints.end(), vb.begin(), vb.end()); // Append vb
+            std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
+            cout << "F) Match: new zub: "<< zub << endl;
+         }
       }
-   }
    else
-   {  lb = Fexpanded[i-1].queryMinCost(maxNumEdges-numSegm).first;
-      if(lb==0) goto l0; // no feasible expansion
-      hasMatch = true;
-      if(z + lb < zub)
-      {  // new incumbent
-         zub = z + lb;
-         cout << "B) New zub: "<< zub << endl;
+      if(i>0)
+      {  lb = get<0>( Fexpanded[i-1].queryMinCost(maxNumEdges-numSegm) );
+         if(lb==0) goto l0; // no feasible expansion
+         hasMatch = true;
+         if(z + lb < zub)
+         {  // new incumbent
+            zub = z + lb;
+            changepoints = get<2>(Bexpanded[i].queryMinCost(numSegm));
+            vector<int> vb = get<2>(Fexpanded[i-1].queryMinCost(maxNumEdges-numSegm));
+            changepoints.insert(changepoints.end(), vb.begin(), vb.end()); // Append vb
+            std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
+            cout << "B) Match: new zub: "<< zub << endl;
+         }
       }
-   }
 l0:return hasMatch;
+}
+
+// ricostruisce la soluzione FnB
+void FnBsegmentation::reconstructFnBsolution()
+{  int i;
+   double sum = 0;
+   vector<tuple<int, int, double, double, double>> sol;
+   cout << "Changepoints: ";
+   int t1 = 0;
+   for (i=1;i<changepoints.size();i++)
+   {  int t2 = changepoints[i];
+      tuple<int, int, double, double, double> tup = costQRMSE(t1,t2);
+      sum += get<4>(tup);
+      sol.push_back(tup);
+      cout << t2 << " ";
+      t1 = t2;
+   }
+   cout << endl;
+   cout << "Costo complessivo " << sum << endl;
+   writeSolCsv(sol,"test_sol.csv");
 }
 
 // single source on a DAG. n number of points, maxt maximum time (=n-1)
@@ -213,13 +260,13 @@ void FnBsegmentation::DAG_SSSP()
    tend = clock();
    ttot = (tend - tstart) / CLOCKS_PER_SEC;
 
-   sol = reconstructSolution(lstOLS,maxt);
+   sol = reconstructDAGsolution(lstOLS,maxt);
    writeSolCsv(sol,"test_sol.csv");
    cout << "F&B (DAG) " << dsName << " cost: " << std::setprecision(5) << mincost[maxt] << " n_brk " << sol.size()-1 << " t.cpu " << ttot << endl;
 }
 
 // ricostruisce la soluzione DAG
-vector<tuple<int, int, double, double, double>> FnBsegmentation::reconstructSolution(vector<tuple<int, int, double, double, double>> lstOLS, int maxt)
+vector<tuple<int, int, double, double, double>> FnBsegmentation::reconstructDAGsolution(vector<tuple<int, int, double, double, double>> lstOLS, int maxt)
 {  int i,j,t;
    double sum = 0;
    vector<tuple<int, int, double, double, double>> sol;

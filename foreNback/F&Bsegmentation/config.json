@@ -1,6 +1,6 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "home\\test",
+	"dsName"  : "M4\\Q8030",
 	"maxNumEdges" : 7,
 	"minLength"   : 5, "minLengthComment": "minimal segment length",
 	"delta"   : 3, "deltaComment": "width of the beam"
