@@ -3,5 +3,6 @@
 	"dsName"  : "M4\\Q8030",
 	"maxNumEdges" : 7,
 	"minLength"   : 5, "minLengthComment": "minimal segment length",
+	"maxLength"   : 10000, "maxLengthComment": "maximal segment length",
 	"delta"   : 3, "deltaComment": "width of the beam"
 }

@@ -30,6 +30,7 @@ extern clock_t tstart, tend;
 extern double  ttot;
 extern int n;                // num of points of the data series
 extern int delta;            // width of the beam
-extern int minLength;        // minmal segnment length
+extern int minLength;        // minimal segnment length
+extern int maxLength;        // maximal segnment length
 extern vector<double> Y;     // the dataseries to model
 extern double zub;

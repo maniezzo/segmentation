@@ -32,11 +32,12 @@ void FnBsegmentation::run_FnB()
 
 // forward pass
 bool FnBsegmentation::forward()
-{  int i,j,t,k,nSegm;
+{  int i,j,t,t2,k,nSegm,tend;
    Stage seed;
    double z,lb;  // lower bound to completion
    bool isImproved = false, hasMatch;
    vector<int> lstPoints;
+   tend = min(n,maxLength);
 
    for(i=0;i<n;i++)
    {  if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength
@@ -57,7 +58,12 @@ bool FnBsegmentation::forward()
          if(hasMatch) continue;
 
          if (i<(n-minLength))
-            lb = get<0>( Bstage[i+1].queryMinCost(maxNumEdges) ); // minimum of unexpanded
+         {  lb = DBL_MAX;
+            for(t2=i+1;t2<n;t2++)
+               if(!Bstage[t2].isEmpty())
+                  lb = min( lb,get<0>( Bstage[i+1].queryMinCost(maxNumEdges))); // minimum of unexpanded
+            if(lb==DBL_MAX) lb=0;
+         }
          else
             lb = 0;
 
@@ -67,8 +73,10 @@ bool FnBsegmentation::forward()
          }
 
          if(nSegm < maxNumEdges)
-            for(t=i+minLength;t<n;t++)
-               isImproved = generateFoffspring(i,t,nSegm,z,lstPoints);
+            for(t=i+minLength;t<tend;t++)
+            {  bool fGen  = generateFoffspring(i, t, nSegm, z, lstPoints);
+               isImproved = isImproved || fGen;
+            }
       }
    }
    return isImproved;
@@ -76,7 +84,7 @@ bool FnBsegmentation::forward()
 
 // backward pass
 bool FnBsegmentation::backward()
-{  int i,j,t,k,nSegm;
+{  int i,j,t,t1,k,nSegm, tstart;
    Stage seed;
    double z,lb;  // lower bound to completion
    bool isImproved = false, hasMatch;
@@ -102,7 +110,12 @@ bool FnBsegmentation::backward()
          if(hasMatch) continue;
 
          if (i>minLength)
-            lb = get<0>( Fstage[i-1].queryMinCost(maxNumEdges) ); // minimum of unexpanded
+         {  lb = DBL_MAX;
+            for(t1=i-1;t1>=0;t1--)
+               if(!Fstage[t1].isEmpty())
+                  lb = min( lb,get<0>( Fstage[t1].queryMinCost(maxNumEdges) )); // minimum of unexpanded
+            if(lb==DBL_MAX) lb=0;
+         }
          else
             lb = 0;
 
@@ -112,8 +125,12 @@ bool FnBsegmentation::backward()
          }
 
          if(nSegm < maxNumEdges)
+         {  tstart = max(0,i-minLength-maxLength);
             for (t=i-minLength;t>=0;t--)
-               isImproved = generateBoffspring(i,t,nSegm,z,lstPoints); // backward, t<i
+            {  bool fGen = generateBoffspring(i, t, nSegm, z, lstPoints); // backward, t<i
+               isImproved = isImproved || fGen;
+            }
+         }
       }
    }
    return isImproved;
@@ -135,7 +152,7 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
       isImproved = true;
    }
 
-   if(cost+z < zub)
+   if(z < zub)
       Fstage[t2].insert(nSegm+1, z, lstPoints);
    else
       nFathomed++;
@@ -161,7 +178,7 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
       isImproved = true;
    }
 
-   if(cost+z < zub)
+   if(z < zub)
       Bstage[t1].insert(nSegm+1, z,lstPoints);
    else
       nFathomed++;
@@ -231,7 +248,7 @@ void FnBsegmentation::reconstructFnBsolution()
 
 // single source on a DAG. n number of points, maxt maximum time (=n-1)
 void FnBsegmentation::DAG_SSSP()
-{  int i,j,t,currInit,maxt,maxstart;
+{  int i,j,t,currInit,maxt,maxstart,tend;
    double c;
    tuple<int, int, double, double, double> tup;
    vector<tuple<int, int, double, double, double>> lstOLS; // t1,t2,m,q,cost of the segment
@@ -247,7 +264,8 @@ void FnBsegmentation::DAG_SSSP()
    mincost[0] = 0;
 
    for (t=0;t<=maxstart;t++)
-   {  for(j=t+minLength;j<=maxt;j++)
+   {  tend = min(maxt,t+maxLength);
+      for(j=t+minLength;j<=tend;j++)
       {  if(t>0 && t<minLength) continue;
          tup = costQRMSE(t,j);  // cosi' segmenti attaccati, se staccati da t a j-1
          c   = get<4>(tup);
@@ -286,7 +304,7 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::reconstructDAGs
 
 // imposta poi lancia bellman ford. n number of points, maxt maximum time (=n-1)
 int FnBsegmentation::run_BF()
-{  int cont;
+{  int cont,tend;
    int numEdges = 0;
    int numv     = n; // partono da 0
    vector<Edge> edges;
@@ -297,7 +315,8 @@ int FnBsegmentation::run_BF()
    cont=0;
    for (int t1 = 0; t1 < n-minLength; ++t1) 
    {  if(t1>0 && t1<minLength) continue;
-      for (int t2 = t1+minLength; t2 < n; ++t2) 
+      tend = min(n,t1+maxLength);
+      for (int t2 = t1+minLength; t2 < tend; ++t2) 
       {  if(t2<n-1 && t2 > n-minLength) continue;
          Edge edge;
          edge.end1 = t1;

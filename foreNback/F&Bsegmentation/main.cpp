@@ -46,6 +46,7 @@ void readConfig()
    maxNumEdges = JSV["maxNumEdges"];
    delta     = JSV["delta"];
    minLength = JSV["minLength"];
+   maxLength = JSV["maxLength"];
    cout << baseDir << endl;
    cout << dsName << endl;
 }
