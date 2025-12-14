@@ -1,8 +1,9 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "M4\\Q8030",
+	"dsName"  : "M3\\N2834",
 	"maxNumEdges" : 7,
 	"minLength"   : 5, "minLengthComment": "minimal segment length",
 	"maxLength"   : 10000, "maxLengthComment": "maximal segment length",
+	"maxcpu"  : 600, "maxcpuComment" : "max running time in sec",
 	"delta"   : 3, "deltaComment": "width of the beam"
 }

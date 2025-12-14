@@ -47,6 +47,7 @@ void readConfig()
    delta     = JSV["delta"];
    minLength = JSV["minLength"];
    maxLength = JSV["maxLength"];
+   maxcpu    = JSV["maxcpu"];
    cout << baseDir << endl;
    cout << dsName << endl;
 }

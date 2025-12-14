@@ -32,5 +32,7 @@ extern int n;                // num of points of the data series
 extern int delta;            // width of the beam
 extern int minLength;        // minimal segnment length
 extern int maxLength;        // maximal segnment length
+extern int maxcpu;           // max running time in seconds
+extern int numMatch;         // number of partial solutions matching
 extern vector<double> Y;     // the dataseries to model
 extern double zub;

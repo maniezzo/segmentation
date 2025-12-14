@@ -16,7 +16,7 @@ def plotSol(dfsol,dfdata):
 
 if __name__ == '__main__':
    solfile = "test_sol.csv"
-   datafile = "M4//Q8030.csv"
+   datafile = "M3//N2834.csv"
    dfsol = pd.read_csv("..//F&Bsegmentation//"+solfile)
    dfdata = pd.read_csv("..//..//data//"+datafile)
    plotSol(dfsol,dfdata)

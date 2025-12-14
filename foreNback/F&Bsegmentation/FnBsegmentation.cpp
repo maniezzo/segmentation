@@ -23,10 +23,13 @@ void FnBsegmentation::run_FnB()
    Bexpanded.resize(n);
    Bstage[n-1].insert(0, 0, {n-1}); // num,cost, [changepoints]
 
-   while(isImprovedF || isImprovedB)
+   tstart = clock();
+   do
    {  isImprovedF = forward();
       isImprovedB = backward();
-   }
+      tend = clock();
+      ttot = (tend - tstart) / CLOCKS_PER_SEC;
+   } while((isImprovedF || isImprovedB) && ttot < maxcpu);
    reconstructFnBsolution();
 }
 
@@ -148,7 +151,8 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
    if (t2==(n-1) && z<zub)
    {  zub = z;
       changepoints = lstPoints;
-      cout << "F) New zub: "<< zub << endl;
+      ttot = (clock() - tstart) / CLOCKS_PER_SEC;
+      cout << "F) New zub: "<< zub << " t.cpu " << ttot << endl;
       isImproved = true;
    }
 
@@ -174,7 +178,8 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
    if (t1==0 && z<zub)
    {  zub = z;
       changepoints = lstPoints;
-      cout << "B) New zub: "<< zub << endl;
+      ttot = (clock() - tstart) / CLOCKS_PER_SEC;
+      cout << "B) New zub: "<< zub << " t.cpu " << ttot << endl;
       isImproved = true;
    }
 
@@ -198,6 +203,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
       {  lb = get<0>( Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm) );
          if(lb==0) goto l0; // no feasible expansion
          hasMatch = true;
+         numMatch++;
          if(z + lb < zub)
          {  // new incumbent
             zub = z + lb;
@@ -213,6 +219,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
       {  lb = get<0>( Fexpanded[i-1].queryMinCost(maxNumEdges-numSegm) );
          if(lb==0) goto l0; // no feasible expansion
          hasMatch = true;
+         numMatch++;
          if(z + lb < zub)
          {  // new incumbent
             zub = z + lb;
@@ -231,6 +238,8 @@ void FnBsegmentation::reconstructFnBsolution()
 {  int i;
    double sum = 0;
    vector<tuple<int, int, double, double, double>> sol;
+   ttot = (clock() - tstart) / CLOCKS_PER_SEC;
+
    cout << "Changepoints: ";
    int t1 = 0;
    for (i=1;i<changepoints.size();i++)
@@ -242,7 +251,7 @@ void FnBsegmentation::reconstructFnBsolution()
       t1 = t2;
    }
    cout << endl;
-   cout << "Costo complessivo " << sum << endl;
+   cout << "Costo complessivo " << sum << " t.cpu " << ttot << " num.matches " << numMatch << " n.fathomed " << nFathomed << endl;
    writeSolCsv(sol,"test_sol.csv");
 }
 
