@@ -21,10 +21,86 @@ Truong, C.; Oudre, L.; Vayatis, N.
 \newblock {\url{https://doi.org/10.1016/j.sigpro.2019.107299}}.
 
 \bibitem[Keogh et~al.(2002)Keogh, Chu, Hart, and Pazzani]{KCHP02}
-Keogh, E.J.; Chu, S.; Hart, D.M.; Pazzani, M.J.
-\newblock Segmenting Time Series: A Survey and Novel Approach.
-\newblock \url{https://api.semanticscholar.org/CorpusID:8365617},  2002.
-\newblock Accessed 2025-12-01.
+Keogh, E.; Chu, S.; Hart, D.; Pazzani, M.
+\newblock An online algorithm for segmenting time series.
+\newblock {\em IEEE International Conference on Data Mining} {\bf 2002}, pp.
+  289--296.
+
+\bibitem[Auger and Lawrence(1989)]{AL89}
+Auger, I.E.; Lawrence, C.E.
+\newblock Algorithms for the optimal identification of segment neighborhoods.
+\newblock {\em Bulletin of Mathematical Biology} {\bf 1989}, {\em 51},~39--54.
+
+\bibitem[Jackson et~al.(2005)Jackson, Scargle, Barnes, Arabhi, Alt, Gioumousis,
+  Gwin, Sangtrakulcharoen, Tan, and Tsai]{JSB05}
+Jackson, B.; Scargle, J.D.; Barnes, D.; Arabhi, S.; Alt, A.; Gioumousis, P.;
+  Gwin, E.; Sangtrakulcharoen, P.; Tan, L.; Tsai, T.T.
+\newblock An algorithm for optimal partitioning of data on an interval.
+\newblock {\em IEEE Signal Processing Letters} {\bf 2005}, {\em 12},~105--108.
+
+\bibitem[Killick et~al.(2012)Killick, Fearnhead, and Eckley]{KFE12}
+Killick, R.; Fearnhead, P.; Eckley, I.A.
+\newblock Optimal detection of changepoints with a linear computational cost.
+\newblock {\em Journal of the American Statistical Association} {\bf 2012},
+  {\em 107},~1590--1598.
+
+\bibitem[Rigaill(2010)]{R10}
+Rigaill, G.
+\newblock Pruned dynamic programming for optimal multiple change-point
+  detection.
+\newblock {\em arXiv preprint arXiv:1004.0887} {\bf 2010}.
+
+\bibitem[Johnson(2013)]{J13}
+Johnson, N.A.
+\newblock A dynamic programming algorithm for the fused lasso and
+  L0-segmentation.
+\newblock {\em Journal of Computational and Graphical Statistics} {\bf 2013},
+  {\em 22},~246--260.
+
+\bibitem[Hocking et~al.(2013)Hocking, Rigaill, Fearnhead, and Bourque]{HRFB13}
+Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
+\newblock Learning sparse penalties for change-point detection using max-margin
+  interval regression.
+\newblock {\em International Conference on Machine Learning (ICML)} {\bf 2013}.
+
+\bibitem[Bellman(1961)]{B61}
+Bellman, R.
+\newblock On the approximation of curves by line segments using dynamic
+  programming.
+\newblock {\em Communications of the ACM} {\bf 1961}, {\em 4},~284.
+
+\bibitem[Picard and Cook(1975)]{PC75}
+Picard, D.; Cook, R.D.
+\newblock Cross-validation of regression models.
+\newblock {\em Journal of the American Statistical Association} {\bf 1975},
+  {\em 79},~575--583.
+
+\bibitem[Hudson(1966)]{H66}
+Hudson, D.J.
+\newblock Fitting segmented curves whose join points have to be estimated.
+\newblock {\em Journal of the American Statistical Association} {\bf 1966},
+  {\em 61},~1097--1129.
+
+\bibitem[Fisher(1958)]{F58}
+Fisher, W.D.
+\newblock On grouping for maximum homogeneity.
+\newblock {\em Journal of the American Statistical Association} {\bf 1958},
+  {\em 53},~789--798.
+
+\bibitem[Bertsimas et~al.(2016)Bertsimas, King, and Mazumder]{BKM16}
+Bertsimas, D.; King, A.; Mazumder, R.
+\newblock Best subset selection via a modern optimization lens.
+\newblock {\em Annals of Statistics} {\bf 2016}, {\em 44},~813--852.
+
+\bibitem[Balinski(1969)]{B69}
+Balinski, M.L.
+\newblock {\em Integer Programming: Methods, Uses, Computation}; Academic
+  Press,  1969.
+
+\bibitem[Schrijver(2003)]{S03}
+Schrijver, A.
+\newblock {\em Combinatorial Optimization: Polyhedra and Efficiency}; Springer,
+   2003.
 
 \bibitem[Prokhorov et~al.(2025)Prokhorov, Radchenko, Semenov, and
   Skrobotov]{PRSS25}

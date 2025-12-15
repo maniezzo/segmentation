@@ -29,16 +29,15 @@
 \title{Fore-and-Back for Changepoint Analysis}
 %
 %\titlerunning{F&B for changepoint anaysis}
-\author{Vittorio Maniezzo\inst{1}\orcidID{0000-0002-1220-1235} \and
-	Morteza Sheykhizadeh\inst{3}\orcidID{2222--3333-4444-5555}}
+\author{Vittorio Maniezzo\inst{1}\orcidID{0000-0002-1220-1235}}
 
 %
-\authorrunning{V. Maniezzo, M. Sheykhizadeh}
+\authorrunning{V. Maniezzo}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 %
 \institute{University of Bologna, Cesena, Italy\\
-\email{vittorio.maniezzo@unibo.it, morteza.sheykhizadeh@studio.unibo.it}\\
+\email{vittorio.maniezzo@unibo.it}\\
 \url{https://www.unibo.it/sitoweb/vittorio.maniezzo/en}}
 % morteza.sheykhizadeh@studio.unibo.it
 \maketitle              % typeset the header of the contribution
@@ -53,51 +52,13 @@ The abstract should briefly summarize the contents of the paper in
 %
 %
 \section{Introduction}	\label{sec:introducion}
-Please note that the first paragraph of a section or subsection is
-not indented. The first paragraph that follows a table, figure,
-equation etc. does not need an indent, either.
+Please note that the first paragraph of a section or subsection is not indented. The first paragraph that follows a table, figure, equation etc. does not need an indent, either.
 
 Subsequent paragraphs, however, are indented.
 
-\subsubsection{Sample Heading (Third Level)} Only two levels of
-headings should be numbered. Lower level headings remain unnumbered;
-they are formatted as run-in headings.
+\subsubsection{Sample Heading (Third Level)} Only two levels of headings should be numbered. Lower level headings remain unnumbered; they are formatted as run-in headings.
 
-\paragraph{Sample Heading (Fourth Level)}
-The contribution should contain no more than four levels of
-headings. Table~\ref{tab1} gives a summary of all heading levels.
-
-\begin{table}
-\caption{Table captions should be placed above the
-tables.}\label{tab1}
-\begin{tabular}{|l|l|l|}
-\hline
-Heading level &  Example & Font size and style\\
-\hline
-Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
-1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
-2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
-3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
-4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
-\hline
-\end{tabular}
-\end{table}
-
-
-Please try to avoid rasterized images for line-art diagrams and
-schemas. Whenever possible, use vector graphics instead (see
-Fig.~\ref{fig1}).
-
-\begin{figure}
-\includegraphics[width=\textwidth]{fig1.eps}
-\caption{A figure caption is always placed below the illustration.
-Please note that short captions are centered, while long ones are
-justified by the macro package automatically.} \label{fig1}
-\end{figure}
-
-For citations of references, we prefer the use of square brackets
-and consecutive numbers. Citations using labels or the author/year
-convention are also acceptable.
+For citations of references, we prefer the use of square brackets and consecutive numbers. Citations using labels or the author/year convention are also acceptable.
 
 \section{Changepoint analysis} 	\label{sec:changepoints}
 Letteratura etc. \cite{the_book}
@@ -130,7 +91,7 @@ Beam Search \cite{B08}
          {set $k=h$; $k1=h-1$;}
          {set $k=n-h+1$; $k1=n-h+2$;}
 
-         \ForEach{node $X \in L^t_{k-1}$}{
+         \ForEach(\tcp*[f]{Possible expansions}){node $X \in L^t_{k-1}$}{
             \ForEach{component $s \in S_k$}{
                let $X' = X \cup \{ s \}$\;
                \If{$X'$ meets conditions $i)$ and $ii)$}{
@@ -140,7 +101,7 @@ Beam Search \cite{B08}
                   \If(\tcp*[f]{feasible solution}){$h = n$ and $c(X') < z_{best}$}{set $z_{best} = c(X')$, $noimpr = 0$ and ${\bf x^*} = X'$;}
                }
             }
-            set $E^k = E^k\cup X$;\tcp*[f]{node expanded}
+            set $E^k = E^k\cup X$;\tcp*[f]{actual node expansion}
          }
 
          \ForEach(\tcp*[f]{extract the subset $L^t_k \in T_k$}){node $X \in T_k$}{
@@ -163,8 +124,42 @@ Beam Search \cite{B08}
    \label{FaB:peudocode}
 \end{algorithm}
 
+In $\text{C++}$, the std::map<int, int> is an excellent choice because it is implemented as a $\text{Red-Black}$ tree, which keeps the keys (your num values) sorted. Store the pairs as std::map<int, int> map name; where the key is num and the value is the minimum cost seen so far for that specific num and all numbers greater than it up to the next existing entry. However, a simpler, more robust approach is to ensure the map only stores non-redundant pairs that form the Pareto frontier of the $(num, cost)$ space.
+Operation Standard BBST - std::mapBBST with Pareto Optimization Insert $O(\log N)$ $O(\log N)$ amortized (because dominated elements are permanently removed) Query $O(\log N)$ $O(\log N)$ (for upper bound and decrement)
+
 \section{Computational results}		\label{sec:computational}
 Computational results
+
+
+\paragraph{Sample Heading (Fourth Level)}
+The contribution should contain no more than four levels of headings. Table~\ref{tab1} gives a summary of all heading levels.
+
+\begin{table}
+	\caption{Table captions should be placed above the
+		tables.}\label{tab1}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		Heading level &  Example & Font size and style\\
+		\hline
+		Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
+		1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
+		2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
+		3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
+		4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
+		\hline
+	\end{tabular}
+\end{table}
+
+
+Please try to avoid rasterized images for line-art diagrams and schemas. Whenever possible, use vector graphics instead (see Fig.~\ref{fig1}).
+
+\begin{figure}(Ht)
+	\includegraphics[width=\textwidth]{fig1.eps}
+	\caption{A figure caption is always placed below the illustration.
+		Please note that short captions are centered, while long ones are
+		justified by the macro package automatically.} \label{fig1}
+\end{figure}
+
 
 \section{Conclusions}		\label{sec:conclusions}
 The conlusions
