@@ -1,4 +1,5 @@
-﻿#include "linearSegmentation.h"
+﻿#include "global.h"
+#include "linearSegmentation.h"
 #include "json.h"
 
 // checks the feasibility of a solution

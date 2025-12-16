@@ -10,7 +10,6 @@
 #include <iomanip>   // setprecision
 #include <utility>   // for std::pair
 #include <cmath>     // for log function
-#include "global.h"
 
 void writeListOLS(vector<tuple<int, int, double, double, double>> lstOLS, string dsName);
 void postProcess(vector<tuple<int, int, double, double, double>>& lstOLS, vector<double>& x,int minlag);
