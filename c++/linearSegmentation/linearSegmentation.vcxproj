@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global.h" />
+    <ClInclude Include="gurobiMIP.h" />
     <ClInclude Include="json.h" />
     <ClInclude Include="linearSegmentation.h" />
   </ItemGroup>

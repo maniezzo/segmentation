@@ -1,5 +1,6 @@
 ﻿#include "global.h"
 #include "linearSegmentation.h"
+#include "gurobiMIP.h"
 #include "json.h"
 
 // checks the feasibility of a solution
@@ -1140,9 +1141,10 @@ int readConfig()
 }
 
 int main(int argc, char** argv)
-{  bool     fLagrangian = false;
-   int      solstat, n_brk=-1;
-   double   objval=-1, tCpuOpt, cost = 0;
+{  bool   fLagrangian = false;
+   bool   fGurobi = true;
+   int    solstat, n_brk=-1;
+   double objval=-1, tCpuOpt, cost = 0;
 
    vector<double> x;
    vector<double> pi;
@@ -1204,6 +1206,10 @@ int main(int argc, char** argv)
       tMIP = clock();
       tCpuOpt = (tMIP - truns) / CLOCKS_PER_SEC;
       cout << "CPU time for Lagr: " << tCpuOpt << endl;
+      goto TERMINATE;
+   }
+   else if(fGurobi)
+   {  goGurobi();
       goto TERMINATE;
    }
 
