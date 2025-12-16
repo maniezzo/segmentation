@@ -1,0 +1,11 @@
+#include "global.h"
+std::string baseDir = "";
+std::string dsName = "";
+std::vector<std::vector<int>> colids;
+<<<<<<< HEAD
+std::vector<std::vector<int>> rowids;
+=======
+std::vector<std::vector<int>> rowid;
+>>>>>>> 9565071c763cfed0aa8a81bac1671c10fdcea1a6
+int maxIter = 0;
+int maxTime = 0;
