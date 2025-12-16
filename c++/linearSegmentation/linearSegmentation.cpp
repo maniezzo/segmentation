@@ -1,7 +1,6 @@
 ﻿#include "linearSegmentation.h"
 #include "json.h"
 
-
 // checks the feasibility of a solution
 bool checkFeas(vector<int> sol, vector<tuple<int, int, double, double, double>> lstOLS, double expCost)
 {  int i,j,tmax,t0,t1;
@@ -1105,7 +1104,6 @@ void compressTableau(vector<tuple<int, int, double, double, double>> lstOLS)
    vector<int> idx(n);
    iota(idx.begin(), idx.end(), 0);   // Initializing idx, increasing values
    sort(idx.begin(), idx.end(), [&](int i, int j) {return c[i] < c[j]; }); // idx by incewasing costs
-
 
    for (int jj = 0; jj < n; jj++)
    {  j = idx[jj];                    // insert ordered by decreasing costs

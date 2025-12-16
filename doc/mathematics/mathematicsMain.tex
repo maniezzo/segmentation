@@ -184,6 +184,21 @@ In summary, existing optimal CPD models exhibit a clear trade-off between comput
 The proposed SC-CPD framework occupies a complementary position in this landscape. By combining a set-covering formulation with modern MILP techniques and problem-specific preprocessing, it delivers global optimality while substantially expanding the class of constraints that can be handled in a principled and scalable manner. This positions SC-CPD as a flexible and extensible optimization framework for changepoint detection in applications where global structure and domain-specific requirements play a central role.
 
 
+\section{An extended set covering model} \label{sec:SCPmodel}
+The core idea of the model presented here is to list all subsequences of series values that satisfy specific structural constraints, in the following denoted as {\it feasible runs} of  values, quantify a quality measure of each run, and select the subset of runs that collectively cover the entire series while minimizing a cost of the difference between actual and model data (the model {\it residuals}) or maximizing a model fitness measure. This is the core of the model, further constraints can be added to accommodate specific desiderata on the model, taking advantage of the modeling flexibility of mixed-integer programming and the effectiveness of state-of-the-art general MIP solvers \cite{FLS09}.
+
+A Set Partitioning Problem (SPP) is at the core of the model, where the objective is to minimize the cost of the residuals and the constraints ensure that each point of the series has a corresponding one in the model. Note that no assumption is made about the nature of the model of the segments, it can be linear regression, giving rise to piecewise linear regression, but also any other nonlinear model. It is also possible to use different models for different runs at no cost to the optimization process. The SPP is defined over a set $X=[x_j]$, $j=1,\ldots,nruns$ of binary decision variables, each associated with one of the runs, i.e., of the segments. The generation of feasible runs can already implement some dominance, e.g. avoiding the generation of runs with too few or too many values. The cost $c_j$ of each run can be computed according to any of the fitness measures proposed in the literature, including $R^2$, SER, $\chi^2$, RMSE, simple variance etc. The constraints ensure that each point of the series is covered by a selected run.
+
+Unfortunately, the number of feasible runs for a real-world application can be very large, and the SPP can take an unacceptable amount of time to solve. Therefore, we relax the equality constraints into inequalities, transforming the problem into a Set Covering Problem (SCP), which can typically be solved in much higher dimensions, at the cost of having multiple runs covering some of the series points, therefore requiring a postprocessing to get a feasible segmentation. The resulting TSSC (standing for Time Series Set Covering) model is the following, where coefficients $a_{ij}$ are 0/1 coefficients taking the value of 1 if and only if run $j$ covers the $i$-th series point, $i \in \{1,\ldots,npoints\}$ and $j \in \{1,\ldots\,nruns\}$.
+
+\begin{alignat}{4}
+(TSSC) \hspace{0.5cm} z_{TSSC} = \min &\; \sum_{j=1}^{nruns} c_j x_{j}  \label{eq:SCPobj} \\
+s.t. &\; \sum_{j=1}^{nruns}a_{ij}x_{j} \geq 1, & \hspace{1.5cm} i=1,\dots,npoints  \label{eq:SCPcov} \\
+ &\; \sum_{j=1}^{nruns} x_{j} \leq maxruns \label{eq:SCPext}\\
+ &\; x_j \in \{0,1\}, &\; j=1,\dots,nruns  \label{eq:SCPvar}
+\end{alignat}
+
+State-of-the-art MIP solvers are very effective on SCP, but very large instances can still require high computational times. We have therefore also implemented a Lagrangian matheuristic \cite{the_book} on the TSSC problem, relaxing all constraints (\ref{eq:SCPcov}) by associating a Lagrangian penalty $\lambda_i$ to each $i$-th constraint, $1 \leq i \leq npoints$, and keeping only constraint (\ref{eq:SCPext}) in the model. This results in model LTSSC (standing for Lagrangian TSSC) and we solved it by a subgradient algorithm, where the subproblem is very easy to solve, requiring to select at most the $maxruns$ most negative variables at each subgradient iteration. A simple fixing heuristic takes the incumbent subproblem solution at each iteration, which can be infeasible because it does not cover all relaxed constraints, and adds selected variables until it becomes feasible.
 
 \subsection{Global series constraints}    \label{subsec:globconstraints}
 
@@ -232,22 +247,6 @@ Constraints for changepoint sets (	MERGE WITH ABOVE)
 	\item Robustness-to-outliers budget: Limit the number of changepoints attributable to isolated spikes by bounding the cumulative outlier-attributed evidence globally.
 \end{itemize}
 
-
-\section{An extended set covering model} \label{sec:SCPmodel}
-The core idea of the model presented here is to list all subsequences of series values that satisfy specific structural constraints, in the following denoted as {\it feasible runs} of  values, quantify a quality measure of each run, and select the subset of runs that collectively cover the entire series while minimizing a cost of the difference between actual and model data (the model {\it residuals}) or maximizing a model fitness measure. This is the core of the model, further constraints can be added to accommodate specific desiderata on the model, taking advantage of the modeling flexibility of mixed-integer programming and the effectiveness of state-of-the-art general MIP solvers \cite{FLS09}.
-
-A Set Partitioning Problem (SPP) is at the core of the model, where the objective is to minimize the cost of the residuals and the constraints ensure that each point of the series has a corresponding one in the model. Note that no assumption is made about the nature of the model of the segments, it can be linear regression, giving rise to piecewise linear regression, but also any other nonlinear model. It is also possible to use different models for different runs at no cost to the optimization process. The SPP is defined over a set $X=[x_j]$, $j=1,\ldots,nruns$ of binary decision variables, each associated with one of the runs, i.e., of the segments. The generation of feasible runs can already implement some dominance, e.g. avoiding the generation of runs with too few or too many values. The cost $c_j$ of each run can be computed according to any of the fitness measures proposed in the literature, including $R^2$, SER, $\chi^2$, RMSE, simple variance etc. The constraints ensure that each point of the series is covered by a selected run.
-
-Unfortunately, the number of feasible runs for a real-world application can be very large, and the SPP can take an unacceptable amount of time to solve. Therefore, we relax the equality constraints into inequalities, transforming the problem into a Set Covering Problem (SCP), which can typically be solved in much higher dimensions, at the cost of having multiple runs covering some of the series points, therefore requiring a postprocessing to get a feasible segmentation. The resulting TSSC (standing for Time Series Set Covering) model is the following, where coefficients $a_{ij}$ are 0/1 coefficients taking the value of 1 if and only if run $j$ covers the $i$-th series point, $i \in \{1,\ldots,npoints\}$ and $j \in \{1,\ldots\,nruns\}$.
-
-\begin{alignat}{4}
-(TSSC) \hspace{0.5cm} z_{TSSC} = \min &\; \sum_{j=1}^{nruns} c_j x_{j}  \label{eq:SCPobj} \\
-s.t. &\; \sum_{j=1}^{nruns}a_{ij}x_{j} \geq 1, & \hspace{1.5cm} i=1,\dots,npoints  \label{eq:SCPcov} \\
- &\; \sum_{j=1}^{nruns} x_{j} \leq maxruns \label{eq:SCPext}\\
- &\; x_j \in \{0,1\}, &\; j=1,\dots,nruns  \label{eq:SCPvar}
-\end{alignat}
-
-State-of-the-art MIP solvers are very effective on SCP, but very large instances can still require high computational times. We have therefore also implemented a Lagrangian matheuristic \cite{the_book} on the TSSC problem, relaxing all constraints (\ref{eq:SCPcov}) by associating a Lagrangian penalty $\lambda_i$ to each $i$-th constraint, $1 \leq i \leq npoints$, and keeping only constraint (\ref{eq:SCPext}) in the model. This results in model LTSSC (standing for Lagrangian TSSC) and we solved it by a subgradient algorithm, where the subproblem is very easy to solve, requiring to select at most the $maxruns$ most negative variables at each subgradient iteration. A simple fixing heuristic takes the incumbent subproblem solution at each iteration, which can be infeasible because it does not cover all relaxed constraints, and adds selected variables until it becomes feasible.
 
 \section{Computational experience} 			\label{sec:computation}
 

@@ -1,26 +1,16 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <ilcplex/cplex.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
-#include <vector>
 #include <tuple>
 #include <numeric>   // accumulate
 #include <algorithm> // for_each
 #include <iomanip>   // setprecision
 #include <utility>   // for std::pair
 #include <cmath>     // for log function
-
-using namespace std;
-
-string baseDir;
-string dsName;    // dataset name (file col .csv)
-int maxIter;      // max nunm of lagrangian iterations
-int maxTime;      // max secs of lagrangian runs
-vector<vector<int>> rowids, colids;  // compression of indices, by row and by col
+#include "global.h"
 
 void writeListOLS(vector<tuple<int, int, double, double, double>> lstOLS, string dsName);
 void postProcess(vector<tuple<int, int, double, double, double>>& lstOLS, vector<double>& x,int minlag);
