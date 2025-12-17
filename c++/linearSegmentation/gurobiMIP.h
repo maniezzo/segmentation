@@ -7,4 +7,4 @@ int populateGurobiByRow(GRBModel& model,
    const vector<tuple<int,int,double,double,double>>& lstOLS,
    vector<GRBVar>& xVars,
    vector<GRBConstr>& constrs);
-int goGurobi();
+vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS);

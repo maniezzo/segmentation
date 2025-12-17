@@ -1,8 +1,6 @@
 #pragma once
-#include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <tuple>
 #include <numeric>   // accumulate
 #include <algorithm> // for_each
 #include <iomanip>   // setprecision

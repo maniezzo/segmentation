@@ -1,6 +1,7 @@
 ﻿#include "global.h"
 #include "linearSegmentation.h"
 #include "gurobiMIP.h"
+#include "cplexMIP.h"
 #include "json.h"
 
 // checks the feasibility of a solution
@@ -1067,20 +1068,12 @@ int readConfig()
 
 int main(int argc, char** argv)
 {  bool   fLagrangian = false;
-   bool   fGurobi = true;
+   bool   fGurobi     = true;
    int    solstat, n_brk=-1;
    double objval=-1, tCpuOpt, cost = 0;
 
-   vector<double> x;
-   vector<double> pi;
-   vector<double> slack;
-   vector<double> dj;
-   vector<char>   ctype;
-
-   int           status = 0;
-   int           i, j, n, idcost, cont;
-   int           cur_numrows=-1, cur_numcols=-1;
-   clock_t       tstart, truns, tMIP;
+   int     i, j, n, idcost, cont;
+   clock_t tstart, tend, truns, tMIP;
 
    std::cout << std::fixed; // prevent scientific notation output
    idcost = readConfig();   // cost function:  R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC
@@ -1092,7 +1085,7 @@ int main(int argc, char** argv)
    string costFunc;
    ofstream dsFile(baseDir + dsName + "_segments.csv");
    vector<int> ids;
-   vector<double> y;
+   vector<double> x,y;
    vector<tuple<int, int, double, double, double>> lstOLS;
 
    n = readData(dataFile, ids, y);
@@ -1122,7 +1115,7 @@ int main(int argc, char** argv)
 
    writeListOLS(lstOLS, dsName); // write csv file with candidate segments
    compressTableau(lstOLS);      // calcola tableau per righe e per colonne, compresse (lista indici)
-   truns = clock();
+   tstart = clock();
 
    if (fLagrangian)
    {  cost = lagrangian(INT_MAX, lstOLS, minlag, alpha);
@@ -1132,8 +1125,41 @@ int main(int argc, char** argv)
       goto TERMINATE;
    }
    else if(fGurobi)
-   {  goGurobi();
-      goto TERMINATE;
+   {  x = goGurobi(y,lstOLS);
    }
+   else
+      x = goCPLEX(y,lstOLS);
 
+   //postProcess(lstOLS, x, minlag);
+   tend = clock();
+   tCpuOpt = (tend-tstart)/CLOCKS_PER_SEC;
+
+   cont = 0;
+   dsFile << "id,low,hi,m,q," << costFunc << endl;
+   for (j = 0; j < x.size(); j++)
+      if (x[j] > 0.01)
+      {
+         cout << cont << ") column " << j << " value=" << x[j];
+         cout << " segm: " << get<0>(lstOLS[j]) << ","
+            << get<1>(lstOLS[j]) << ","
+            << get<2>(lstOLS[j]) << ","
+            << get<3>(lstOLS[j]) << ","
+            << get<4>(lstOLS[j]) << endl;
+         dsFile << j << "," << get<0>(lstOLS[j]) << ","
+            << get<1>(lstOLS[j]) << ","
+            << get<2>(lstOLS[j]) << ","
+            << get<3>(lstOLS[j]) << ","
+            << get<4>(lstOLS[j]) << endl;
+         cont++;
+         cost += get<4>(lstOLS[j]);
+      }
+   dsFile.close();
+   n_brk = cont - 1;
+   cout << "Final number of segments: " << cont << " cost " << cost << endl;
+
+   cout << (fLagrangian ? "Lagrangian " : "MIP ") << dsName <<
+      " n_runs " << n << " t_runs " << tCpuRuns <<
+      " SCP objval " << objval << " final cost " << std::setprecision(6) << cost << " n_brk " << n_brk << " t_opt " << tCpuOpt << endl;
+
+TERMINATE: cout << "Fine" << endl;
 }  /* END main */

@@ -1,8 +1,11 @@
 #pragma once
 #include <vector>
 #include <string.h>
+#include <iostream>
 #include <sstream>
 #include <time.h>
+#include <tuple>
+
 
 using namespace std;
 

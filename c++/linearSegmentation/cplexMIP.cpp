@@ -1,6 +1,5 @@
 #include "cplexMIP.h"
 
-
 // Cplex, to populate by row, we first create the columns, and then add the rows.
 int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS)
 {  int status,numrows,numcols,numnz,i,j,n,m;
@@ -26,12 +25,12 @@ int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int
    // Now create the new columns.
    for(j=0;j<n;j++)
    {  obj.push_back(get<4>(lstOLS[j]));
-   lb.push_back(0.0);
-   ub.push_back(1.0);
-   ostringstream osstr;
-   osstr << "x" << j;
-   colname.push_back(osstr.str());
-   numcols++;
+      lb.push_back(0.0);
+      ub.push_back(1.0);
+      ostringstream osstr;
+      osstr << "x" << j;
+      colname.push_back(osstr.str());
+      numcols++;
    }
 
    // vector<string> to char**
@@ -77,57 +76,67 @@ int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int
 } 
 
 
-void goCPLEX()
-{
+vector<double> goCPLEX(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS)
+{  int i,j;
+   int       cur_numrows=-1, cur_numcols=-1;
+   int       status = 0;
+   CPXENVptr env = NULL;
+   CPXLPptr  lp = NULL;
+   int       solstat, n_brk=-1;
+   double    objval=-1, tCpuOpt, cost = 0;
+   clock_t   tstart, truns, tMIP;
 
-   CPXENVptr     env = NULL;
-   CPXLPptr      lp = NULL;
+   vector<double> x;
+   vector<double> pi;
+   vector<double> slack;
+   vector<double> dj;
+   vector<char>   ctype;
 
+   int n = lstOLS.size();
    // Initialize the CPLEX environment
    env = CPXopenCPLEX(&status);
    if (env == NULL)
    {  char  errmsg[CPXMESSAGEBUFSIZE];
-   cout << "Could not open CPLEX environment." << endl;
-   CPXgeterrorstring(env, status, errmsg);
-   cout << errmsg << endl;
-   goto TERMINATE;
+      cout << "Could not open CPLEX environment." << endl;
+      CPXgeterrorstring(env, status, errmsg);
+      cout << errmsg << endl;
+      goto TERMINATE;
    }
 
    // Turn on output to the screen 
    status = CPXsetintparam(env, CPXPARAM_ScreenOutput, CPX_ON);
    if (status)
    {  cout << "Failure to turn on screen indicator, error " << status << endl;
-   goto TERMINATE;
+      goto TERMINATE;
    }
 
    // Turn on data checking
    status = CPXsetintparam(env, CPXPARAM_Read_DataCheck, CPX_DATACHECK_WARN);
    if (status)
    {  cout << "Failure to turn on data checking, error " << status << endl;
-   goto TERMINATE;
+      goto TERMINATE;
    }
 
    // Create the problem.
    lp = CPXcreateprob(env, &status, "linSegm");
    if (lp == NULL)
-   {
-      cout << "Failed to create LP." << endl;
+   {  cout << "Failed to create LP." << endl;
       goto TERMINATE;
    }
 
    // Now populate the problem with the data.
    status = populatebyrow(env, lp, y, lstOLS);
    if (status)
-   {
-      cout << "Failed to populate problem." << endl;
+   {  cout << "Failed to populate problem." << endl;
       goto TERMINATE;
    }
 
    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+   tstart = clock();
    status = CPXlpopt(env, lp);
    if (status)
    {  cout << "Failed to optimize LP." << endl;
-   goto TERMINATE;
+      goto TERMINATE;
    }
 
    cur_numrows = CPXgetnumrows(env, lp);
@@ -136,18 +145,18 @@ void goCPLEX()
 
    for (int j = 0; j < cur_numcols; j++)
    {  x.push_back(0);  // primal values
-   dj.push_back(0); // reduced costs
+      dj.push_back(0); // reduced costs
    }
 
    for (int i = 0; i < cur_numrows; i++)
    {  pi.push_back(0);     // dual values
-   slack.push_back(0);  // constraint slacks
+      slack.push_back(0);  // constraint slacks
    }
 
    status = CPXsolution(env, lp, &solstat, &objval, &x[0], &pi[0], &slack[0], &dj[0]);
    if (status)
    {  cout << "Failed to obtain solution." << endl;
-   goto TERMINATE;
+      goto TERMINATE;
    }
 
    // Write the output to the screen.
@@ -165,18 +174,18 @@ void goCPLEX()
    status = CPXcopyctype(env, lp, &ctype[0]);
    if (status)
    {  cout << "Failed to copy ctype" << endl;
-   goto TERMINATE;
+      goto TERMINATE;
    }
 
    // ---------------------------- Optimize to integrality
    status = CPXmipopt(env, lp);
    if (status)
    {  cout << "Failed to optimize MIP" << endl;
-   goto TERMINATE;
+      goto TERMINATE;
    }
 
    tMIP = clock();
-   tCpuOpt = (tMIP - truns) / CLOCKS_PER_SEC;
+   tCpuOpt = (tMIP - tstart) / CLOCKS_PER_SEC;
    cout << "CPU time for MIP: " << tCpuOpt << endl;
 
    solstat = CPXgetstat(env, lp);
@@ -195,33 +204,8 @@ void goCPLEX()
    status = CPXgetx(env, lp, &x[0], 0, cur_numcols - 1);
    if (status)
    {  cout << "Failed to get optimal integer x." << endl;
-   goto TERMINATE;
+      goto TERMINATE;
    }
-
-   postProcess(lstOLS, x, minlag);
-
-   cont = 0;
-   dsFile << "id,low,hi,m,q," << costFunc << endl;
-   for (j = 0; j < cur_numcols; j++)
-      if (x[j] > 0.01)
-      {
-         cout << cont << ") column " << j << " value=" << x[j];
-         cout << " segm: " << get<0>(lstOLS[j]) << ","
-            << get<1>(lstOLS[j]) << ","
-            << get<2>(lstOLS[j]) << ","
-            << get<3>(lstOLS[j]) << ","
-            << get<4>(lstOLS[j]) << endl;
-         dsFile << j << "," << get<0>(lstOLS[j]) << ","
-            << get<1>(lstOLS[j]) << ","
-            << get<2>(lstOLS[j]) << ","
-            << get<3>(lstOLS[j]) << ","
-            << get<4>(lstOLS[j]) << endl;
-         cont++;
-         cost += get<4>(lstOLS[j]);
-      }
-   dsFile.close();
-   n_brk = cont - 1;
-   cout << "Final number of segments: " << cont << " cost " << cost << endl;
 
    // Finally, write a copy of the problem to a file
    if (cur_numcols < 200)
@@ -242,20 +226,13 @@ TERMINATE:
 
    // Free up the CPLEX environment, if necessary
    if (env != NULL)
-   {
-      status = CPXcloseCPLEX(&env);
+   {  status = CPXcloseCPLEX(&env);
       if (status)
-      {
-         char  errmsg[CPXMESSAGEBUFSIZE];
+      {  char  errmsg[CPXMESSAGEBUFSIZE];
          cout << "Could not close CPLEX environment." << endl;
          CPXgeterrorstring(env, status, errmsg);
          cout << errmsg << endl;
       }
    }
-
-   cout << (fLagrangian ? "Lagrangian " : "MIP ") << dsName <<
-      " n_runs " << n << " t_runs " << tCpuRuns <<
-      " SCP objval " << objval << " final cost " << std::setprecision(6) << cost << " n_brk " << n_brk << " t_opt " << tCpuOpt <<
-      " n_rows " << cur_numrows << " n_cols " << cur_numcols << endl;
-   return (status);
+   return (x);
 }

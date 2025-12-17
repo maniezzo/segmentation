@@ -252,6 +252,21 @@ Constraints for changepoint sets (	MERGE WITH ABOVE)
 
 We implemented models TSSC and LTSSC in C++ and ran them on a Windows 11 Intel i7 machine equipped with 32 Gb of RAM. The MIP solver used was CPLEX 22.11. All codes and data are available from the project repository.
 
+\subsection{Cost function}		\label{subsec:costfunc}
+
+Many different cost functions, see figure \ref{fig:costfunctions}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{CostFunctions}
+	\caption{Alternative cost functions}
+	\label{fig:costfunctions}
+\end{figure}
+
+
+
+\subsection{Benchmarking and Comparative Performance} \label{subsec:benchmarking}
+
 The computational results reported here, still to be considered as preliminary, are mainly obtained on environmental monitoring data series, which initially prompted this research. The series were produced in the context of the SMARTLAGOON project, an EU H2020 project, born with the primary objective of developing a tool to allow real-time monitoring, analysis, to predict socio-environmental evolution of the vulnerable area {\it Mar Menor}, which is the largest saltwater coastal lagoon in Europe. \cite{smartlagoon}. Within the framework of the project, smart buoys were deployed in the lagoon and their sensors generated series on 12 attributes.
 
 The sensed variables used here are: the steam pressure (Vapor-Pressure-Avg), the average wind speed (WS-ms-Avg), water temperature measured by a thermistor at the depth of 0.5m (ThermTemp1-Avg), water temperature measured by oximeter at different depths (1m - Wtemp-C1-Avg, 3m - Wtemp-C2-Avg), water temperature measured by conductimeter at the depth of 1m (SDI-Temp-1m), minimum current in the battery (IBatt-Min), average and maximum temperature obtained by a datalogger panel temp thermocouple (PTemp-C-Avg, PTemp-C-Max) and average charging voltage (V-in-chg-Avg). The overall dataset was recorded from August 2022 to April 2023.

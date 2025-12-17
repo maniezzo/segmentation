@@ -54,7 +54,7 @@ int populateGurobiByRow(GRBModel& model,
                sum += xVars[j];
          }
          string cname = "c" + to_string(i);
-         GRBConstr c = model.addConstr(sum >= 1.0, cname);
+         GRBConstr c = model.addConstr(sum == 1.0, cname);  // <<<<<<<<<<<<<<<<<<< PARTITIONING OPPURE COVERING == oppure <=
          constrs.push_back(c);
       }
       model.update();
@@ -71,18 +71,14 @@ int populateGurobiByRow(GRBModel& model,
 }
 
 // Main function
-int goGurobi() 
+vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS) 
 {
-   try 
-   {  // Example input (replace with your actual data)
-      vector<double> y = {1, 1, 1, 1, 1}; // rows
-      vector<tuple<int,int,double,double,double>> lstOLS = 
-      {
-         {0, 2, 0, 0, 10.0},
-         {1, 4, 0, 0, 8.0},
-         {0, 4, 0, 0, 15.0}
-      };
+   clock_t tstart, truns, tMIP;
+   vector<double> xnil;
 
+   try 
+   {  
+      int n = lstOLS.size();
       // Create environment and model
       GRBEnv env = GRBEnv(true);
       env.set(GRB_IntParam_OutputFlag, 1);
@@ -97,7 +93,7 @@ int goGurobi()
       int status = populateGurobiByRow(model, y, lstOLS, xVars, constrs);
       if (status) 
       {  cout << "Failed to populate model." << endl;
-         return status;
+         goto TERMINATE;
       }
 
       // ---------- Solve LP ----------
@@ -134,24 +130,29 @@ int goGurobi()
       int solstat = model.get(GRB_IntAttr_Status);
       cout << "Solution status = " << solstat << endl;
 
+      // redefine to hold the integer solution
+      x.clear();
       if (solstat == GRB_OPTIMAL) 
       {  objval = model.get(GRB_DoubleAttr_ObjVal);
          cout << "MIP objective = " << objval << endl;
          for (int j = 0; j < numCols; ++j)
-            cout << "x[" << j << "] = " << xVars[j].get(GRB_DoubleAttr_X) << endl;
+         {  x.push_back(xVars[j].get(GRB_DoubleAttr_X));
+            //cout<<"x["<<j<<"] = "<<x[j]<<endl;
+         }
       }
 
       if (numCols < 200)
          model.write("problem.lp");
-
+      return x;
    } 
    catch (GRBException& e) 
    {  cout << "Gurobi exception: " << e.getErrorCode() << " " << e.getMessage() << endl;
-      return e.getErrorCode();
+      goto TERMINATE;
    } 
    catch (...) 
    {  cout << "Unknown exception." << endl;
-      return -1;
+      goto TERMINATE;
    }
-   return 0;
+
+TERMINATE: return xnil;
 }

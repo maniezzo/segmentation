@@ -107,13 +107,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>c:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\include;C:\gurobi1200\win64\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\include;C:\gurobi1300\win64\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\gurobi1200\win64\lib;c:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\x64_windows_msvc14\stat_mdd</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);cplex2211.lib;gurobi120.lib;gurobi_c++mdd2017.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\gurobi1300\win64\lib;c:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\x64_windows_msvc14\stat_mdd</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);cplex2211.lib;gurobi130.lib;gurobi_c++mdd2017.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -124,15 +124,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>c:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\include;C:\gurobi1200\win64\include;C:\gurobi103\win64\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\include;C:\gurobi1300\win64\include;C:\gurobi103\win64\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\gurobi1200\win64\lib;c:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\x64_windows_msvc14\stat_mda</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);cplex2211.lib;gurobi120.lib;gurobi_c++md2017.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\gurobi1300\win64\lib;c:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\x64_windows_msvc14\stat_mda</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);cplex2211.lib;gurobi130.lib;gurobi_c++md2017.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
