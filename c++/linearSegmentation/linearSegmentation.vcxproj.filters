@@ -27,6 +27,9 @@
     <ClCompile Include="global.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cplexMIP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="json.h">
@@ -39,6 +42,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gurobiMIP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cplexMIP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,9 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <ilcplex/cplex.h>
 #include <stdlib.h>
-#include <time.h>
 #include <tuple>
 #include <numeric>   // accumulate
 #include <algorithm> // for_each

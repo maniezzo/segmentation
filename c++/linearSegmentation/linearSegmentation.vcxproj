@@ -136,12 +136,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cplexMIP.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="gurobiMIP.cpp" />
     <ClCompile Include="json.cpp" />
     <ClCompile Include="linearSegmentation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cplexMIP.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="gurobiMIP.h" />
     <ClInclude Include="json.h" />
