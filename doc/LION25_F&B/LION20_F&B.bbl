@@ -1,7 +1,17 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{URL }
 \providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{AC17}
+Aminikhanghahi, S., Cook, D.J.: A survey of methods for time series change
+  point detection. Knowledge and Information Systems  \textbf{51},  339--367
+  (2017). \doi{10.1007/s10115-016-0987-z}
+
+\bibitem{AL89}
+Auger, I.E., Lawrence, C.E.: Algorithms for the optimal identification of
+  segment neighborhoods. Bulletin of Mathematical Biology  \textbf{51}(1),
+  39--54 (1989)
 
 \bibitem{BMM08}
 Bartolini, E., Maniezzo, V., Mingozzi, A.: An adaptive memory-based approach
@@ -12,9 +22,45 @@ Bartolini, E., Maniezzo, V., Mingozzi, A.: An adaptive memory-based approach
 Blum, C.: Beam-{ACO} for simple assembly line balancing. {INFORMS} Journal on
   Computing  \textbf{20}(4),  618--627 (2008)
 
+\bibitem{FLS09}
+Fischetti, M., Lodi, A., Salvagnin, D.: Just {MIP} it! In: Maniezzo, V.,
+  St{\"u}tzle, T., Vo{\ss}, S. (eds.) Matheuristics, Annals of Information
+  Systems, vol.~10, pp. 1--20. Springer (2009)
+
+\bibitem{KCHP01}
+Keogh, E.J., Chu, S., Hart, D.M., Pazzani, M.J.: An online algorithm for
+  segmenting time series. In: Proceedings of the 2001 IEEE International
+  Conference on Data Mining. pp. 289--296. IEEE, San Jose, CA, USA (2001).
+  \doi{10.1109/ICDM.2001.989541}
+
+\bibitem{KCHP02}
+Keogh, E.J., Chu, S., Hart, D.M., Pazzani, M.J.: Segmenting time series: A
+  survey and novel approach.
+  \url{https://api.semanticscholar.org/CorpusID:8365617} (2002), accessed
+  2025-12-01
+
+\bibitem{KFE12}
+Killick, R., Fearnhead, P., Eckley, I.A.: Optimal detection of changepoints
+  with a linear computational cost. Journal of the American Statistical
+  Association  \textbf{107}(500),  1590--1598 (2012)
+
 \bibitem{the_book}
 Maniezzo, V., Boschetti, M.A., St{\"u}tzle, T.: Matheuristics: Algorithms and
   Implementations. EURO Advanced Tutorials on Operations Research, Springer
   (2021). \doi{10.1007/978-3-030-64219-4}
+
+\bibitem{R15}
+Rigaill, G.: A pruned dynamic programming algorithm to recover the optimal
+  segmentation of a signal. Journal de la Soci{\'e}t{\'e} Fran{\c c}aise de
+  Statistique  \textbf{156}(4),  180--205 (2015)
+
+\bibitem{SK74}
+Scott, A.J., Knott, M.: A cluster analysis method for grouping means in the
+  analysis of variance. Biometrics  \textbf{30}(3),  507--512 (1974)
+
+\bibitem{TOV20}
+Truong, C., Oudre, L., Vayatis, N.: Selective review of offline change point
+  detection methods. Signal Processing  \textbf{167},  107299 (2020).
+  \doi{10.1016/j.sigpro.2019.107299}
 
 \end{thebibliography}
