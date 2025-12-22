@@ -220,16 +220,63 @@ Many changepoint frameworks encode these ideas via global penalization rather th
 These are the constraints that "operate over the whole segmentation" and are discussed in the global constraint catalogues and CP-based changepoint detection literature (Beldiceanu, Régin; O'Hearn; Gionis; Killick; etc.), as well as in bioinformatics segmentation and shape-constrained segmentation. The main global constraints identified in the segmentation literature (CP + changepoint detection + structural break models) are:
 
 \begin{itemize}
-	\item Segment-count constraints (you already use);
-	\item Constraints on the distribution of segment lengths (global AMONG/NVALUES)
-	\item Constraints on the global pattern of changes (REGULAR, PEAK/VALLY count)
-	\item Global monotonicity or global shape constraints
-	\item Global cost budgets / global total variation constraints
-	\item Global constraint on number of distinct regimes
-	\item Global maxima/minima on segment attributes (e.g., amplitude range)
-	\item Global forbidden-pattern constraints
-	\item Global window-based count constraints
+	\item Segment-count constraints (you already use); In MIP: $Σ d_t ≤ K$.
+	\item Constraints on the distribution of segment lengths (global AMONG/NVALUES) Global-length constraint	Constraint on the multiset of segment lengths, not per-segment one-by-one:
+	(a) Total length equality (trivial): $Σ length_i = T$
+		But more interesting:
+	(b) Length profile constraints
+	Examples seen in CP segmentation papers:
+	AMONG/LENGTH-NVALUES constraints on the set of lengths
+	e.g., number of distinct segment lengths ≤ L
+	SUM of lengths in certain categories, e.g.:
+	number of long segments ≤ α, number of short segments ≤ β.
+	\item Constraints on the global pattern of changes (REGULAR, PEAK/VALLY count) Used in shape-constrained segmentation, speech segmentation, and bioinformatics.
+	A peak is an increase followed by a decrease in segment means (or vice versa).
+	Global constraint: $PEAK_COUNT ≤ P$.
+	\item Global monotonicity or global shape constraints. Not per segment, but a global pattern constraint:
+	Entire segmentation must be monotone nondecreasing, or
+	Must follow a user-specified pattern (e.g., up → plateau → down). 
+	Define a finite automaton over segment types (increasing, decreasing, stationary).
+	Segments must form a string in that language.
+	Examples:
+	No "up–down–up–down" oscillations beyond a pattern.
+	Must alternate increase/decrease in a specific regular pattern.
+	Change types must follow periodic structure (e.g., stable → volatile → stable).
+	\item Global cost budgets / global total variation constraints. A constraint on the sum of segment costs, similar to a global knapsack or global linear constraint:
+	Sum of all segment penalties ≤ B
+	Sum of divergences ≤ B
+	Total variation ≤ B (global TV constraint)
+	\item Global constraint on number of distinct regimes. Constraint: Number of unique $regimes ≤ R$.
+	Used in regime-switching, hidden-state segmentation, and multiple-change models.
+	\item Global maxima/minima on segment attributes (e.g., amplitude range). $Max jump ≤ Δmax$,
+	$Min jump ≥ Δmin$,
+	Or bound the range of all segment means:	$max(μ_i) – min(μ_i) ≤ R$.
+	\item Global forbidden-pattern constraints. A global constraint that forbids entire patterns:
+	No more than α alternations of direction.
+	No pattern like “short–long–short” repeated.
+	Prevent certain segment-type sequences entirely.
+	This is essentially a global pattern-avoidance constraint
+	\item Global window-based count constraints. If each segment has some attribute $a_i$ (e.g., slope, variance, change point score), enforce:
+	$Σ a_i ≤ A$,
+	or$ A_min ≤ Σ a_i ≤ A_max$.
+	Examples in segmentation:
+	Global constraint on total curvature.
+	Global constraint on total number of outliers explained by segmentation.
+	Constraint on total misfit.
 	\item Global constraints on total curvature or total slope
+	\item Minimum / maximum number of "episodes" of a type
+	For multi-type segmentation (e.g., up/down/flat segments):
+	At most K episodes of type “up”, regardless of length.
+	At least M episodes of type “stable”.
+	This is global: it refers to the entire labeling.
+	\item Global domain-specific constraints
+	Found in applied changepoint papers in ecology, neuroscience, econometrics:
+	At most one structural break per season / per macro-regime
+	(the “season” or “macro-regime” spans multiple segments; still a global constraint)
+	Segments must align with known block boundaries, but only globally
+	(global periodicity constraints)
+	At most one changepoint in the entire first half of the series
+	(windowed-global count constraints)
 \end{itemize}
 
 
@@ -246,6 +293,96 @@ Constraints for changepoint sets (	MERGE WITH ABOVE)
 	\item Multi-scale consistency: Enforce that changepoints persist across coarse-to-fine aggregations (e.g., daily to weekly), selecting positions robust globally.
 	\item Robustness-to-outliers budget: Limit the number of changepoints attributable to isolated spikes by bounding the cumulative outlier-attributed evidence globally.
 \end{itemize}
+
+1) Global pattern constraints (e.g., up–down constraints across all segments)
+
+Reference
+
+Hocking, T. D., Rigaill, G., Fearnhead, P., \& Bourque, G. (2017). A Log-Linear Time Algorithm for Constrained Changepoint Detection. arXiv:1703.03352.
+— Constrained changepoint detection with affine constraints on adjacent segment means (e.g., up–down patterns). 
+arXiv
+
+How it maps
+This work imposes global constraints across the segmentation (not per segment) on the relative direction of adjacent changes and shows how to incorporate them in an optimal detection algorithm. It’s widely cited for global directional constraints on changepoint sequences.
+
+2) Global structural constraints / regular patterns under a global formulation (higher-level constrained segmentation)
+
+Reference
+
+Hocking, T. D., Rigaill, G., Fearnhead, P., \& Bourque, G. (2018). Generalized Functional Pruning Optimal Partitioning (GFPOP) for Constrained Changepoint Detection in Genomic Data. arXiv:1810.00117.
+— Generalizes the pattern constraints to alternate up–down and other affine constraints across the whole segmentation. 
+arXiv
+
+How it maps
+The GFPOP work formalizes global constraints across segments as state transitions in a constrained model, allowing regular patterns across the entire solution rather than isolated local rules.
+
+3) Penalized global cost / budget constraints on segmentation
+
+While not always referred to as a global constraint in a CP sense, the core idea of a total budget / global penalty on the segmentation as a whole (affecting number of changepoints / model selection) is formalized in classic changepoint frameworks:
+
+Reference (classical)
+
+Killick, R., Fearnhead, P., \& Eckley, I. A. (2012). Optimal Detection of Changepoints With a Linear Computational Cost. Journal of the American Statistical Association.
+— Introduces the PELT algorithm with a global penalty on number of changepoints. (You can also cite the Arxiv pdf preprint if needed.)
+(PMCID not available, but widely known in the literature.)
+
+Related reference
+
+Yao, Y. C. (1988). Estimating the Number of Change-Points via Schwarz’ Criterion. Statistics \& Probability Letters.
+— Framework for selecting number of changepoints via information criteria (global cost consideration).
+
+These works treat the number of segments / overall penalty as part of the global optimization rather than a per-segment constraint.
+
+4) Global structural break frameworks (econometrics)
+
+Although econometric “structural break” models are not always couched as CP/MIP constraints, they formalize global constraints on the solution such as at most m structural breaks, with simultaneous estimation of break locations:
+
+Reference (foundational)
+
+Bai, J., \& Perron, P. (1998). Estimating and Testing Linear Models With Multiple Structural Changes. Econometrica, 66(1), 47–78.
+— Provides methods for global estimation of multiple structural breaks with explicit control on the number of breaks. 
+Boston University
+
+Follow-up survey
+
+Casini, A., \& Perron, P. (2018). Structural Breaks in Time Series. Oxford Research Encyclopedia of Economics and Finance.
+— A comprehensive review including multiple break estimation and tests. 
+Boston University
+
+These capture global constraints on the entire segmentation such as the number and joint locations of breaks.
+
+Constraint Programming Global Constraint References
+
+These are general global constraints (REGULAR, NVALUES, AMONG, etc.) that could be adapted to enforce whole-solution properties in a segmentation model:
+
+Reference (core text)
+
+Rossi, F., van Beek, P., \& Walsh, T. (Eds.). (2006). Handbook of Constraint Programming. Elsevier, ISBN: 978-0-444-52726-4.
+— Surveys global constraints (e.g., REGULAR for sequence patterns, global count constraints) across variables. 
+cs.uwaterloo.ca
+
+From the handbook you can specifically cite chapters on:
+
+REGULAR constraint — constrains a sequence of decision variables to be accepted by a finite automaton (global pattern constraint).
+
+NVALUES / AMONG / COUNT constraints — constrain global counts / distinct values of sets of variables.
+
+(The Handbook entry lists these as global constraint types; you can cite the appropriate chapter when applying them to segmentation.)
+
+Summary of Types and Representative References
+Constraint type	Representative reference	Notes
+Global up–down pattern / affine constraints	Hocking et al. (2017) arXiv:1703.03352	Changepoint detection with global constraints on adjacent segments. 
+arXiv
+
+General global segmented pattern / regular structure	Hocking et al. (2018) arXiv:1810.00117	GFPOP extends global pattern constraints over all segments. 
+arXiv
+
+Global cost / penalty budget	Killick et al. (2012), Yao (1988)	PELT penalized optimization, information criteria.
+Global selection of breaks	Bai \& Perron (1998) Econometrica	Structural break global model constraints. 
+Boston University
+
+Global CP constraints (REGULAR, COUNT, etc.)	Rossi et al. (2006) Handbook of Constraint Programming	Catalog of global constraints that can enforce global structure. 
+cs.uwaterloo.ca
 
 
 \section{Computational experience} 			\label{sec:computation}
