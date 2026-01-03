@@ -5,44 +5,44 @@ Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: splncs04.bst
 Reallocating 'name_of_file' (item size: 1) to 11 items.
 Database file #1: LION20_F&B.bib
-You've used 12 entries,
+You've used 15 entries,
             2850 wiz_defined-function locations,
-            691 strings with 6608 characters,
-and the built_in function-call counts, 7362 in all, are:
-= -- 616
-> -- 199
-< -- 18
-+ -- 85
-- -- 68
-* -- 470
-:= -- 908
-add.period$ -- 20
-call.type$ -- 12
-change.case$ -- 73
+            713 strings with 7071 characters,
+and the built_in function-call counts, 8685 in all, are:
+= -- 731
+> -- 220
+< -- 20
++ -- 95
+- -- 74
+* -- 536
+:= -- 1070
+add.period$ -- 23
+call.type$ -- 15
+change.case$ -- 85
 chr.to.int$ -- 0
-cite$ -- 12
-duplicate$ -- 661
-empty$ -- 666
-format.name$ -- 80
-if$ -- 1631
+cite$ -- 15
+duplicate$ -- 788
+empty$ -- 798
+format.name$ -- 86
+if$ -- 1932
 int.to.chr$ -- 0
-int.to.str$ -- 12
-missing$ -- 129
-newline$ -- 42
-num.names$ -- 28
-pop$ -- 221
+int.to.str$ -- 15
+missing$ -- 150
+newline$ -- 51
+num.names$ -- 34
+pop$ -- 263
 preamble$ -- 1
-purify$ -- 55
+purify$ -- 64
 quote$ -- 0
-skip$ -- 222
+skip$ -- 270
 stack$ -- 0
-substring$ -- 452
-swap$ -- 401
-text.length$ -- 18
+substring$ -- 539
+swap$ -- 472
+text.length$ -- 20
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 46
+type$ -- 58
 warning$ -- 0
-while$ -- 65
-width$ -- 14
-write$ -- 137
+while$ -- 76
+width$ -- 17
+write$ -- 167

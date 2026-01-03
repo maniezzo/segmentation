@@ -44,10 +44,25 @@ Killick, R., Fearnhead, P., Eckley, I.A.: Optimal detection of changepoints
   with a linear computational cost. Journal of the American Statistical
   Association  \textbf{107}(500),  1590--1598 (2012)
 
+\bibitem{L76}
+Lowerre, B.: The {HARPY} speech recognition system. Ph.D. thesis, Carnegie
+  Mellon University, Pittsburgh, PA (1976)
+
+\bibitem{M21github}
+Maniezzo, V.: {MatheuristicsGAP}: Accompanying code for {M}atheuristics,
+  algorithms and implementations.
+  \url{https://github.com/maniezzo/MatheuristicsGAP} (2021), accessed: 5
+  January 2026
+
 \bibitem{the_book}
 Maniezzo, V., Boschetti, M.A., St{\"u}tzle, T.: Matheuristics: Algorithms and
   Implementations. EURO Advanced Tutorials on Operations Research, Springer
   (2021). \doi{10.1007/978-3-030-64219-4}
+
+\bibitem{N89}
+Natarajan, B.K.: On the use of beam search in exact inference. IEEE
+  Transactions on Pattern Analysis and Machine Intelligence  \textbf{11}(8),
+  883–887 (1989)
 
 \bibitem{R15}
 Rigaill, G.: A pruned dynamic programming algorithm to recover the optimal

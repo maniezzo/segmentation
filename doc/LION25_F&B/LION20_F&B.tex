@@ -69,7 +69,6 @@ Extensive computational experiments demonstrate that the proposed approach consi
 The remainder of the paper is organized as follows. Section 2 reviews related work on changepoint detection and optimization-based approaches. Section 3 introduces the mathematical programming formulation underlying the proposed method. Section 4 details the fore–n–back matheuristic and its algorithmic components. Section 5 presents computational results, and Section 6 concludes with directions for future research.
 
 \section{Changepoint analysis} 	\label{sec:changepoints}
-Letteratura etc. \cite{the_book}
 
 Changepoint detection has been extensively studied across statistics, machine learning, and operations research, leading to a rich body of methodological literature. Early approaches focused on hypothesis testing and likelihood ratio methods applied sequentially or retrospectively, often with limited scalability or weak global optimality guarantees. More recent work has converged on segmentation-based formulations, in which the time series is partitioned into contiguous segments by minimizing a penalized cost function. Comprehensive surveys of this evolution can be found in \cite{AC17} and \cite{TOV20}.
 
@@ -86,11 +85,31 @@ Matheuristics offer a principled way to combine the strengths of these two world
 The method proposed in this paper contributes to this emerging area by introducing a fore–n–back matheuristic that explicitly leverages an optimization-based formulation while maintaining heuristic flexibility and anytime performance. Unlike classical DP or purely algorithmic heuristics, the proposed approach is designed to accommodate complex cost structures and global constraints, positioning it as a complementary alternative within the broader CPD literature.
 
 \section{Fore-and-Back for changepoint analysis}	\label{sec:forenback}
-Fore-and-back \cite{BMM08,the_book} is an extension of {\em Beam Search} (BS) that can improve its effectiveness. Fore-and-Back, when run with no limits on computational resources, becomes an exact solution method. However, by design, it is mainly concerned with heuristic solving, trying to quickly get high quality solutions with little attention paid to optimality proofs.
+Developed as an enhancement of traditional Beam Search (BS), a variant of standard tree  search that limits the number of offsprings that are expanded at each iteration, the Fore-and-Back method (F\&B, \cite{BMM08,the_book}) aims to increase the overall effectiveness of the standard BS approach \cite{L76,N89,B08}. While Fore-and-back functions as an exact solution algorithm when provided with unlimited computational power, its primary intent is to serve as a heuristic. In this capacity, it prioritizes the rapid discovery of high-quality solutions over the rigorous pursuit of optimality proofs.
 
-A significant characteristic of this method is that, despite being a primal only method, it is able to compute bounds to the cost of completing partial solutions, therefore to discard partial solutions from expansion and ultimately to reduce the search space.
+A defining feature of this approach is its ability to generate bounds on the cost required to complete partial solutions, even though it operates as a {\it primal-only method}. By calculating these bounds, the algorithm can identify and prune unpromising partial solutions before they are expanded, effectively narrowing the search space and increasing efficiency.
 
-Beam Search \cite{B08}
+Beam search (BS) does not perform the exhaustive exploration typical of branch-and-bound algorithms. Instead, at each expansion step it maintains a restricted set of partial solutions, called the {\it beam} {\bf T}, from which at most $\delta$ solutions are retained, where $\delta$ is the {\it beam width}. These solutions are selected according to a ranking criterion that estimates the potential quality of their extensions, for instance by using bounds on the cost of their possible completions. 
+
+F\&B extends the general beam search paradigm by alternating explorations in opposite expansion directions and by learning from partial solutions generated in previous iterations, which are stored in memory. These learned partial results are then exploited as a look-ahead mechanism to complete partial solutions when the search proceeds in the opposite direction. Consequently, the algorithm is particularly effective for problems that admit a natural direction for constructing partial solutions, which can also be meaningfully reversed.
+
+F\&B leverages this structure by embedding it into an iterative heuristic framework that adopts a memory-based learning and look-ahead strategy, explicitly exploiting information learned during earlier search phases. The algorithm performs a partial exploration of the solution space through a sequence of beam-search–like trees of two types, referred to as forward and backward trees. Each node at level $h$ in these trees corresponds to a partial solution consisting of $h$ solution components.
+
+At iteration $t$, a forward tree $F^t$ is constructed if $t$ is odd, whereas a backward tree $B^t$ is generated if $t$ is even. During the construction of a tree, each partial solution $X$ is extended to a feasible complete solution by combining it with learned partial solutions produced in the previous iteration of the complementary tree. The cost of the resulting solution is then used to bound the quality of the best complete solution that can be obtained from $X$.
+
+A list, denoted by $L^t_h$, is associated with each level $h$ of the tree built at iteration $t$. The list contains $\delta$ nodes generated but not expanded at level $h$, where $\delta$ is an input control parameter equivalent to the likewise denoted parameter of Beam Search. All nodes so far expanded at level $h$ in all trees at odd iterations are kept in set $E^h$ for forward trees, while those expanded at level $h$ in all trees at even iterations are kept in $\overline{E}^h$ for backward trees.
+The nodes in the lists $L^t_h$, $h=1,\ldots, n$, represent the memory of iteration $t$, that will be used to guide the exploration of the current tree and of the tree that will be explored in the following iteration $t+1$. 
+
+The core idea of Fore-and-Back is to evaluate the completion cost of partial solutions stored at level $h$ of the tree by means of the partial solutions stored in $L^{t-1}_{n-h}$ in case of forward trees, or, analogously, the completion of partial solutions in $L^t_{n-h}$ by means of solutions in $L^{t-1}_h$ in case of backward trees. 
+
+Algorithm \ref{FaB:peudocode} presents a pseudocode for F\&B. In it, {\bf T} denotes alternatively the forward tree {\bf F} or the backward tree {\bf B}, depending on the parity of the iteration counter, and $T_h$ denotes the level $h$ of the tree {\bf T}, be it forward or backward.
+The algorithm is controlled by three user-defined parameters: $\delta$, the number of nodes expanded at each level of both forward and backward trees; {\it maxn}, the maximum total number of nodes to expand; {\it maxtnodes}, the limit of the number of nodes of each tree. 
+
+In order to expand level $h$ of a tree at iteration $t$, the algorithm computes the value $c(X)$ for each node $X \in T_h$ and builds the set $L^t_h \subseteq T_h$. The list is defined ordering $T_h$ by increasing cost values and keeping in $L^t_h$ only its $\delta$ nodes having the smallest cost, which will be further expanded.
+
+A distinctive characteristic of the Fore-and-Back algorithm is that, at each level $h$ of the tree generated at iteration $t$, it also records the value $\hat{c}^t_h$. This value corresponds to the minimum cost among the nodes in $T_h$ that do not belong to $L^t_h$. It represents the smallest cost that is expected to be incurred when completing a complementary partial solution without relying on the partial solutions that contributed to the construction of $L^t_h$.
+
+More details about the algorithm can be found in \cite{the_book}, a sample implementation of F\&B applied to the GAP problem can be downloaded from \cite{M21github}.
 
 \begin{algorithm}
    \SetKwInOut{Input}{Input}
@@ -146,12 +165,8 @@ Beam Search \cite{B08}
    \label{FaB:peudocode}
 \end{algorithm}
 
-In $\text{C++}$, the std::map<int, int> is an excellent choice because it is implemented as a $\text{Red-Black}$ tree, which keeps the keys (your num values) sorted. Store the pairs as std::map<int, int> map name; where the key is num and the value is the minimum cost seen so far for that specific num and all numbers greater than it up to the next existing entry. However, a simpler, more robust approach is to ensure the map only stores non-redundant pairs that form the Pareto frontier of the $(num, cost)$ space.
-Operation Standard BBST - std::mapBBST with Pareto Optimization Insert $O(\log N)$ $O(\log N)$ amortized (because dominated elements are permanently removed) Query $O(\log N)$ $O(\log N)$ (for upper bound and decrement)
-
 \section{Computational results}		\label{sec:computational}
-Computational results
-
+The F\&B algorithm for the CPD problem was implemented in$\text{C++}$ and executed on a Windows 11 laptop equipped with an Intel Core Ultra 7 processor and 1 TB of RAM. Particular attention was devoted to the design of the data structures used to maintain the stages at each level of the search trees. These stages were implemented using the standard library container \texttt{std::map<int, int>}, which is realized as a {\it Red–Black} tree and therefore maintains its keys in sorted order. In this structure, the key corresponds to the number {\it num} of arcs used so far in the partial solution, while the associated value stores the minimum cost observed so far for that specific {\it num} and for all larger values up to the next existing key.
 
 \paragraph{Sample Heading (Fourth Level)}
 The contribution should contain no more than four levels of headings. Table~\ref{tab1} gives a summary of all heading levels.
