@@ -6,6 +6,23 @@ void FnBsegmentation::run_FnB()
 {  int i;
    bool isImprovedF = true, isImprovedB = true;
 
+   // 2. Assign the pointer based on idcost
+   switch (idcost) 
+   {
+      //case 0 : pntCost = &FnBsegmentation::costR2;     break;
+      //case 1 : pntCost = &FnBsegmentation::costMSE;    break;
+      //case 2 : pntCost = &FnBsegmentation::costChi2;   break; 
+      //case 3 : pntCost = &FnBsegmentation::costSER;    break;
+      //case 4 : pntCost = &FnBsegmentation::costVar;    break;
+      //case 5 : pntCost = &FnBsegmentation::costRMSE;   break;
+      case 6 : pntCost = &FnBsegmentation::costQRMSE; costName = "QRMSE"; break;
+      //case 7 : pntCost = &FnBsegmentation::costQRMSEn; break;
+      case 8 : pntCost = &FnBsegmentation::costAIC; costName = "AIC"; break;
+      //case 9 : pntCost = &FnBsegmentation::costBIC;    break;
+      default: cout << "------- ERROR IN ASSIGNING COST FUNCTION ----------";
+   }
+
+
    Stage N;
    N.mainNode();
 
@@ -139,12 +156,12 @@ bool FnBsegmentation::backward()
    return isImproved;
 }
 
-// forward offspring generation
+// forward offspring generation, cost computation
 bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost, vector<int> lstPoints)
 {  double c,m,q,z;
    bool isImproved = false;
 
-   tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
+   tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costQRMSE(t1, t2);
    z = cost+get<4>(res);
    lstPoints.push_back(t2);
 
@@ -165,13 +182,13 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
    return isImproved;
 }
 
-// backward offspring generation
+// backward offspring generation, cost computation
 bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost, vector<int> lstPoints)
 {  int i;
    double c,m,q,z;
    bool isImproved = false;
 
-   tuple<int,int,double,double,double> res = costQRMSE(t1, t2);
+   tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costQRMSE(t1, t2);
    z = cost+get<4>(res);
    lstPoints.insert(lstPoints.begin(), t1);
 
@@ -209,7 +226,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
             zub = z + lb;
             changepoints = get<2>(Fexpanded[i].queryMinCost(numSegm));
             vector<int> vb = get<2>(Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm));
-            changepoints.insert(changepoints.end(), vb.begin(), vb.end()); // Append vb
+            changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
             cout << "F) Match: new zub: "<< zub << endl;
          }
@@ -225,7 +242,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
             zub = z + lb;
             changepoints = get<2>(Bexpanded[i].queryMinCost(numSegm));
             vector<int> vb = get<2>(Fexpanded[i-1].queryMinCost(maxNumEdges-numSegm));
-            changepoints.insert(changepoints.end(), vb.begin(), vb.end()); // Append vb
+            changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
             cout << "B) Match: new zub: "<< zub << endl;
          }
@@ -244,7 +261,7 @@ void FnBsegmentation::reconstructFnBsolution()
    int t1 = 0;
    for (i=1;i<changepoints.size();i++)
    {  int t2 = changepoints[i];
-      tuple<int, int, double, double, double> tup = costQRMSE(t1,t2);
+      tuple<int, int, double, double, double> tup = (this->*pntCost)(t1, t2); //costQRMSE(t1,t2);
       sum += get<4>(tup);
       sol.push_back(tup);
       cout << t2 << " ";
@@ -276,7 +293,7 @@ void FnBsegmentation::DAG_SSSP()
    {  tend = min(maxt,t+maxLength);
       for(j=t+minLength;j<=tend;j++)
       {  if(t>0 && t<minLength) continue;
-         tup = costQRMSE(t,j);  // cosi' segmenti attaccati, se staccati da t a j-1
+         tup = (this->*pntCost)(t,j); //costQRMSE(t,j);  // cosi' segmenti attaccati, se staccati da t a j-1
          c   = get<4>(tup);
          if (mincost[j]==DBL_MAX || mincost[j]>(mincost[t]+c))
          {  mincost[j] = mincost[t] + c;
@@ -330,7 +347,7 @@ int FnBsegmentation::run_BF()
          Edge edge;
          edge.end1 = t1;
          edge.end2 = t2;
-         lstOLS.push_back(costQRMSE(t1,t2));
+         lstOLS.push_back((this->*pntCost)(t1, t2)); //costQRMSE(t1,t2));
          edge.cost = get<4>(lstOLS[cont]);
          edge.segm = cont++;
          edges.push_back(edge);
@@ -397,7 +414,8 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
       " " << edges[paths1[numv - 1][i]].cost << 
       " tot " << totc << endl;
       nedges++;
-      tup = costQRMSE(edges[paths1[numv-1][i]].end1, edges[paths1[numv-1][i]].end2);
+      //tup = costQRMSE(edges[paths1[numv-1][i]].end1, edges[paths1[numv-1][i]].end2);
+      tup = (this->*pntCost)(edges[paths1[numv-1][i]].end1, edges[paths1[numv-1][i]].end2);
       sol.push_back(tup);
    }
    cout << "F&B (Bellman-Ford) "<< dsName << " cost: " << std::setprecision(5) << totc << " n_brk " << nedges-1 << " t.cpu " << ttot << endl;
@@ -434,7 +452,7 @@ int FnBsegmentation::writeSolCsv(vector<tuple<int, int, double, double, double>>
       return 1;
    }
 
-   outFile << "t1,t2,m,q,cost" << endl;
+   outFile << "t1,t2,m,q,cost" << costName << endl;
    for (i=0;i<sol.size();i++) 
    {
       outFile << get<0>(sol[i]) << "," << 
@@ -473,6 +491,52 @@ tuple<int, int, double, double, double> FnBsegmentation::costQRMSE(int t1, int t
    }
    double costQRMSE = sumres2 / sqrt(n);
    return { t1, t2, m, q, costQRMSE };
+}
+
+/// Compute AIC for a linear model yhat = m*x + q given y and (optionally) x.
+/// If x is null, x[i] is assumed to be i (0,1,2,...).
+/// The returned AIC is n*log(RSS/n) + 2*k, with k=3 (slope, intercept, sigma^2).
+/// Set includeConstant=true to add n*log(2*pi) + n (software-dependent constant).
+tuple<int, int, double, double, double> FnBsegmentation::costAIC(int t1, int t2)
+{  int i, n;
+   double m, q, rss=0;
+   vector<int> x;
+   vector<double> y;
+   vector<double> ypred, residuals;
+   bool includeConstant = false;  // per la formula AIC estesa
+
+   n = t2-t1;
+   for (i = t1; i < t2; i++)
+   {  x.push_back(i);
+      y.push_back(Y[i]);
+   }
+
+   tie(m, q) = linearRegression(x, y);
+
+   for (i = 0; i < n; i++)
+   {  double yhat = m * x[i] + q;
+      double e = y[i] - yhat;
+      rss += e * e;
+   }
+
+   // MLE of sigma^2 is RSS/n
+   double mse = rss / n;
+
+   // Number of estimated parameters: slope, intercept, and error variance sigma^2
+   const int k = 3;
+
+   // AIC without the constant (commonly used for comparison across models fit to the same data)
+   double aic = n * log(mse) + 2 * k;
+
+   // Optional: add the software-dependent constant n*log(2*pi) + n
+   if (includeConstant)
+      aic += n * log(2.0 * 3.141592) + n;
+
+   // here it becomes AICc
+   if(n<40)
+      aic = aic + (2*k*k+2*k)/(n-k+1);
+
+   return { t1, t2, m, q, aic};
 }
 
 // OLS line through vector of points

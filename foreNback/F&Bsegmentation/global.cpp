@@ -10,6 +10,7 @@ int      minLength   = 0;
 int      maxLength   = 0;
 int      maxcpu      = 0;
 int      numMatch    = 0;
+int      idcost      = 0;           // id (0 based) of the cost function
 double   zub         = 0.0;
 double   ttot        = 0.0;
 clock_t  tstart, tend;

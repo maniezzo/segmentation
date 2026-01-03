@@ -48,6 +48,7 @@ void readConfig()
    minLength = JSV["minLength"];
    maxLength = JSV["maxLength"];
    maxcpu    = JSV["maxcpu"];
+   idcost    = JSV["idcost"];
    cout << baseDir << endl;
    cout << dsName << endl;
 }
@@ -136,7 +137,7 @@ int main()
    readConfig();
    zub = DBL_MAX;
 
-   int idDataSet = 0;
+   int    idDataSet = 0;
    string dataFile        = baseDir + dsName + ".csv";
    string segmentFileName = baseDir + dsName + "_runs.csv";
    vector<int> X;
