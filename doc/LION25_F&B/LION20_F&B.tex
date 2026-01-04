@@ -43,7 +43,7 @@
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-This paper introduces a novel fore–n–back matheuristic for changepoint detection in univariate time series, combining the modeling rigor of mathematical programming with the efficiency of heuristic search. Classical exact approaches to optimal partitioning, such as dynamic programming, offer strong optimality guarantees but typically exhibit quadratic time and memory requirements in the sequence length, which can limit their applicability to long series or resource-constrained settings.
+This paper introduces a novel fore–n–back matheuristic for offline changepoint detection in univariate time series, combining the modeling rigor of mathematical programming with the efficiency of heuristic search. Classical exact approaches to optimal partitioning, such as dynamic programming, offer strong optimality guarantees but typically exhibit quadratic time and memory requirements in the sequence length, which can limit their applicability to long series or resource-constrained settings.
 The proposed method embeds an optimization-based formulation within an iterative forward–backward search scheme that rapidly constructs high-quality feasible segmentations and incrementally improves them as additional computational resources become available. This design yields an anytime algorithm that preserves the structural advantages of exact models—such as extensibility and constraint handling—while avoiding exhaustive exploration.
 Computational experiments show that the matheuristic consistently attains near-optimal solutions at a fraction of the computational cost of standard exact methods, providing a scalable and flexible alternative for optimization-based changepoint detection in practice.
 \keywords{Changepoint analysis \and matheuristics \and Fore-and-Back.}
@@ -168,12 +168,24 @@ More details about the algorithm can be found in \cite{the_book}, a sample imple
 \section{Computational results}		\label{sec:computational}
 The F\&B algorithm for the CPD problem was implemented in$\text{C++}$ and executed on a Windows 11 laptop equipped with an Intel Core Ultra 7 processor and 1 TB of RAM. Particular attention was devoted to the design of the data structures used to maintain the stages at each level of the search trees. These stages were implemented using the standard library container \texttt{std::map<int, int>}, which is realized as a {\it Red–Black} tree and therefore maintains its keys in sorted order. In this structure, the key corresponds to the number {\it num} of arcs used so far in the partial solution, while the associated value stores the minimum cost observed so far for that specific {\it num} and for all larger values up to the next existing key.
 
-\paragraph{Sample Heading (Fourth Level)}
-The contribution should contain no more than four levels of headings. Table~\ref{tab1} gives a summary of all heading levels.
+\subsubsection{Benchmark instances.} 
+The instances in the test set were selected to be representative of a variety of application areas in which time series analysis is relevant. We leveraged benchmarks from the M forecasting competitions \cite{M26}, including instances from the M3, M4, and M6 installments. Specifically, the M3 and M4 datasets include time series from microeconomics, industry, macroeconomics, finance, demographics, and an unspecified “other” category, while the M6 dataset consists of daily adjusted close prices of the competition assets. In addition, we complemented the test set with IoT time series collected from environmental sensors, as described in \cite{M24}.
+
+\subsubsection{Benchmark codes.}
+Different codes were used to benchmark the effectiveness of F\&B under various application conditions. In the simplest setting, where the objective is solely to identify effective changepoints and the quality of a model is assumed to be additive over its constituent segments, the time points of the series can be mapped to the nodes of a graph, with segments represented as arcs. Under this formulation, the CPD problem reduces to finding a least-cost path from time 0 to the final time point in the resulting graph. This problem can be efficiently solved, for example, using the DAG-SHORTEST-PATHS (DSP) algorithm \cite{CLRS09}.
+
+A commonly imposed constraint limits the maximum number of segments in the solution, specified as a parameter. Under this constraint, the problem remains easy to solve, as it requires only a minor adaptation of the Bellman–Ford shortest-path recursion \cite{CLRS09}, in which the number of dynamic programming stages is capped at the prescribed parameter value. We implemented this approach denoting it BF.
+
+Finally, the state-of-the-art for CPD solution is represented by the {\it ruptures} library \cite{TOV20}, a Python library for offline change point detection that provides a variety of methods for the analysis and segmentation of non-stationary signals. We include, as baselines, three widely used changepoint detection algorithms implemented in the ruptures library, namely PELT, dynamic programming (DYNP), and binary segmentation (BinSeg). These methods are representative of different algorithmic paradigms and trade-offs between optimality and computational efficiency.
+
+\paragraph{Pruned Exact Linear Time} (PELT) \cite{KFE12}, is an exact method for optimal multiple changepoint detection under an additive cost formulation with a penalty on the number of changepoints. PELT exploits a pruning rule that discards suboptimal candidate changepoints during the dynamic programming recursion, yielding linear expected time complexity under mild assumptions on the cost function and penalty. PELT is often regarded as a state-of-the-art exact method for large-scale offline changepoint detection.
+
+\paragraph{Dynamic programming} (DYNP) computes the globally optimal segmentation for a fixed number of changepoints (or segments) by exhaustively exploring all possible partitions of the time series. This approach dates back to early work by Auger and Lawrence \cite{AL89} and guarantees optimality, but its computational complexity is quadratic or worse in the length of the series.
+
+\paragraph{Binary segmentation} (BinSeg) is a greedy, recursive procedure that iteratively detects a single changepoint over the entire series and then applies the same procedure to the resulting subsegments. Classical binary segmentation was introduced by Scott and Knott \cite{SK74} and remains popular due to its simplicity and low computational cost. 
 
 \begin{table}
-	\caption{Table captions should be placed above the
-		tables.}\label{tab1}
+	\caption{Table captions should be placed above the tables.}\label{tab1}
 	\begin{tabular}{|l|l|l|}
 		\hline
 		Heading level &  Example & Font size and style\\

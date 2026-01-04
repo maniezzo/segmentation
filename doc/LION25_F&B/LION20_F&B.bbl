@@ -3,6 +3,11 @@
 \providecommand{\urlprefix}{URL }
 \providecommand{\doi}[1]{https://doi.org/#1}
 
+\bibitem{M26}
+Makridakis competitions.
+  \url{https://en.wikipedia.org/wiki/Makridakis\_Competitions}, accessed: 5
+  January 2026
+
 \bibitem{AC17}
 Aminikhanghahi, S., Cook, D.J.: A survey of methods for time series change
   point detection. Knowledge and Information Systems  \textbf{51},  339--367
@@ -21,6 +26,10 @@ Bartolini, E., Maniezzo, V., Mingozzi, A.: An adaptive memory-based approach
 \bibitem{B08}
 Blum, C.: Beam-{ACO} for simple assembly line balancing. {INFORMS} Journal on
   Computing  \textbf{20}(4),  618--627 (2008)
+
+\bibitem{CLRS09}
+Cormen, T.H., Leiserson, C.E., Rivest, R.L., Stein, C.: Introduction to
+  Algorithms. MIT Press, 3rd edn. (2009)
 
 \bibitem{FLS09}
 Fischetti, M., Lodi, A., Salvagnin, D.: Just {MIP} it! In: Maniezzo, V.,
@@ -53,6 +62,12 @@ Maniezzo, V.: {MatheuristicsGAP}: Accompanying code for {M}atheuristics,
   algorithms and implementations.
   \url{https://github.com/maniezzo/MatheuristicsGAP} (2021), accessed: 5
   January 2026
+
+\bibitem{M24}
+Maniezzo, V.: Extended set covering for time series segmentation. In:
+  Metaheuristics: 15th International Conference, MIC 2024, Lorient, France,
+  June 4–7, 2024, Proceedings, Part I. p. 193–199. Springer-Verlag, Berlin,
+  Heidelberg (2024)
 
 \bibitem{the_book}
 Maniezzo, V., Boschetti, M.A., St{\"u}tzle, T.: Matheuristics: Algorithms and
