@@ -13,5 +13,6 @@ int      numMatch    = 0;
 int      idcost      = 0;           // id (0 based) of the cost function
 double   zub         = 0.0;
 double   ttot        = 0.0;
+bool     isVerbose   = true;
 clock_t  tstart, tend;
 vector<double> Y;

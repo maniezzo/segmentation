@@ -49,6 +49,7 @@ void readConfig()
    maxLength = JSV["maxLength"];
    maxcpu    = JSV["maxcpu"];
    idcost    = JSV["idcost"];
+   isVerbose = JSV["isVerbose"];
    cout << baseDir << endl;
    cout << dsName << endl;
 }

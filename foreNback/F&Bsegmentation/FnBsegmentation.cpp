@@ -22,16 +22,18 @@ void FnBsegmentation::run_FnB()
       default: cout << "------- ERROR IN ASSIGNING COST FUNCTION ----------";
    }
 
-
    Stage N;
    N.mainNode();
 
+   cout << "\n---------------------------------------------------- DAG" << endl;
    // optimal solution with no constraint on the number of arcs (but with minLength)
    DAG_SSSP();
 
+   cout << "\n---------------------------------------------------- BF" << endl;
    // optimal solution with one constraint on the number of arcs and with minLength
    run_BF();
 
+   cout << "\n---------------------------------------------------- FnB" << endl;
    Fstage.resize(n);
    Fexpanded.resize(n);
    Fstage[0].insert(0, 0, {0});   // num,cost, [changepoints]
@@ -47,6 +49,7 @@ void FnBsegmentation::run_FnB()
       tend = clock();
       ttot = (tend - tstart) / CLOCKS_PER_SEC;
    } while((isImprovedF || isImprovedB) && ttot < maxcpu);
+   cout << "FnB: t.cpu " << ttot << endl;
    reconstructFnBsolution();
 }
 
@@ -168,8 +171,10 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
    if (t2==(n-1) && z<zub)
    {  zub = z;
       changepoints = lstPoints;
-      ttot = (clock() - tstart) / CLOCKS_PER_SEC;
-      cout << "F) New zub: "<< zub << " t.cpu " << ttot << endl;
+      if(isVerbose)
+      {  ttot = (clock()-tstart)/CLOCKS_PER_SEC;
+         cout << "F) New zub: "<< zub << " t.cpu " << ttot << endl;
+      }
       isImproved = true;
    }
 
@@ -195,8 +200,10 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
    if (t1==0 && z<zub)
    {  zub = z;
       changepoints = lstPoints;
-      ttot = (clock() - tstart) / CLOCKS_PER_SEC;
-      cout << "B) New zub: "<< zub << " t.cpu " << ttot << endl;
+      if(isVerbose)
+      {  ttot = (clock()-tstart)/CLOCKS_PER_SEC;
+         cout<<"B) New zub: "<<zub<<" t.cpu "<<ttot<<endl;
+      }
       isImproved = true;
    }
 
@@ -228,7 +235,8 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
             vector<int> vb = get<2>(Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm));
             changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
-            cout << "F) Match: new zub: "<< zub << endl;
+            if(isVerbose)
+               cout << "F) Match: new zub: "<< zub << endl;
          }
       }
    else
@@ -244,7 +252,8 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
             vector<int> vb = get<2>(Fexpanded[i-1].queryMinCost(maxNumEdges-numSegm));
             changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
-            cout << "B) Match: new zub: "<< zub << endl;
+            if(isVerbose)
+               cout << "B) Match: new zub: "<< zub << endl;
          }
       }
 l0:return hasMatch;
@@ -306,7 +315,7 @@ void FnBsegmentation::DAG_SSSP()
 
    sol = reconstructDAGsolution(lstOLS,maxt);
    writeSolCsv(sol,"test_sol.csv");
-   cout << "F&B (DAG) " << dsName << " cost: " << std::setprecision(5) << mincost[maxt] << " n_brk " << sol.size()-1 << " t.cpu " << ttot << endl;
+   cout << "DAG " << dsName << " cost: " << std::setprecision(5) << mincost[maxt] << " n_brk " << sol.size()-1 << " t.cpu " << ttot << endl;
 }
 
 // ricostruisce la soluzione DAG
