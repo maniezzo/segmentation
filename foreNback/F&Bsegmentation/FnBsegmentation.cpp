@@ -36,7 +36,7 @@ void FnBsegmentation::run_FnB()
    cout << "\n---------------------------------------------------- FnB" << endl;
    Fstage.resize(n);
    Fexpanded.resize(n);
-   Fstage[0].insert(0, 0, {0});   // num,cost, [changepoints]
+   Fstage[0].insert(0, 0, {0});     // num,cost, [changepoints]
 
    Bstage.resize(n);
    Bexpanded.resize(n);
@@ -62,7 +62,7 @@ bool FnBsegmentation::forward()
    vector<int> lstPoints;
    tend = min(n,maxLength);
 
-   for(i=0;i<n;i++)
+   for(i=0;i<n;i++) // stage
    {  if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength
 
       for(k=0;k<delta;k++) // beam width
@@ -149,7 +149,7 @@ bool FnBsegmentation::backward()
 
          if(nSegm < maxNumEdges)
          {  tstart = max(0,i-minLength-maxLength);
-            for (t=i-minLength;t>=0;t--)
+            for (t=i-minLength-1;t>=0;t--)
             {  bool fGen = generateBoffspring(i, t, nSegm, z, lstPoints); // backward, t<i
                isImproved = isImproved || fGen;
             }
@@ -164,6 +164,11 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
 {  double c,m,q,z;
    bool isImproved = false;
 
+   if(t1>0) 
+   {  t1+=1;   // nuovo segmento parte un time point dopo la fine del precedente
+      if(t2-t1 < minLength)
+         return false;  // segmento troppo corto, può capitare a causa di t1=0
+   }
    tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costQRMSE(t1, t2);
    z = cost+get<4>(res);
    lstPoints.push_back(t2);
@@ -175,11 +180,12 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
       {  ttot = (clock()-tstart)/CLOCKS_PER_SEC;
          cout << "F) New zub: "<< zub << " t.cpu " << ttot << endl;
       }
-      isImproved = true;
    }
 
    if(z < zub)
-      Fstage[t2].insert(nSegm+1, z, lstPoints);
+   {  Fstage[t2].insert(nSegm+1, z, lstPoints);
+      isImproved = true;
+   }
    else
       nFathomed++;
    //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
@@ -193,6 +199,12 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
    double c,m,q,z;
    bool isImproved = false;
 
+   if(t2<n-1) 
+   {  t2-=1;   // nuovo segmento finisce un time point prima dell'inizio del seguente
+      if(t2-t1 < minLength)
+         return false;  // segmento troppo corto, può capitare a causa di t1=0
+   }
+
    tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costQRMSE(t1, t2);
    z = cost+get<4>(res);
    lstPoints.insert(lstPoints.begin(), t1);
@@ -204,11 +216,12 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
       {  ttot = (clock()-tstart)/CLOCKS_PER_SEC;
          cout<<"B) New zub: "<<zub<<" t.cpu "<<ttot<<endl;
       }
-      isImproved = true;
    }
 
    if(z < zub)
-      Bstage[t1].insert(nSegm+1, z,lstPoints);
+   {  Bstage[t1].insert(nSegm+1, z, lstPoints);
+      isImproved = true;
+   }
    else
       nFathomed++;
    //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
@@ -225,7 +238,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
    if (isForward)
       if(i<maxt)
       {  lb = get<0>( Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm) );
-         if(lb==0) goto l0; // no feasible expansion
+         if(lb==0) goto l0; // no feasible match
          hasMatch = true;
          numMatch++;
          if(z + lb < zub)
@@ -274,7 +287,7 @@ void FnBsegmentation::reconstructFnBsolution()
       sum += get<4>(tup);
       sol.push_back(tup);
       cout << t2 << " ";
-      t1 = t2;
+      t1 = t2+1;
    }
    cout << endl;
    cout << "Costo complessivo " << sum << " t.cpu " << ttot << " num.matches " << numMatch << " n.fathomed " << nFathomed << endl;
@@ -398,8 +411,7 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
          w = edges[j].cost;
 
          du = 0;
-         //if(u>0) du = cost0[u]; // il nuovo segm parte subito dopo la fine del precedente
-         if(u>0) du = cost0[u-1]; // il nuovo segm parte 1 dopo la fine del precedente
+         if(u>0) du = cost0[u]; // costo per arrivare al primo estremo
          if (cost0[u] != DBL_MAX && (du + w) < cost1[v])
          {  cost1[v] = du + w;
             prev[v] = u;
@@ -408,7 +420,7 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
             paths1[v].push_back(j); // l'arco percorso per arrivare
          }
       }
-      cost0 = cost1; // cost1 will be the cost0 at next iteration
+      cost0  = cost1; // cost1 will be the cost0 at next iteration
       paths0 = paths1;
    }
    tend = clock();
@@ -423,9 +435,9 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
    for(i=0;i<paths1[numv-1].size();i++)
    {  totc += edges[paths1[numv - 1][i]].cost;
       cout << i << ") " << edges[paths1[numv - 1][i]].end1 << 
-      " " << edges[paths1[numv - 1][i]].end2 << 
-      " " << edges[paths1[numv - 1][i]].cost << 
-      " tot " << totc << endl;
+         " " << edges[paths1[numv - 1][i]].end2 << 
+         " " << edges[paths1[numv - 1][i]].cost << 
+         " tot " << totc << endl;
       nedges++;
       //tup = costQRMSE(edges[paths1[numv-1][i]].end1, edges[paths1[numv-1][i]].end2);
       tup = (this->*pntCost)(edges[paths1[numv-1][i]].end1, edges[paths1[numv-1][i]].end2);
