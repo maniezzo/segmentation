@@ -22,8 +22,8 @@ void FnBsegmentation::run_FnB()
       default: cout << "------- ERROR IN ASSIGNING COST FUNCTION ----------";
    }
 
-   Stage N;
-   N.mainNode();
+   //Stage N;
+   //N.mainNode();
 
    cout << "\n---------------------------------------------------- DAG" << endl;
    // optimal solution with no constraint on the number of arcs (but with minLength)
@@ -289,6 +289,7 @@ void FnBsegmentation::DAG_SSSP()
    vector<tuple<int, int, double, double, double>> lstOLS; // t1,t2,m,q,cost of the segment
    vector<tuple<int, int, double, double, double>> sol;
 
+   cout<<"Running DAG SSSP, n="<<n<<" minLength="<<minLength<<" maxLength="<<maxLength<<endl;
    maxt     = n-1;
    maxstart = maxt - minLength;
    lstOLS.resize(n);
@@ -299,10 +300,13 @@ void FnBsegmentation::DAG_SSSP()
    mincost[0] = 0;
 
    for (t=0;t<=maxstart;t++)
-   {  tend = min(maxt,t+maxLength);
+   {  tend = min(maxt,t+maxLength); // nel caso di serie lunghissime, maxt grande
+      if(t%100==0)
+         cout << "DAG processing t=" << t << endl;
+
       for(j=t+minLength;j<=tend;j++)
       {  if(t>0 && t<minLength) continue;
-         tup = (this->*pntCost)(t,j); //costQRMSE(t,j);  // cosi' segmenti attaccati, se staccati da t a j-1
+         tup = (this->*pntCost)(t,j-1); //costQRMSE(t,j);  // j segmenti attaccati, se staccati da t a j-1
          c   = get<4>(tup);
          if (mincost[j]==DBL_MAX || mincost[j]>(mincost[t]+c))
          {  mincost[j] = mincost[t] + c;
@@ -394,8 +398,8 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
          w = edges[j].cost;
 
          du = 0;
-         if(u>0) du = cost0[u]; // il nuovo segm parte subito dopo la fine del precedente
-         //if(u>0) du = cost0[u-1]; // il nuovo segm parte 1 dopo la fine del precedente
+         //if(u>0) du = cost0[u]; // il nuovo segm parte subito dopo la fine del precedente
+         if(u>0) du = cost0[u-1]; // il nuovo segm parte 1 dopo la fine del precedente
          if (cost0[u] != DBL_MAX && (du + w) < cost1[v])
          {  cost1[v] = du + w;
             prev[v] = u;
