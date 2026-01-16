@@ -212,6 +212,8 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
    if (t1==0 && z<zub)
    {  zub = z;
       changepoints = lstPoints;
+      for (i=1;i<changepoints.size()-1;i++)
+         changepoints[i]--;   // il changepoint è la fine del segmento prima
       if(isVerbose)
       {  ttot = (clock()-tstart)/CLOCKS_PER_SEC;
          cout<<"B) New zub: "<<zub<<" t.cpu "<<ttot<<endl;
@@ -279,18 +281,20 @@ void FnBsegmentation::reconstructFnBsolution()
    vector<tuple<int, int, double, double, double>> sol;
    ttot = (clock() - tstart) / CLOCKS_PER_SEC;
 
-   cout << "Changepoints: ";
    int t1 = 0;
+   cout << "Segments: "<<endl;
    for (i=1;i<changepoints.size();i++)
    {  int t2 = changepoints[i];
       tuple<int, int, double, double, double> tup = (this->*pntCost)(t1, t2); //costQRMSE(t1,t2);
       sum += get<4>(tup);
       sol.push_back(tup);
-      cout << t2 << " ";
+      cout << to_string(get<0>(tup))+" "+to_string(get<1>(tup))+" "+to_string(get<4>(tup))+" " << endl;
       t1 = t2+1;
    }
-   cout << endl;
+   cout << "Changepoints: "; for(int x:changepoints) std::cout << x << ' '; std::cout << endl;
    cout << "Costo complessivo " << sum << " t.cpu " << ttot << " num.matches " << numMatch << " n.fathomed " << nFathomed << endl;
+   if(abs(sum-zub) > 0.001)
+      cout<<"------- ERROR IN RECONSTRUCTING FnB SOLUTION ----------"<<endl;
    writeSolCsv(sol,"test_sol.csv");
 }
 
@@ -477,7 +481,7 @@ int FnBsegmentation::writeSolCsv(vector<tuple<int, int, double, double, double>>
       return 1;
    }
 
-   outFile << "t1,t2,m,q,cost" << costName << endl;
+   outFile << "t1,t2,m,q,cost" << costName <<","<< dsName << endl;
    for (i=0;i<sol.size();i++) 
    {
       outFile << get<0>(sol[i]) << "," << 
@@ -500,8 +504,8 @@ tuple<int, int, double, double, double> FnBsegmentation::costQRMSE(int t1, int t
    vector<double> y;
    vector<double> ypred, residuals;
 
-   n = t2-t1;
-   for (i = t1; i < t2; i++)
+   n = t2-t1+1; // estremi inclusi
+   for (i = t1; i <= t2; i++)
    {  x.push_back(i);
       y.push_back(Y[i]);
    }
@@ -530,8 +534,8 @@ tuple<int, int, double, double, double> FnBsegmentation::costAIC(int t1, int t2)
    vector<double> ypred, residuals;
    bool includeConstant = false;  // per la formula AIC estesa
 
-   n = t2-t1;
-   for (i = t1; i < t2; i++)
+   n = t2-t1+1;
+   for (i = t1; i <= t2; i++)
    {  x.push_back(i);
       y.push_back(Y[i]);
    }
