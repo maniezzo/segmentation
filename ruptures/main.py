@@ -5,6 +5,8 @@ from ruptures.base  import BaseCost
 from ruptures.costs import NotEnoughPoints
 from sklearn.linear_model import LinearRegression
 import time
+from AICcost import AICcost
+from QRMSEcost import QRMSELinearCost
 
 def printResults(method,results,y):
    f = open(f"res_{method}.csv", "w")
@@ -34,7 +36,7 @@ def go_rupturesMinimal(data):
     return
 
 # PELT with AIC cost function and piecewise linear model
-def go_PELT_AIC(y):
+def go_PELT_AIC(y, isAIC=False):
    # 1. Data Cleaning & Preparation
    y_float = np.array(y).astype(float).flatten()
    n = len(y_float)
@@ -44,26 +46,21 @@ def go_PELT_AIC(y):
    # We add a column of ones so the cost function accounts for the intercept
    data = np.column_stack((x, np.ones_like(x), y_float))
    
-   # 2. Estimate noise variance (sig2) for a proper AIC
-   # Using MAD on diffs is robust to the actual changepoints
-   sigma = np.median(np.abs(np.diff(y_float))) / 0.6745
-   sig2 = sigma ** 2
+   pen_value = 7
+   if(isAIC):
+      # PELT with AIC cost
+      cost = AICcost(k_params=2).fit(data)
+      algo = rpt.Pelt(custom_cost=cost, min_size=5, jump=7).fit(data)
+      result = algo.predict(pen=pen_value)  # AIC penalty is inside the cost
+   else:
+      # PELT with QRMSE cost
+      cost = QRMSELinearCost().fit(data)
+      algo = rpt.Pelt(custom_cost=cost, min_size=cost.min_size).fit(data)
+      result = algo.predict(pen=pen_value)
    
-   # 3. Fit PELT
-   # model="linear" fits y = ax + b
-   algo = rpt.Pelt(model="linear").fit(data)
-   
-   # AIC penalty = 2 * k * sigma^2
-   # k=2 because we have 2 parameters per segment: slope and intercept
-   k = 2
-   penalty_value = 2 * k * sig2
-   
-   # Predict changepoints (returns indices of the end of each segment)
-   result = algo.predict(pen=penalty_value)
-   
-   # 4. Printing Results
-   print(f"Detected changepoints (indices): {result}")
-   print(f"Number of segments found: {len(result)}")
+   # changepoints, indices of the end of each segment
+   print(f"Cchangepoints: {result}")
+   print(f"Number of segments: {len(result)}")
    return result
 
 def go_ruptures(y):
@@ -89,7 +86,7 @@ def go_ruptures(y):
    printResults(method,result,np.array(y,dtype=np.float64))
 
    # dynamic programming, needs the number of points
-   algo = rpt.Dynp(model="l2", min_size=20).fit(signal)
+   algo = rpt.Dynp(model="linear", min_size=5).fit(signal)
    result = algo.predict(n_bkps=numBreakPnts)
    rpt.display(signal, bkps, result)
    plt.title("DynProgr")
@@ -97,7 +94,7 @@ def go_ruptures(y):
    print(f"DynProgr: {result}")
 
    # rolling window
-   algo = rpt.Window(model="l2", width=20)
+   algo = rpt.Window(model="linear", width=20)
    algo.fit(signal)
    result = algo.predict(n_bkps=numBreakPnts)
    rpt.display(signal, bkps, result)
@@ -106,7 +103,7 @@ def go_ruptures(y):
    print(f"Rolling: {result}")
 
    # bottom up
-   algo = rpt.BottomUp(model="l2", min_size=20)
+   algo = rpt.BottomUp(model="linear", min_size=20)
    algo.fit(signal)
    result = algo.predict(n_bkps=numBreakPnts)
    rpt.display(signal, bkps, result)
@@ -131,12 +128,12 @@ def go_ruptures(y):
    plt.show()
    print(f"RMSE: {result}")
 
-def writeCsv(y, changepoints, filename="results.csv"):
+def writeCsv(y, changepoints, filename="results.csv", isAIC=False):
    y_float = np.array(y).astype(float).flatten()
    n = len(y_float)
    x = np.arange(n).reshape(-1, 1)
    
-   # 5. Plotting
+   # Plotting
    plt.figure(figsize=(12, 6))
    plt.scatter(x, y_float, s=10, color='lightgray', label="Data")
    
@@ -144,8 +141,8 @@ def writeCsv(y, changepoints, filename="results.csv"):
    start_idx = 0
    for cp in changepoints:
       # Define the segment range
-      seg_x = x[start_idx:cp]
-      seg_y = y_float[start_idx:cp]
+      seg_x = x[start_idx:cp+1]
+      seg_y = y_float[start_idx:cp+1]
       
       # Fit a local linear regression for visualization
       lr = LinearRegression().fit(seg_x, seg_y)
@@ -159,19 +156,19 @@ def writeCsv(y, changepoints, filename="results.csv"):
       if cp < n:
          plt.axvline(x=cp, color='blue', linestyle='--', alpha=0.6)
       
-      start_idx = cp
+      start_idx = cp+1
    
-   plt.title("Piecewise Linear Segments (PELT + AIC)")
+   costName = "QRMSE"
+   if(isAIC): costName = "AIC"
+   plt.title(f"Piecewise Linear Segments (PELT + {costName})")
    plt.xlabel("Index")
    plt.ylabel("Value")
    plt.legend()
    plt.show()
    
-   # 1. Estimate sigma^2 for the cost calculation
    sigma = np.median(np.abs(np.diff(y_float))) / 0.6745
    sig2 = sigma ** 2
    
-   # 2. Prepare the list of endpoints
    cost = 0
    endpoints = [0] + sorted(list(set(changepoints)))
    if endpoints[-1] != n:
@@ -180,36 +177,31 @@ def writeCsv(y, changepoints, filename="results.csv"):
    segment_data = []
    k = 2  # number of parameters (slope, intercept)
    
-   # 3. Process each segment
+   # define each segment
    for i in range(len(endpoints) - 1):
       t1 = endpoints[i]
+      if(t1>0): t1+=1 # disjoint endpoints
       t2 = endpoints[i + 1]
       
-      # Slicing (t2 is exclusive in numpy slicing)
-      seg_x = x[t1:t2]
-      seg_y = y_float[t1:t2]
+      seg_x = x[t1:t2+1]
+      seg_y = y_float[t1:t2+1]
       
-      # Fit Linear Regression: y = mx + q
+      # Linear Regression: y = mx + q
       model = LinearRegression().fit(seg_x, seg_y)
       m = model.coef_[0]
       q = model.intercept_
       
-      # Calculate Segment AIC Cost
+      # Segment AIC Cost
       y_pred = model.predict(seg_x)
       rss = np.sum((seg_y - y_pred) ** 2)
       # AIC = (RSS / sigma^2) + 2k
       cost_aic = (rss / sig2) + (2 * k)
       cost += cost_aic
       
-      segment_data.append({
-         't1': t1,
-         't2': t2,
-         'm': m,
-         'q': q,
-         'cost': cost_aic
-      })
-   
-   # 4. Create DataFrame and Export
+      segment_data.append({'t1': t1,'t2': t2,'m': m,'q': q,'cost': cost_aic})
+      print(f"t1: {t1},t2: {t2},m: {m},q: {q},cost: {cost_aic}")
+
+   # Export data
    df = pd.DataFrame(segment_data)
    df.to_csv(filename, index=False)
    
@@ -218,15 +210,14 @@ def writeCsv(y, changepoints, filename="results.csv"):
 
 if __name__ == "__main__":
     matplotlib.use("TkAgg")
-    df = pd.read_csv('M3C_monthly.csv')
-    filtered_df = df[df['Series'] == 'N1918']
-    data = filtered_df.iloc[0, 6:]
+    data = pd.read_csv("../data/M3/N1918.csv",usecols=[1])
     
     start_cpu = time.process_time()
-    results = go_PELT_AIC(data.values)
+    isAIC = True
+    results = go_PELT_AIC(data.values,isAIC=isAIC)
     end_cpu = time.process_time()
     print(f"Total CPU time: {end_cpu - start_cpu:.4f} seconds")
 
-    writeCsv(data,results,"results.csv")
+    writeCsv(data,results,"results.csv",isAIC=isAIC)
     #go_ruptures(data.values)
     print("fine")

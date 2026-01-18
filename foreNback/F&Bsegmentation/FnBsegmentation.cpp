@@ -248,6 +248,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
             zub = z + lb;
             changepoints = get<2>(Fexpanded[i].queryMinCost(numSegm));
             vector<int> vb = get<2>(Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm));
+            for(int i=0;i<vb.size()-1;i++) vb[i]--; // changepoints are defined in foreward
             changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
             if(isVerbose)
@@ -300,7 +301,7 @@ void FnBsegmentation::reconstructFnBsolution()
 
 // single source on a DAG. n number of points, maxt maximum time (=n-1)
 void FnBsegmentation::DAG_SSSP()
-{  int i,j,t,currInit,maxt,maxstart,tend;
+{  int i,j,t,maxt,maxstart,tend;
    double c;
    tuple<int, int, double, double, double> tup;
    vector<tuple<int, int, double, double, double>> lstOLS; // t1,t2,m,q,cost of the segment
@@ -367,7 +368,8 @@ int FnBsegmentation::run_BF()
    vector<tuple<int, int, double, double, double>> lstOLS;
    vector<tuple<int, int, double, double, double>> sol;
 
-   cout << "For each edge:" << endl;
+   cout << "Precomputing edges:" << endl;
+   tstart = clock();
    cont=0;
    for (int t1 = 0; t1 < n-minLength; ++t1) 
    {  if(t1>0 && t1<minLength) continue;
@@ -389,7 +391,7 @@ int FnBsegmentation::run_BF()
    return 0;
 }
 
-// Bellman-Ford algorithm with bounded number of edges
+// Adapted Bellman-Ford algorithm with bounded number of edges, dijoint endpoints
 vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vector<Edge>& edges, int numv, int maxNumEdges) 
 {  int i,j,u,v,t;
    double w,du;
@@ -402,7 +404,6 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
    vector<tuple<int, int, double, double, double>> sol;
    tuple<int, int, double, double, double> tup;
 
-   tstart = clock();
    for(i=0;i<numv;i++)
       paths0[i] = vector<int>();
    cost0[0] = 0;
@@ -414,13 +415,15 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
          v = edges[j].end2;
          w = edges[j].cost;
 
+         // relax, conviene arrivare a v passando per u?
          du = 0;
-         if(u>0) du = cost0[u]; // costo per arrivare al primo estremo
-         if (cost0[u] != DBL_MAX && (du + w) < cost1[v])
+         if(u>0) du = cost0[u-1]; // costo per arrivare al primo estremo
+         if (cost0[u] != DBL_MAX  && (du + w) < cost1[v])
          {  cost1[v] = du + w;
             prev[v] = u;
             minsegm[v]  = edges[j].segm;
-            paths1[v] = (u==0 ? paths0[u] : paths0[u]);
+            if(u>0)
+               paths1[v] = paths0[u-1];
             paths1[v].push_back(j); // l'arco percorso per arrivare
          }
       }
