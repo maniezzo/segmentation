@@ -30,7 +30,8 @@ class QRMSELinearCost(BaseCost):
         beta, _, _, _ = np.linalg.lstsq(X, y, rcond=None)
         y_hat = X @ beta
         residuals = y - y_hat
+        residuals = residuals[:,-1]
         sse = np.sum(residuals**2)
 
-        # QRMSE = sqrt(SSE) / n
-        return np.sqrt(sse) / n
+        # QRMSE = sse / np.sqrt(n)
+        return sse / np.sqrt(n)

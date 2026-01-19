@@ -1,4 +1,4 @@
-import numpy as np, pandas as pd
+import numpy as np, pandas as pd, os
 import matplotlib.pyplot as plt
 
 def plotSol(dfsol,dfdata):
@@ -22,6 +22,7 @@ def plotSol(dfsol,dfdata):
    return
 
 if __name__ == '__main__':
+   os.chdir(os.path.dirname(os.path.abspath(__file__)))
    solfile = "test_sol.csv"
    dfsol = pd.read_csv("..//F&Bsegmentation//"+solfile)
    datafile = dfsol.columns[5].replace("/","//")

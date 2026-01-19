@@ -213,7 +213,7 @@ if __name__ == "__main__":
     data = pd.read_csv("../data/M3/N1918.csv",usecols=[1])
     
     start_cpu = time.process_time()
-    isAIC = True
+    isAIC = False
     results = go_PELT_AIC(data.values,isAIC=isAIC)
     end_cpu = time.process_time()
     print(f"Total CPU time: {end_cpu - start_cpu:.4f} seconds")

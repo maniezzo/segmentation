@@ -210,6 +210,13 @@ Please try to avoid rasterized images for line-art diagrams and schemas. Wheneve
 \end{figure}
 
 
+A cost function obtained by normalizing the residual sum of squares by the square root of the segment length does not satisfy the subadditivity condition required by PELT, since splitting a segment can increase the total cost. Consequently, the correctness of PELT pruning is not guaranteed for such a cost.
+In fact, any concave normalization in segment length (such as division by the square root of the length, as in RMSE or QRMSE) breaks PELT’s subadditivity assumption.
+
+Example: a flat series with some noise: $n_1=n_2=50$, $RSS_1=RSS_2=50$ (unit variance noise)
+Then: One segment $C(1,100)=\frac{100}{\sqrt[]{100}}=10$, Two segments $C(1,50)+C(51,100)=\frac{50}{\sqrt[]{50}}+\frac{50}{\sqrt[]{50}}$=7.07+7.07=14.14
+So: $C(1,100)<C(1,50)+C(51,100)$
+
 \section{Conclusions}		\label{sec:conclusions}
 The conlusions
 
