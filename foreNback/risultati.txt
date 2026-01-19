@@ -1,0 +1,72 @@
+M3/N1879 func 6 costo 24092765.27462 t.cpu 0.00000 num.matches 266 n.fathomed 40446
+M3/N1879 func 8 costo 2025.18020 t.cpu 0.00000 num.matches 362 n.fathomed 7174
+M3/N1881 func 6 costo 8360752.55993 t.cpu 0.00000 num.matches 363 n.fathomed 20441
+M3/N1881 func 8 costo 1819.64571 t.cpu 0.00000 num.matches 355 n.fathomed 11831
+M3/N1882 func 6 costo 65136.19599 t.cpu 0.00000 num.matches 285 n.fathomed 40027
+M3/N1882 func 8 costo 1108.90806 t.cpu 0.00000 num.matches 425 n.fathomed 20198
+M3/N1883 func 6 costo 29611.05315 t.cpu 0.00000 num.matches 359 n.fathomed 25539
+M3/N1883 func 8 costo 976.01432 t.cpu 0.00000 num.matches 431 n.fathomed 20765
+M3/N1884 func 6 costo 94746.70102 t.cpu 0.00000 num.matches 337 n.fathomed 41697
+M3/N1884 func 8 costo 1119.59271 t.cpu 0.00000 num.matches 437 n.fathomed 13336
+M3/N1918 func 6 costo 363787.27712 t.cpu 0.00000 num.matches 446 n.fathomed 21688
+M3/N1918 func 8 costo 1395.69139 t.cpu 0.00000 num.matches 401 n.fathomed 16108
+M3/N2830 func 6 costo 194522.02370 t.cpu 0.00000 num.matches 219 n.fathomed 12497
+M3/N2830 func 8 costo 959.84160 t.cpu 0.00000 num.matches 237 n.fathomed 6173
+M3/N2831 func 6 costo 6478704.11610 t.cpu 0.00000 num.matches 175 n.fathomed 16713
+M3/N2831 func 8 costo 1289.78763 t.cpu 0.00000 num.matches 269 n.fathomed 6088
+M3/N2832 func 6 costo 67549187.47649 t.cpu 0.00000 num.matches 160 n.fathomed 19533
+M3/N2832 func 8 costo 1580.99199 t.cpu 0.00000 num.matches 171 n.fathomed 2953
+M3/N2833 func 6 costo 14795269.08694 t.cpu 0.00000 num.matches 262 n.fathomed 4184
+M3/N2833 func 8 costo 1391.71798 t.cpu 0.00000 num.matches 240 n.fathomed 4093
+M3/N2834 func 6 costo 17208.08454 t.cpu 0.00000 num.matches 248 n.fathomed 8600
+M3/N2834 func 8 costo 707.71519 t.cpu 0.00000 num.matches 229 n.fathomed 6110
+M4/D127 func 6 costo 3183769.67733 t.cpu 202.00000 num.matches 1572 n.fathomed 28636452 n.brk 7 F&B (Bellman-Ford) M4/D127 cost: 3125249.69952 n_brk 7 t.cpu 1.0000
+M4/D127 func 8 costo 10587.68998 t.cpu 71.00000 num.matches 2055 n.fathomed 4883838 n.brk 7
+M4/Q14640 func 6 costo 37100222.05049 t.cpu 0.00000 num.matches 0 n.fathomed 17037 n.brk 0
+M4/Q14640 func 8 costo 1730.11803 t.cpu 0.00000 num.matches 80 n.fathomed 1213 n.brk 1
+M4/Q15444 n 126 func 6 costo 335032.43112 t.cpu 0.00000 num.matches 105 n.fathomed 11704 n.brk 3
+M4/Q15444 n 126 func 8 costo 1228.21128 t.cpu 0.00000 num.matches 125 n.fathomed 6303 n.brk 3
+M4/Q18148 n 71 func 6 costo 14716823.89286 t.cpu 0.00000 num.matches 92 n.fathomed 2329 n.brk 2
+M4/Q18148 n 71 func 8 costo 977.77577 t.cpu 0.00000 num.matches 85 n.fathomed 1123 n.brk 4
+M4/Q18496 n 126 func 6 costo 8785.94504 t.cpu 0.00000 num.matches 252 n.fathomed 17004 n.brk 7
+M4/Q18496 n 126 func 8 costo 723.20571 t.cpu 0.00000 num.matches 225 n.fathomed 14281 n.brk 7
+M4/Q19604 n 123 func 6 costo 4010354.93433 t.cpu 0.00000 num.matches 263 n.fathomed 18127 n.brk 7
+M4/Q19604 n 123 func 8 costo 1072.62167 t.cpu 0.00000 num.matches 305 n.fathomed 15793 n.brk 7
+M4/Q19637 n 123 func 6 costo 219756.92032 t.cpu 0.00000 num.matches 334 n.fathomed 21332 n.brk 7
+M4/Q19637 n 123 func 8 costo -inf t.cpu 0.00000 num.matches 0 n.fathomed 827 n.brk 7
+M4/Q2002 n 170 func 6 costo 93339232.13474 t.cpu 0.00000 num.matches 519 n.fathomed 103936 n.brk 7
+M4/Q2002 n 170 func 8 costo 2563.71067 t.cpu 0.00000 num.matches 574 n.fathomed 19364 n.brk 7
+M4/Q22221 n 738 func 6 costo 676312.21312 t.cpu 40.00000 num.matches 2659 n.fathomed 6424871 n.brk 7
+M4/Q22221 n 738 func 8 costo 6547.82705 t.cpu 28.00000 num.matches 1911 n.fathomed 2785509 n.brk 7
+M4/Q5109 n 866 func 6 costo 1477454.69412 t.cpu 97.00000 num.matches 1809 n.fathomed 16246274 n.brk 7
+M4/Q5109 n 866 func 8 costo 8097.73556 t.cpu 38.00000 num.matches 2590 n.fathomed 3831071 n.brk 7
+M4/Q7774 n 115 func 6 costo 41866.81170 t.cpu 0.00000 num.matches 102 n.fathomed 18649 n.brk 2
+M4/Q7774 n 115 func 8 costo 916.15124 t.cpu 0.00000 num.matches 222 n.fathomed 3529 n.brk 5
+M4/Q8030 n 97 func 6 costo 343646.65677 t.cpu 0.00000 num.matches 183 n.fathomed 6872 n.brk 7
+M4/Q8030 n 97 func 8 costo 943.33713 t.cpu 0.00000 num.matches 194 n.fathomed 5354 n.brk 7
+M6/ABBV n 253 func 6 costo 136.17642 t.cpu 1.00000 num.matches 974 n.fathomed 270239 n.brk 7
+M6/ABBV n 253 func 8 costo 339.15603 t.cpu 0.00000 num.matches 857 n.fathomed 220920 n.brk 7
+M6/BTCUSD n 367 func 6 costo 89853060.74414 t.cpu 3.00000 num.matches 1157 n.fathomed 675562 n.brk 7
+M6/BTCUSD n 367 func 8 costo 5036.56538 t.cpu 2.00000 num.matches 810 n.fathomed 263543 n.brk 7
+M6/EURCHF n 263 func 6 costo 0.00041 t.cpu 1.00000 num.matches 903 n.fathomed 364509 n.brk 7
+M6/EURCHF n 263 func 8 costo -2269.45545 t.cpu 0.00000 num.matches 0 n.fathomed 258 n.brk 0
+M6/EURUSD n 263 func 6 costo 0.00093 t.cpu 1.00000 num.matches 507 n.fathomed 264444 n.brk 7
+M6/EURUSD n 263 func 8 costo -2215.12112 t.cpu 0.00000 num.matches 0 n.fathomed 258 n.brk 0
+M6/EWG n 253 func 6 costo 3.15023 t.cpu 0.00000 num.matches 719 n.fathomed 185694 n.brk 7
+M6/EWG n 253 func 8 costo -324.54599 t.cpu 0.00000 num.matches 0 n.fathomed 8948 n.brk 7
+M6/EWQ n 253 func 6 costo 5.71623 t.cpu 0.00000 num.matches 816 n.fathomed 185572 n.brk 7
+M6/EWQ n 253 func 8 costo -249.32962 t.cpu 0.00000 num.matches 0 n.fathomed 8102 n.brk 7
+M6/EWZ n 253 func 6 costo 9.26083 t.cpu 1.00000 num.matches 618 n.fathomed 354703 n.brk 7
+M6/EWZ n 253 func 8 costo -198.52470 t.cpu 0.00000 num.matches 0 n.fathomed 3210 n.brk 7
+M6/GBPUSD n 263 func 6 costo 0.00139 t.cpu 1.00000 num.matches 580 n.fathomed 291430 n.brk 7
+M6/GBPUSD n 263 func 8 costo -2038.36578 t.cpu 0.00000 num.matches 0 n.fathomed 258 n.brk 0
+M6/PYPL n 253 func 6 costo 68.21080 t.cpu 0.00000 num.matches 760 n.fathomed 214249 n.brk 7
+M6/PYPL n 253 func 8 costo 169.32530 t.cpu 0.00000 num.matches 1058 n.fathomed 215718 n.brk 7
+M6/RBLX n 253 func 6 costo 61.30738 t.cpu 1.00000 num.matches 784 n.fathomed 301279 n.brk 7
+M6/RBLX n 253 func 8 costo 125.98056 t.cpu 0.00000 num.matches 1040 n.fathomed 310517 n.brk 7
+M6/ROST n 253 func 6 costo 84.23482 t.cpu 0.00000 num.matches 824 n.fathomed 225076 n.brk 7
+M6/ROST n 253 func 8 costo 193.62532 t.cpu 0.00000 num.matches 1103 n.fathomed 276101 n.brk 7
+M6/SLV n 253 func 6 costo 7.59185 t.cpu 0.00000 num.matches 686 n.fathomed 132486 n.brk 7
+M6/SLV n 253 func 8 costo -321.84192 t.cpu 0.00000 num.matches 0 n.fathomed 3631 n.brk 7
+M6/USDJPY n 263 func 6 costo 29.10227 t.cpu 1.00000 num.matches 687 n.fathomed 263442 n.brk 7
+M6/USDJPY n 263 func 8 costo -50.43204 t.cpu 0.00000 num.matches 0 n.fathomed 2896 n.brk 7

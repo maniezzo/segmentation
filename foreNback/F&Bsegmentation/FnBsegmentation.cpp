@@ -22,9 +22,6 @@ void FnBsegmentation::run_FnB()
       default: cout << "------- ERROR IN ASSIGNING COST FUNCTION ----------";
    }
 
-   //Stage N;
-   //N.mainNode();
-
    cout << "\n---------------------------------------------------- DAG" << endl;
    // optimal solution with no constraint on the number of arcs (but with minLength)
    DAG_SSSP();
@@ -46,6 +43,7 @@ void FnBsegmentation::run_FnB()
    do
    {  isImprovedF = forward();
       isImprovedB = backward();
+      computeLB();
       tend = clock();
       ttot = (tend - tstart) / CLOCKS_PER_SEC;
    } while((isImprovedF || isImprovedB) && ttot < maxcpu);
@@ -66,7 +64,7 @@ bool FnBsegmentation::forward()
    {  if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength
 
       for(k=0;k<delta;k++) // beam width
-      {
+      {  // find the least cost unexpanded node at this level
          z         = get<0>( Fstage[i].queryMinCost(maxNumEdges) ); // cost up to stage i
          nSegm     = get<1>( Fstage[i].queryMinCost(maxNumEdges) ); // num of segments up to stage i
          lstPoints = get<2>( Fstage[i].queryMinCost(maxNumEdges) ); // changepoints up to stage i
@@ -275,6 +273,30 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
 l0:return hasMatch;
 }
 
+double FnBsegmentation::computeLB()
+{  int i,j;
+   double lbf,lbb,lb,iterLB;
+
+   iterLB = DBL_MAX;
+   for(i=minLength;i<n-minLength;i++)
+   {  lbf = get<0>( Fexpanded[i-1].queryMinCost(maxNumEdges) );
+      lbb = get<0>( Bstage[i].queryMinCost(maxNumEdges) ); // forward
+      lb = lbf + lbb;
+      if(lb > 0 && lb < iterLB) iterLB = lb;
+
+      lbb = get<0>( Bexpanded[i].queryMinCost(maxNumEdges) );
+      lbf = get<0>( Fstage[i-1].queryMinCost(maxNumEdges) ); // backward
+      lb = lbf + lbb;
+      if(lb > 0 && lb < iterLB) iterLB = lb;
+   }
+   if(iterLB>zlb)
+   {  zlb = iterLB;
+      if(isVerbose) cout << "New zlb: " << zlb << endl;
+   }
+
+   return lb;
+}
+
 // ricostruisce la soluzione FnB
 void FnBsegmentation::reconstructFnBsolution()
 {  int i;
@@ -293,7 +315,7 @@ void FnBsegmentation::reconstructFnBsolution()
       t1 = t2+1;
    }
    cout << "Changepoints: "; for(int x:changepoints) std::cout << x << ' '; std::cout << endl;
-   cout << "Costo complessivo " << sum << " t.cpu " << ttot << " num.matches " << numMatch << " n.fathomed " << nFathomed << endl;
+   cout << dsName << " n " << n << " func " << idcost << " costo " << sum << " t.cpu " << ttot << " num.matches " << numMatch << " n.fathomed " << nFathomed << " n.brk " << changepoints.size()-2 << endl;
    if(abs(sum-zub) > 0.001)
       cout<<"------- ERROR IN RECONSTRUCTING FnB SOLUTION ----------"<<endl;
    writeSolCsv(sol,"test_sol.csv");
@@ -321,13 +343,14 @@ void FnBsegmentation::DAG_SSSP()
    {  tend = min(maxt,t+maxLength); // nel caso di serie lunghissime, maxt grande
       if(t%100==0)
          cout << "DAG processing t=" << t << endl;
-
+      //if(t>0 && t<minLength) continue;
+         
       for(j=t+minLength;j<=tend;j++)
-      {  if(t>0 && t<minLength) continue;
-         tup = (this->*pntCost)(t,j-1); //costQRMSE(t,j);  // j segmenti attaccati, se staccati da t a j-1
+      {  tup = (this->*pntCost)(t,j); //costQRMSE(t,j);  // j segmenti attaccati, se staccati da t a j-1
          c   = get<4>(tup);
-         if (mincost[j]==DBL_MAX || mincost[j]>(mincost[t]+c))
-         {  mincost[j] = mincost[t] + c;
+         if (mincost[j]==DBL_MAX || mincost[j]>(mincost[t-1]+c))
+         {  mincost[j] = c;
+            if(t>minLength) mincost[j] += mincost[t-1]; // ci arrivo non al primo step
             lstOLS[j]  = tup;
          }
       }
@@ -353,7 +376,7 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::reconstructDAGs
       sol.push_back(lstOLS[t]);
       cout << "Segm " << t << ") t1=" << get<0>(lstOLS[t]) << " t2= " << get<1>(lstOLS[t]) << 
          " m= " << get<2>(lstOLS[t]) << " q= " << get<3>(lstOLS[t]) <<" costo " << get<4>(lstOLS[t]) <<endl;
-      t = i;
+      t = i-1;
    }
    cout << "Costo complessivo " << sum << endl;
    return sol;

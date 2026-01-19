@@ -2,8 +2,9 @@
 #include "Stage.h"
 
 /*
-Use std::map<int, int> where key = num segm, value = minimum cost for that exact num of segments.
-augment the structure to store prefix minimums.
+std::map<int, int> where key = num segm, value = minimum cost for that exact num of segments.
+"prefix minimum" is the minimum cost for any number of segments up to and including the current number
+The structure is augmented to store prefix minimums.
 On insertion, update prefix minimums.
 On query, use upper_bound(threshold) to find the largest num <= threshold and return its prefix minimum.
 */
@@ -111,6 +112,7 @@ std::tuple<double, int, std::vector<int>> Stage::popMinCost(double threshold)
    return result;
 }
 
+// tiny example
 void Stage::mainNode()
 {  Stage s;
 

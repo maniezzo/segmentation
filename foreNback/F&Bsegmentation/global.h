@@ -37,4 +37,5 @@ extern int numMatch;         // number of partial solutions matching
 extern int idcost;           // id (0 based) of the cost function
 extern vector<double> Y;     // the dataseries to model
 extern double zub;
+extern double zlb;
 extern bool isVerbose;

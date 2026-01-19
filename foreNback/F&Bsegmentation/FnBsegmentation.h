@@ -19,6 +19,7 @@ private:
    bool generateFoffspring(int t1, int t2, int nSegm, double cost, vector<int> lstPoints);
    bool generateBoffspring(int t1, int t2, int nSegm, double cost, vector<int> lstPoints);
    bool match(bool isForward, int i, int numSegm, double z);
+   double computeLB();
    void reconstructFnBsolution();
    tuple<double, double> linearRegression(vector<int> x, vector<double> y);
    tuple<int, int, double, double, double> costQRMSE(int t1, int t2);

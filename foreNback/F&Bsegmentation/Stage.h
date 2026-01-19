@@ -6,6 +6,7 @@
 class Stage {
 private:
    // structure: {cost, vec, {prefix_min_cost, prefix_min_num}}. vec is a list of changepoints
+   // "prefix minimum" is the minimum cost for any number of segments up to and including the current number
    typedef std::pair<double, int> PrefixMin;
    typedef std::tuple<double, std::vector<int>, PrefixMin> Value;
    std::map<int, Value> data; // key = num
