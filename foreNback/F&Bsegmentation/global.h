@@ -27,7 +27,7 @@ extern string  baseDir;
 extern string  dsName;       // dataset name (file col .csv)
 extern int     maxNumEdges;  // max number if segments
 extern clock_t tstart, tend;
-extern double  ttot;
+extern double  ttot,topt;
 extern int n;                // num of points of the data series
 extern int delta;            // width of the beam
 extern int minLength;        // minimal segnment length

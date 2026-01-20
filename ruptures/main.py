@@ -50,7 +50,7 @@ def go_PELT_AIC(y, isAIC=False):
    if(isAIC):
       # PELT with AIC cost
       cost = AICcost(k_params=2).fit(data)
-      algo = rpt.Pelt(custom_cost=cost, min_size=5, jump=7).fit(data)
+      algo = rpt.Pelt(custom_cost=cost, min_size=5, jump=1).fit(data)
       result = algo.predict(pen=pen_value)  # AIC penalty is inside the cost
    else:
       # PELT with QRMSE cost
