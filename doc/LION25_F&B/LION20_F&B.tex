@@ -171,6 +171,10 @@ The F\&B algorithm for the CPD problem was implemented in$\text{C++}$ and execut
 \subsubsection{Benchmark instances.} 
 The instances in the test set were selected to be representative of a variety of application areas in which time series analysis is relevant. We leveraged benchmarks from the M forecasting competitions \cite{M26}, including instances from the M3, M4, and M6 installments. Specifically, the M3 and M4 datasets include time series from microeconomics, industry, macroeconomics, finance, demographics, and an unspecified “other” category, while the M6 dataset consists of daily adjusted close prices of the competition assets. In addition, we complemented the test set with IoT time series collected from environmental sensors, as described in \cite{M24}.
 
+The series of the M-benchmark datasets have length up to 5,000 observations. This range corresponds to the regime commonly considered in the changepoint literature where regime changes are semantically unambiguous and do not need additional scale assumptions. For substantially longer time series, meaningful changepoint analysis typically requires preprocessing steps, such as aggregation, smoothing, or multiscale constraints, not only to manage the computational cost, but to avoid mistaking short-lived fluctuations for actual structural changes.  As Killick et al. \cite{KFE12} highlight, both algorithmic efficiency and appropriate scale considerations become critical as series length grows, to prevent overfitting and the detection of spurious changepoints. 
+
+In general in fact, the segment length must be greater than the noise scale (in turns greater than the sampling interval), to avoid over-segmentation. For long, high-frequency series CPA would detect variance bursts, outliers, or noise-induced artifacts, which are statistically valid changepoints but semantically meaningless.
+
 \subsubsection{Benchmark codes.}
 Different codes were used to benchmark the effectiveness of F\&B under various application conditions. In the simplest setting, where the objective is solely to identify effective changepoints and the quality of a model is assumed to be additive over its constituent segments, the time points of the series can be mapped to the nodes of a graph, with segments represented as arcs. Under this formulation, the CPD problem reduces to finding a least-cost path from time 0 to the final time point in the resulting graph. This problem can be efficiently solved, for example, using the DAG-SHORTEST-PATHS (DSP) algorithm \cite{CLRS09}.
 
@@ -203,12 +207,19 @@ Finally, the state-of-the-art for CPD solution is represented by the {\it ruptur
 Please try to avoid rasterized images for line-art diagrams and schemas. Whenever possible, use vector graphics instead (see Fig.~\ref{fig1}).
 
 \begin{figure}(Ht)
-	\includegraphics[width=\textwidth]{fig1.eps}
+	\includegraphics[width=0.7\textwidth]{"N1879 costAIC.png"}
 	\caption{A figure caption is always placed below the illustration.
 		Please note that short captions are centered, while long ones are
 		justified by the macro package automatically.} \label{fig1}
 \end{figure}
 
+
+\begin{figure}(Ht)
+	\includegraphics[width=0.7\textwidth]{"N1879 costQRMSE.png"}
+	\caption{A figure caption is always placed below the illustration.
+		Please note that short captions are centered, while long ones are
+		justified by the macro package automatically.} \label{fig2}
+\end{figure}
 
 A cost function obtained by normalizing the residual sum of squares by the square root of the segment length does not satisfy the subadditivity condition required by PELT, since splitting a segment can increase the total cost. Consequently, the correctness of PELT pruning is not guaranteed for such a cost.
 In fact, any concave normalization in segment length (such as division by the square root of the length, as in RMSE or QRMSE) breaks PELT’s subadditivity assumption.

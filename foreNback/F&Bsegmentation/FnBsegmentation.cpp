@@ -173,10 +173,10 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
 
    if (t2==(n-1) && z<zub)
    {  zub = z;
+      topt = (clock()-tstart)/CLOCKS_PER_SEC;
       changepoints = lstPoints;
       if(isVerbose)
-      {  ttot = (clock()-tstart)/CLOCKS_PER_SEC;
-         cout << "F) New zub: "<< zub << " t.cpu " << ttot << endl;
+      {  cout << "F) New zub: "<< zub << " t.cpu " << topt << endl;
       }
    }
 
@@ -210,11 +210,11 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
    if (t1==0 && z<zub)
    {  zub = z;
       changepoints = lstPoints;
+      topt = (clock()-tstart)/CLOCKS_PER_SEC;
       for (i=1;i<changepoints.size()-1;i++)
          changepoints[i]--;   // il changepoint è la fine del segmento prima
       if(isVerbose)
-      {  ttot = (clock()-tstart)/CLOCKS_PER_SEC;
-         cout<<"B) New zub: "<<zub<<" t.cpu "<<ttot<<endl;
+      {  cout<<"B) New zub: "<<zub<<" t.cpu "<<topt<<endl;
       }
    }
 
@@ -244,13 +244,14 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
          if(z + lb < zub)
          {  // new incumbent
             zub = z + lb;
+            topt = (clock()-tstart)/CLOCKS_PER_SEC;
             changepoints = get<2>(Fexpanded[i].queryMinCost(numSegm));
             vector<int> vb = get<2>(Bexpanded[i+1].queryMinCost(maxNumEdges-numSegm));
             for(int i=0;i<vb.size()-1;i++) vb[i]--; // changepoints are defined in foreward
             changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
             if(isVerbose)
-               cout << "F) Match: new zub: "<< zub << endl;
+               cout << "F) Match: new zub: "<< zub << "t.cpu " << topt << endl;
          }
       }
    else
@@ -262,12 +263,13 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
          if(z + lb < zub)
          {  // new incumbent
             zub = z + lb;
+            topt = (clock()-tstart)/CLOCKS_PER_SEC;
             changepoints = get<2>(Bexpanded[i].queryMinCost(numSegm));
             vector<int> vb = get<2>(Fexpanded[i-1].queryMinCost(maxNumEdges-numSegm));
             changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
             if(isVerbose)
-               cout << "B) Match: new zub: "<< zub << endl;
+               cout << "B) Match: new zub: "<< zub << " t.cpu " << topt << endl;
          }
       }
 l0:return hasMatch;
@@ -315,7 +317,7 @@ void FnBsegmentation::reconstructFnBsolution()
       t1 = t2+1;
    }
    cout << "Changepoints: "; for(int x:changepoints) std::cout << x << ' '; std::cout << endl;
-   cout << dsName << " n " << n << " func " << idcost << " costo " << sum << " t.cpu " << ttot << " num.matches " << numMatch << " n.fathomed " << nFathomed << " n.brk " << changepoints.size()-2 << endl;
+   cout << dsName << " n " << n << " func " << idcost << " costo " << sum << " t.cpu " << ttot << " topt " << topt << " num.matches " << numMatch << " n.fathomed " << nFathomed << " n.brk " << changepoints.size()-2 << endl;
    if(abs(sum-zub) > 0.001)
       cout<<"------- ERROR IN RECONSTRUCTING FnB SOLUTION ----------"<<endl;
    writeSolCsv(sol,"test_sol.csv");

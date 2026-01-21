@@ -1,11 +1,11 @@
 {
    "basedir" : "../../data/",
-   "dsName"  : "M6/USDJPY",
+   "dsName"  : "M3/N1879",
    "maxNumEdges" : 8,
    "minLength"   : 6, 		"minLengthComment": "minimal segment length",
    "maxLength"   : 10000, 	"maxLengthComment": "maximal segment length",
    "maxcpu"  : 600, 		"maxcpuComment" : "max running time in sec",
    "delta"   : 3, 			"deltaComment": "width of the beam"
    "idcost"  : 8,    		"commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC",
-   "isVerbose" : false
+   "isVerbose" : true
 }
