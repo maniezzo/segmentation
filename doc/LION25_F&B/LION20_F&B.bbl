@@ -27,14 +27,32 @@ Bartolini, E., Maniezzo, V., Mingozzi, A.: An adaptive memory-based approach
 Blum, C.: Beam-{ACO} for simple assembly line balancing. {INFORMS} Journal on
   Computing  \textbf{20}(4),  618--627 (2008)
 
+\bibitem{BA02}
+Burnham, K., Anderson, D.: Model Selection and Inference: A Practical
+  Information-Theoretic Approach. Springer-Verlag, New York, 2nd edn. (2002)
+
 \bibitem{CLRS09}
 Cormen, T.H., Leiserson, C.E., Rivest, R.L., Stein, C.: Introduction to
   Algorithms. MIT Press, 3rd edn. (2009)
+
+\bibitem{Datalog}
+Engineering, D.: Piecewise regression: When one line simply isn't enough.
+  \url{https://www.datadoghq.com/blog/engineering/piecewise-regression/}
+  (2017), accessed December 2023
 
 \bibitem{FLS09}
 Fischetti, M., Lodi, A., Salvagnin, D.: Just {MIP} it! In: Maniezzo, V.,
   St{\"u}tzle, T., Vo{\ss}, S. (eds.) Matheuristics, Annals of Information
   Systems, vol.~10, pp. 1--20. Springer (2009)
+
+\bibitem{GXF24}
+Gao, Z., Xiao, X., Fang, Y.P., Rao, J., Mo, H.: A selective review on
+  information criteria in multiple change point detection. Entropy
+  \textbf{26}(1), ~50 (2024)
+
+\bibitem{HTF09}
+Hastie, T., Tibshirani, R., Friedman, J.: The elements of statistical learning:
+  data mining, inference and prediction. Springer, 2 edn. (2009)
 
 \bibitem{KCHP01}
 Keogh, E.J., Chu, S., Hart, D.M., Pazzani, M.J.: An online algorithm for
@@ -92,5 +110,10 @@ Scott, A.J., Knott, M.: A cluster analysis method for grouping means in the
 Truong, C., Oudre, L., Vayatis, N.: Selective review of offline change point
   detection methods. Signal Processing  \textbf{167},  107299 (2020).
   \doi{10.1016/j.sigpro.2019.107299}
+
+\bibitem{XSW25}
+Xu, R., Song, Z., Wu, J., Wang, C., Zhou, S.: Change-point detection with deep
+  learning: A review. Frontiers of Engineering Management  \textbf{12},
+  154–176 (2025)
 
 \end{thebibliography}

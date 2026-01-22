@@ -9,6 +9,7 @@
 %\usepackage{algorithm} % <-- needed for standard algorithm float
 \usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage [autostyle, english = american]{csquotes} % left and right opening quotes with "
+\usepackage{subcaption}      % multiple subfigures
 \MakeOuterQuote{"}
 
 
@@ -189,62 +190,50 @@ Finally, the state-of-the-art for CPD solution is represented by the {\it ruptur
 \paragraph{Binary segmentation} (BinSeg) is a greedy, recursive procedure that iteratively detects a single changepoint over the entire series and then applies the same procedure to the resulting subsegments. Classical binary segmentation was introduced by Scott and Knott \cite{SK74} and remains popular due to its simplicity and low computational cost. 
 
 \subsubsection{Cost function.}
+In the practical application of piecewise linear models, the quality of a model is often related to interpretability or forecasting utility rather than mathematical properties. While statistical literature provides a rigorous framework for identifying structural breaks, practitioners frequently find that the most useful model is the one that aligns with the "naked eye" or provides the most coherent narrative for decision-making. As noted in industry applications, a model is often deemed successful if it identifies breakpoints that correspond to known external events—such as a shift in market policy or a technical failure—regardless of whether it satisfies every formal hypothesis test \cite{Datalog}. Modern methods have moved away from strict cost function optimization toward visual or semantic alignment with human-labeled events \cite{XSW25}. 
 
-Model Selection in Changepoint Analysis: Aesthetics vs. Utility
-In the practical application of piecewise linear models, the quality of a model is often related to interpretability or forecasting utility. While statistical literature provides a rigorous framework for identifying structural breaks, practitioners frequently find that the most useful model is the one that aligns with the "naked eye" or provides the most coherent narrative for decision-making. As noted in industry applications, a model is often deemed successful if it identifies breakpoints that correspond to known external events—such as a shift in market policy or a technical failure—regardless of whether it satisfies every formal hypothesis test (Datadog, 2017).
+For actual purposes, the evaluation of a changepoint model often falls into two categories:
+\begin{itemize}
+\item{\it Aesthetic Clarity}: A model must be simple enough for stakeholders to understand its significance. While overly complex models with numerous small segments may achieve a better fit, they are often dismissed as 'noisy' or 'unstructured' \cite{GXF24}. 
+\item{\it Predictive Accuracy}: In time-series contexts, the ultimate indicator of quality is often out-of-sample performance. Although complex models may minimize in-sample residuals, simpler piecewise structures often produce more stable 7–30-day forecasts and lower generalization error. A changepoint is deemed meaningful when it impacts decision-making. In many industries, a "perfect" statistical fit on historical data is useless if it doesn't alert you to the moment your forecasting model stops working. Recent work suggests that instead of monitoring the complex raw data, we should monitor the forecast errors \cite{GXF24}.
+\end{itemize}
 
-For actual purposes, the evaluation of a changepoint model typically falls into two categories:
+Common cost functions such as AIC, negative log-likelihood, and RMSE are frequently employed not because they represent a “true” physical reality, but because of their computational tractability. Penalized likelihood methods provide a formal stopping rule in the search for changepoints, which does not necessarily reflect the underlying data-generating processes \cite{BA02,HTF09}. Information criteria such as AIC or BIC act as analytical tools that automate what would otherwise be a subjective model selection process by introducing a standard penalty for complexity. These metrics are best viewed as instruments for identifying useful approximations rather than a “true” model, which is virtually never contained in real-world candidate sets \cite{GXF24}.
 
-\paragraph{Aesthetic Clarity}: A model must be parsimonious enough to be explained to stakeholders. Overly complex models with numerous small segments may achieve better fit but are often dismissed as "noisy" or "unstructured" (Gao etc., 2024).
+While a systematic assessment of forecasting performance lies beyond the scope of this work, we acknowledge that no single cost function captures the full spectrum of practical objectives. Among standard criteria, the log-likelihood is valued for its mathematical structure and optimization efficiency, while AIC and BIC serve to minimize information loss by penalizing complexity. Conversely, RMSE offers an intuitive measure of predictive error in the original data units. We present results for both AIC and a variant of RMSE, called QRMSE(Quasi-RMSE) \cite{M24}, which scales the sum of squared errors by the square root of the sample size rather than its mean. This scaling proved able to effectively gauge the complexity versus representativeness of the proposed model by favoring segments that maintain fit stability over longer intervals.
 
-\paragraph{Predictive Accuracy}: The ultimate arbiter of quality in time-series contexts is often out-of-sample performance. Research suggests that while complex models may minimize in-sample residuals, simpler piecewise structures often yield lower generalization error and more stable 7-to-30-day forecasts (ResearchGate, 2025; arXiv, 2021).
+Comment for Fig.~\ref{fig1}) and  Fig.~\ref{fig2}).
 
-Common cost functions such as AIC (Akaike Information Criterion), Negative Log-Likelihood, and RMSE are frequently employed not because they represent a "true" physical reality, but for their computational tractability.
-
-As highlighted by Burnham and Anderson (2003) and reiterated in recent reviews, these criteria are approximations used to navigate the trade-off between bias and variance. AIC and BIC serve as "analytical shortcuts" to automate what would otherwise be a subjective manual process (UCL Discovery, 2016). They provide a standard penalty for complexity, but as the aphorism "all models are wrong" suggests, these metrics are tools for finding the most useful approximation rather than the "true" model, which is virtually never present in real-world candidate sets (Wikipedia, 2024; Gao etc., 2024).
-
-"The use of penalized likelihood methods is often a matter of convention... providing an objective stopping rule in the search for segments, but not necessarily reflecting the underlying reality." (Adapted from Hastie et al. and Burnham, Anderson).
-
-References:
-
-Burnham, K.P. and Anderson, D.R. (2002) Model Selection and Inference: A Practical Information-Theoretic Approach. 2nd Edition, Springer-Verlag, New York.
-
-Datadog Engineering (2017). Piecewise regression: When one line simply isn't enough. https://www.datadoghq.com/blog/engineering/piecewise-regression/
-
-Gao, Z., Xiao, X., Fang, Y.-P., Rao, J., Mo, H. (2024). A Selective Review on Information Criteria in Multiple Change Point Detection. Entropy, 26(1), 50.
-
-@article{article,
-	author = {Grundy, Thomas and Killick, Rebecca and Svetunkov, Ivan},
-	year = {2025},
-	month = {06},
-	pages = {},
-	title = {Online Detection of Forecast Model Inadequacies Using Forecast Errors},
-	journal = {Journal of Time Series Analysis},
-	doi = {10.1111/jtsa.12843}
-}
-
-Hastie, T., Tibshirani, R., Friedman, J. (2009). The Elements of Statistical Learning: Data Mining, Inference, and Prediction.
-Relevance: Specifically, Chapter 7 ("Model Assessment and Selection") provides the foundational argument that information criteria like AIC/BIC are estimates of "in-sample" vs. "out-of-sample" error. It supports the point that these metrics are analytical conveniences used to penalize complexity
-
-These refer to the growing body of work regarding "Predictive Change Point Detection."
-
-arXiv:2106.02031: Change-Point Analysis of Time Series with Evolutionary Spectra (Casini, Perron, 2021). This work deals with detecting changes in non-stationary data where the "quality" of a fit is judged by how well it handles complex, shifting patterns.
-
-arXiv:2305.06630: Predictive change point detection for heterogeneous data (published in updated forms through 2024/2025). This paper explicitly links changepoint quality to forecasting (the "Predict and Compare" framework), arguing that a changepoint is "useful" if it significantly reduces the error between a prediction and the observed data.
-
-. ResearchGate (2025)
-This refers to recent surveys and papers on Deep Learning for CPD (Change Point Detection).
-Specific Citation: Change-point detection with deep learning: A review (Frontiers of Engineering Management, 2025).
-Relevance: This review discusses how modern methods have moved away from strict "cost function" optimization (like pure Log-Likelihood) toward "Accuracy" and "F1-scores" on real-world datasets, where the goal is often "visual" or "semantic" alignment with human-labeled events.
-
-University College London's statistical science department (a hub for changepoint research).
-Real-world Counterpart: A key work from this era/institution is Haynes, K. (2016). Efficient Algorithms for Detecting Changes in Mean and Variance.
-Relevance: It explores the computational efficiency of search methods (like PELT) and acknowledges that the "penalty" choice is often a matter of convention to ensure the algorithm remains computationally "tractable" (easy to analyze) for large datasets.
-
-Metric	Theoretical Purpose	Actual Pragmatic Purpose
-AIC/BIC	Minimize Information Loss	A "stopping rule" to keep the graph from looking too messy.
-Log-Likelihood	Maximize Probabilistic Fit	A mathematically "smooth" function that algorithms can solve quickly.
-RMSE	Minimize Variance	A metric that humans can understand because it's in the same units as the data.
+\begin{figure}[htbp]
+	\centering
+	\begin{subfigure}[b]{0.47\textwidth}
+		\includegraphics[width=\textwidth]{"N1879 costAIC.png"}
+		\caption{Segmentation with AIC cost.}
+		\label{fig:sub1}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.47\textwidth}
+		\includegraphics[width=\textwidth]{"N1879 costQRMSE.png"}
+		\caption{Segmentation with QRMSE cost.}
+		\label{fig:sub2}
+	\end{subfigure}
+	
+	\vspace{0.5cm} % Add some vertical space
+	
+	\begin{subfigure}[b]{0.47\textwidth}
+		\includegraphics[width=\textwidth]{"N1879 costAIC.png"}
+		\caption{Segmentation with AIC cost.}
+		\label{fig:sub3}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.47\textwidth}
+		\includegraphics[width=\textwidth]{"N1879 costQRMSE.png"}
+		\caption{Segmentation with QRMSE cost.}
+		\label{fig:sub4}
+	\end{subfigure}
+	\caption{AIC vs. QRMSE models}
+	\label{fig1}
+\end{figure}
 
 \subsubsection{Preliminary results.}
 
@@ -294,18 +283,42 @@ M6/USDJPY & Finance      & 263 &  0 & 0 & 687 & 263442 & 7 \\
 	\end{tabular}
 \end{table}
 
-Comment for Fig.~\ref{fig1}) and  Fig.~\ref{fig2}).
 
-\begin{figure}(Ht)
-	\includegraphics[width=0.7\textwidth]{"N1879 costAIC.png"}
-	\caption{Segmentation with AIC cost.} \label{fig1}
-\end{figure}
-
-
-\begin{figure}(Ht)
-	\includegraphics[width=0.7\textwidth]{"N1879 costQRMSE.png"}
-	\caption{Segmentation with QRMSE cost.} \label{fig2}
-\end{figure}
+N1879, Total CPU time: 0.0625 seconds, Number of segments: 2
+N1881, Total CPU time: 0.1094 seconds, Number of segments: 4
+N1882, Total CPU time: 0.0469 seconds, Number of segments: 12
+N1883, Total CPU time: 0.0469 seconds, Number of segments: 15
+N1884, Total CPU time: 0.0312 seconds, Number of segments: 19
+N1918, Total CPU time: 0.0781 seconds, Number of segments: 5
+N2830, Total CPU time: 0.0312 seconds, Number of segments: 7
+N2831, Total CPU time: 0.0312 seconds, Number of segments: 10
+N2832, Total CPU time: 0.0625 seconds, Number of segments: 4
+N2833, Total CPU time: 0.0469 seconds, Number of segments: 7
+N2834, Total CPU time: 0.0469 seconds, Number of segments: 9
+Q14640, Total CPU time: 0.0156 seconds, Number of segments: 1
+Q15444, Total CPU time: 0.0312 seconds, Number of segments: 3
+Q18148, Total CPU time: 0.0469 seconds, Number of segments: 4
+Q18496, Total CPU time: 0.0469 seconds, Number of segments: 5
+Q19604, Total CPU time: 0.0469 seconds, Number of segments: 8
+Q19637, Total CPU time: 0.0312 seconds, Number of segments: 14
+Q2002, Total CPU time: 0.0781 seconds, Number of segments: 11
+Q22221, Total CPU time: 0.3594 seconds, Number of segments: 58
+Q5109, Total CPU time: 0.2969 seconds, Number of segments: 102
+Q7774, Total CPU time: 0.0781 seconds, Number of segments: 3
+Q8030, Total CPU time: 0.0312 seconds, Number of segments: 6
+ABBV, Total CPU time: 0.1094 seconds Number of segments: 19
+BTCUSD, Total CPU time: 0.1562 seconds Number of segments: 22
+EURCHF, Total CPU time: 0.1250 seconds Number of segments: 20
+EURUSD, Total CPU time: 0.1094 seconds Number of segments: 18
+EWG, Total CPU time: 0.1094 seconds Number of segments: 15 
+EWQ, Total CPU time: 0.1250 seconds Number of segments: 14
+EWZ, Total CPU time: 0.1250 seconds Number of segments: 16
+GBPUSD, Total CPU time: 0.0938 seconds Number of segments: 17
+PYPL, Total CPU time: 0.1094 seconds Number of segments: 19
+RBLX, Total CPU time: 0.0938 seconds Number of segments: 21
+ROST, Total CPU time: 0.0781 seconds Number of segments: 20
+SLV, Total CPU time: 0.1094 seconds Number of segments: 23
+USDJPY, Total CPU time: 0.1094 seconds Number of segments: 22
 
 A cost function obtained by normalizing the residual sum of squares by the square root of the segment length does not satisfy the subadditivity condition required by PELT, since splitting a segment can increase the total cost. Consequently, the correctness of PELT pruning is not guaranteed for such a cost.
 In fact, any concave normalization in segment length (such as division by the square root of the length, as in RMSE or QRMSE) breaks PELT’s subadditivity assumption.
@@ -315,7 +328,7 @@ Then: One segment $C(1,100)=\frac{100}{\sqrt[]{100}}=10$, Two segments $C(1,50)+
 So: $C(1,100)<C(1,50)+C(51,100)$
 
 \section{Conclusions}		\label{sec:conclusions}
-The conlusions
+Move to assesment based on forecasting qualities, not cost function fit
 
 
 \bibliographystyle{splncs04}

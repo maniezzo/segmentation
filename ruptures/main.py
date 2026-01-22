@@ -36,8 +36,7 @@ def go_rupturesMinimal(data):
     return
 
 # PELT with AIC cost function and piecewise linear model
-def go_PELT_AIC(y, isAIC=True):
-   # 1. Data Cleaning & Preparation
+def go_PELT(y, isAIC=True):
    y_float = np.array(y).astype(float).flatten()
    n = len(y_float)
    x = np.arange(n).reshape(-1, 1)
@@ -46,7 +45,7 @@ def go_PELT_AIC(y, isAIC=True):
    # We add a column of ones so the cost function accounts for the intercept
    data = np.column_stack((x, np.ones_like(x), y_float))
    
-   pen_value = 7
+   pen_value = 15
    if(isAIC):
       # PELT with AIC cost
       cost = AICcost(k_params=2).fit(data)
@@ -209,16 +208,25 @@ def writeCsv(y, changepoints, filename="results.csv", isAIC=False):
 
 if __name__ == "__main__":
     matplotlib.use("TkAgg")
-    data = pd.read_csv("../data/M3/N1918.csv",usecols=[1])
-    
-    start_cpu = time.process_time()
-    isAIC = True
-    results = go_PELT_AIC(data.values,isAIC=isAIC)
-    end_cpu = time.process_time()
-    print(f"Total CPU time: {end_cpu - start_cpu:.4f} seconds")
+    lstFiles = ["N1879", "N1881", "N1882", "N1883", "N1884", "N1918", "N2830", "N2831", "N2832", "N2833", "N2834"]
+    lstFiles = ["Q14640", "Q15444", "Q18148", "Q18496", "Q19604", "Q19637", "Q2002", "Q22221", "Q5109", "Q7774", "Q8030"]
+    lstFiles = ["ABBV","BTCUSD","EURCHF","EURUSD","EWG","EWQ","EWZ","GBPUSD","PYPL","RBLX","ROST","SLV","USDJPY"]
 
-    fWriteRes = False
-    if(fWriteRes):
-      writeCsv(data,results,"results.csv",isAIC=isAIC)
-    #go_ruptures(data.values)
+    #df = pd.read_csv("../data/M3/M3month.csv")
+    #df = pd.read_csv("../data/M4/M4-selected.csv")
+    df = pd.read_csv("../data/M6/M6-selected.csv")
+    for fileName in lstFiles:
+       x = df[df["Series"] == fileName]
+       data = x.iloc[0, 6:].dropna().values.reshape(-1,1)
+
+       start_cpu = time.process_time()
+       isAIC = True
+       results = go_PELT(data, isAIC=isAIC)
+       end_cpu = time.process_time()
+       print(f"{fileName}, Total CPU time: {end_cpu - start_cpu:.4f} seconds")
+
+       fWriteRes = False
+       if(fWriteRes):
+         writeCsv(data,results,"results.csv",isAIC=isAIC)
+       #go_ruptures(data.values)
     print("fine")
