@@ -36,7 +36,7 @@ def go_rupturesMinimal(data):
     return
 
 # PELT with AIC cost function and piecewise linear model
-def go_PELT_AIC(y, isAIC=False):
+def go_PELT_AIC(y, isAIC=True):
    # 1. Data Cleaning & Preparation
    y_float = np.array(y).astype(float).flatten()
    n = len(y_float)
@@ -59,8 +59,7 @@ def go_PELT_AIC(y, isAIC=False):
       result = algo.predict(pen=pen_value)
    
    # changepoints, indices of the end of each segment
-   print(f"Cchangepoints: {result}")
-   print(f"Number of segments: {len(result)}")
+   print(f"Changepoints: {result}, Number of segments: {len(result)}")
    return result
 
 def go_ruptures(y):
@@ -213,11 +212,13 @@ if __name__ == "__main__":
     data = pd.read_csv("../data/M3/N1918.csv",usecols=[1])
     
     start_cpu = time.process_time()
-    isAIC = False
+    isAIC = True
     results = go_PELT_AIC(data.values,isAIC=isAIC)
     end_cpu = time.process_time()
     print(f"Total CPU time: {end_cpu - start_cpu:.4f} seconds")
 
-    writeCsv(data,results,"results.csv",isAIC=isAIC)
+    fWriteRes = False
+    if(fWriteRes):
+      writeCsv(data,results,"results.csv",isAIC=isAIC)
     #go_ruptures(data.values)
     print("fine")

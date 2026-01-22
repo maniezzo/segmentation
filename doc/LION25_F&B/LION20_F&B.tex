@@ -184,41 +184,96 @@ Finally, the state-of-the-art for CPD solution is represented by the {\it ruptur
 
 \paragraph{Pruned Exact Linear Time} (PELT) \cite{KFE12}, is an exact method for optimal multiple changepoint detection under an additive cost formulation with a penalty on the number of changepoints. PELT exploits a pruning rule that discards suboptimal candidate changepoints during the dynamic programming recursion, yielding linear expected time complexity under mild assumptions on the cost function and penalty. PELT is often regarded as a state-of-the-art exact method for large-scale offline changepoint detection.
 
-\paragraph{Dynamic programming} (DYNP) computes the globally optimal segmentation for a fixed number of changepoints (or segments) by exhaustively exploring all possible partitions of the time series. This approach dates back to early work by Auger and Lawrence \cite{AL89} and guarantees optimality, but its computational complexity is quadratic or worse in the length of the series.
+\paragraph{Dynamic programming} (DYNP), implements what is called {\em Segment Neighborhood} and in the algorithmic literature is better known as a truncated Bellman-Ford algorithm for single-source shortest path, computes the globally optimal segmentation for up to a fixed number of changepoints (or segments) by exploring all possible partitions of the time series. This approach dates back to early work by Auger and Lawrence \cite{AL89} and guarantees optimality, but its computational complexity is quadratic or worse in the length of the series.
 
 \paragraph{Binary segmentation} (BinSeg) is a greedy, recursive procedure that iteratively detects a single changepoint over the entire series and then applies the same procedure to the resulting subsegments. Classical binary segmentation was introduced by Scott and Knott \cite{SK74} and remains popular due to its simplicity and low computational cost. 
 
+\subsubsection{Cost function.}
+
+Model Selection in Changepoint Analysis: Aesthetics vs. Utility
+In the practical application of piecewise linear models, the quality of a model is often related to interpretability or forecasting utility. While statistical literature provides a rigorous framework for identifying structural breaks, practitioners frequently find that the most useful model is the one that aligns with the "naked eye" or provides the most coherent narrative for decision-making. As noted in industry applications, a model is often deemed successful if it identifies breakpoints that correspond to known external events—such as a shift in market policy or a technical failure—regardless of whether it satisfies every formal hypothesis test (Datadog, 2017).
+
+For actual purposes, the evaluation of a changepoint model typically falls into two categories:
+
+\paragraph{Aesthetic Clarity}: A model must be parsimonious enough to be explained to stakeholders. Overly complex models with numerous small segments may achieve better fit but are often dismissed as "noisy" or "unstructured" (MDPI, 2024).
+
+\paragraph{Predictive Accuracy}: The ultimate arbiter of quality in time-series contexts is often out-of-sample performance. Research suggests that while complex models may minimize in-sample residuals, simpler piecewise structures often yield lower generalization error and more stable 7-to-30-day forecasts (ResearchGate, 2025; arXiv, 2021).
+
+Common cost functions such as AIC (Akaike Information Criterion), Negative Log-Likelihood, and RMSE are frequently employed not because they represent a "true" physical reality, but for their computational tractability.
+
+As highlighted by Burnham and Anderson (2003) and reiterated in recent reviews, these criteria are approximations used to navigate the trade-off between bias and variance. AIC and BIC serve as "analytical shortcuts" to automate what would otherwise be a subjective manual process (UCL Discovery, 2016). They provide a standard penalty for complexity, but as the aphorism "all models are wrong" suggests, these metrics are tools for finding the most useful approximation rather than the "true" model, which is virtually never present in real-world candidate sets (Wikipedia, 2024; MDPI, 2024).
+
+"The use of penalized likelihood methods is often a matter of convention... providing an objective stopping rule in the search for segments, but not necessarily reflecting the underlying reality." (Adapted from Hastie et al. and Burnham, Anderson).
+
+References:
+
+Burnham, K. P., Anderson, D. R. (2003). Model Selection and Multimodel Inference: A Practical Information-Theoretic Approach.
+
+Datadog Engineering (2017). Piecewise regression: When one line simply isn't enough.
+
+MDPI (2024). A Selective Review on Information Criteria in Multiple Change Point Detection.
+
+arXiv (2025). Online detection of forecast model inadequacies using forecast errors.
+
+\subsubsection{Preliminary results.}
+
+
 \begin{table}
-	\caption{Table captions should be placed above the tables.}\label{tab1}
-	\begin{tabular}{|l|l|l|}
+	\caption{Preliminary results using QRMSE cost function.}\label{tab1}
+	\begin{tabular}{llc|cc|cr|c}
 		\hline
-		Heading level &  Example & Font size and style\\
+name      & category     & n   & t.tot & t.opt & matches & fathomed & n.brk \\
 		\hline
-		Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
-		1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
-		2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
-		3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
-		4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
+M3/N1879  & Industry     & 144 &  0 & 0 & 266 & 40446 & 2 \\
+M3/N1881  & Industry     & 144 &  0 & 0 & 363 & 20441 & 7 \\
+M3/N1882  & Industry     & 144 &  0 & 0 & 285 & 40027 & 7 \\
+M3/N1883  & Industry     & 144 &  0 & 0 & 359 & 25539 & 7 \\
+M3/N1884  & Industry     & 144 &  0 & 0 & 337 & 41697 & 7 \\
+M3/N1918  & Industry     & 144 &  0 & 0 & 446 & 21688 & 6 \\
+M3/N2830  & Micro        & 104 &  0 & 0 & 219 & 12497 & 7 \\
+M3/N2831  & Micro        & 104 &  0 & 0 & 175 & 16713 & 6 \\
+M3/N2832  & Micro        & 104 &  0 & 0 & 160 & 19533 & 4 \\
+M3/N2833  & Micro        & 104 &  0 & 0 & 262 & 4184 & 7 \\
+M3/N2834  & Finance      & 104 &  0 & 0 & 248 & 8600 & 7 \\
+M4/Q14640 & Industry     & 115 &  0 & 0 &   0 & 17037 & 0 \\
+M4/Q15444 & Industry     & 126 &  0 & 0 & 105 & 11704 & 3 \\
+M4/Q18148 & Industry     &  71 &  0 & 0 &  92 & 2329 & 2 \\
+M4/Q18496 & Industry     & 126 &  0 & 0 & 252 & 17004 & 7 \\
+M4/Q19604 & Industry     & 123 &  0 & 0 & 263 & 18127 & 7 \\
+M4/Q19637 & Industry     & 123 &  0 & 0 & 334 & 21332 & 7 \\
+M4/Q2002  & Macro        & 170 &  0 & 0 & 519 & 103936 & 7 \\
+M4/Q22221 & Finance      & 738 & 40 &35 & 2659 & 6424871 & 7 \\
+M4/Q5109  & Macro        & 866 & 97 &84 & 1809 & 16246274 & 7 \\
+M4/Q7774  & Micro        & 115 &  0 & 0 & 102 & 18649 & 2 \\
+M4/Q8030  & Micro        &  97 &  0 & 0 & 183 & 6872 & 7 \\
+M6/ABBV   & Finance      & 253 &  0 & 0 & 974 & 270239 & 7 \\
+M6/BTCUSD & Finance      & 367 &  2 & 2 & 1157 & 675562 & 7 \\
+M6/EURCHF & Finance      & 263 &  0 & 0 & 903 & 364509 & 7 \\
+M6/EURUSD & Finance      & 263 &  0 & 0 & 507 & 264444 & 7 \\
+M6/EWG    & Finance      & 253 &  0 & 0 & 719 & 185694 & 7 \\
+M6/EWQ    & Finance      & 253 &  0 & 0 & 816 & 185572 & 7 \\
+M6/EWZ    & Finance      & 253 &  0 & 0 & 618 & 354703 & 7 \\
+M6/GBPUSD & Finance      & 263 &  0 & 0 & 580 & 291430 & 7 \\
+M6/PYPL   & Finance      & 253 &  0 & 0 & 760 & 214249 & 7 \\
+M6/RBLX   & Finance      & 253 &  0 & 0 & 784 & 301279 & 7 \\
+M6/ROST   & Finance      & 253 &  0 & 0 & 824 & 225076 & 7 \\
+M6/SLV    & Finance      & 253 &  0 & 0 & 686 & 132486 & 7 \\
+M6/USDJPY & Finance      & 263 &  0 & 0 & 687 & 263442 & 7 \\
 		\hline
 	\end{tabular}
 \end{table}
 
-
-Please try to avoid rasterized images for line-art diagrams and schemas. Whenever possible, use vector graphics instead (see Fig.~\ref{fig1}).
+Comment for Fig.~\ref{fig1}) and  Fig.~\ref{fig2}).
 
 \begin{figure}(Ht)
 	\includegraphics[width=0.7\textwidth]{"N1879 costAIC.png"}
-	\caption{A figure caption is always placed below the illustration.
-		Please note that short captions are centered, while long ones are
-		justified by the macro package automatically.} \label{fig1}
+	\caption{Segmentation with AIC cost.} \label{fig1}
 \end{figure}
 
 
 \begin{figure}(Ht)
 	\includegraphics[width=0.7\textwidth]{"N1879 costQRMSE.png"}
-	\caption{A figure caption is always placed below the illustration.
-		Please note that short captions are centered, while long ones are
-		justified by the macro package automatically.} \label{fig2}
+	\caption{Segmentation with QRMSE cost.} \label{fig2}
 \end{figure}
 
 A cost function obtained by normalizing the residual sum of squares by the square root of the segment length does not satisfy the subadditivity condition required by PELT, since splitting a segment can increase the total cost. Consequently, the correctness of PELT pruning is not guaranteed for such a cost.
