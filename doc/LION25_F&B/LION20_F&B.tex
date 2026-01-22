@@ -195,25 +195,56 @@ In the practical application of piecewise linear models, the quality of a model 
 
 For actual purposes, the evaluation of a changepoint model typically falls into two categories:
 
-\paragraph{Aesthetic Clarity}: A model must be parsimonious enough to be explained to stakeholders. Overly complex models with numerous small segments may achieve better fit but are often dismissed as "noisy" or "unstructured" (MDPI, 2024).
+\paragraph{Aesthetic Clarity}: A model must be parsimonious enough to be explained to stakeholders. Overly complex models with numerous small segments may achieve better fit but are often dismissed as "noisy" or "unstructured" (Gao etc., 2024).
 
 \paragraph{Predictive Accuracy}: The ultimate arbiter of quality in time-series contexts is often out-of-sample performance. Research suggests that while complex models may minimize in-sample residuals, simpler piecewise structures often yield lower generalization error and more stable 7-to-30-day forecasts (ResearchGate, 2025; arXiv, 2021).
 
 Common cost functions such as AIC (Akaike Information Criterion), Negative Log-Likelihood, and RMSE are frequently employed not because they represent a "true" physical reality, but for their computational tractability.
 
-As highlighted by Burnham and Anderson (2003) and reiterated in recent reviews, these criteria are approximations used to navigate the trade-off between bias and variance. AIC and BIC serve as "analytical shortcuts" to automate what would otherwise be a subjective manual process (UCL Discovery, 2016). They provide a standard penalty for complexity, but as the aphorism "all models are wrong" suggests, these metrics are tools for finding the most useful approximation rather than the "true" model, which is virtually never present in real-world candidate sets (Wikipedia, 2024; MDPI, 2024).
+As highlighted by Burnham and Anderson (2003) and reiterated in recent reviews, these criteria are approximations used to navigate the trade-off between bias and variance. AIC and BIC serve as "analytical shortcuts" to automate what would otherwise be a subjective manual process (UCL Discovery, 2016). They provide a standard penalty for complexity, but as the aphorism "all models are wrong" suggests, these metrics are tools for finding the most useful approximation rather than the "true" model, which is virtually never present in real-world candidate sets (Wikipedia, 2024; Gao etc., 2024).
 
 "The use of penalized likelihood methods is often a matter of convention... providing an objective stopping rule in the search for segments, but not necessarily reflecting the underlying reality." (Adapted from Hastie et al. and Burnham, Anderson).
 
 References:
 
-Burnham, K. P., Anderson, D. R. (2003). Model Selection and Multimodel Inference: A Practical Information-Theoretic Approach.
+Burnham, K.P. and Anderson, D.R. (2002) Model Selection and Inference: A Practical Information-Theoretic Approach. 2nd Edition, Springer-Verlag, New York.
 
-Datadog Engineering (2017). Piecewise regression: When one line simply isn't enough.
+Datadog Engineering (2017). Piecewise regression: When one line simply isn't enough. https://www.datadoghq.com/blog/engineering/piecewise-regression/
 
-MDPI (2024). A Selective Review on Information Criteria in Multiple Change Point Detection.
+Gao, Z., Xiao, X., Fang, Y.-P., Rao, J., Mo, H. (2024). A Selective Review on Information Criteria in Multiple Change Point Detection. Entropy, 26(1), 50.
 
-arXiv (2025). Online detection of forecast model inadequacies using forecast errors.
+@article{article,
+	author = {Grundy, Thomas and Killick, Rebecca and Svetunkov, Ivan},
+	year = {2025},
+	month = {06},
+	pages = {},
+	title = {Online Detection of Forecast Model Inadequacies Using Forecast Errors},
+	journal = {Journal of Time Series Analysis},
+	doi = {10.1111/jtsa.12843}
+}
+
+Hastie, T., Tibshirani, R., Friedman, J. (2009). The Elements of Statistical Learning: Data Mining, Inference, and Prediction.
+Relevance: Specifically, Chapter 7 ("Model Assessment and Selection") provides the foundational argument that information criteria like AIC/BIC are estimates of "in-sample" vs. "out-of-sample" error. It supports the point that these metrics are analytical conveniences used to penalize complexity
+
+These refer to the growing body of work regarding "Predictive Change Point Detection."
+
+arXiv:2106.02031: Change-Point Analysis of Time Series with Evolutionary Spectra (Casini, Perron, 2021). This work deals with detecting changes in non-stationary data where the "quality" of a fit is judged by how well it handles complex, shifting patterns.
+
+arXiv:2305.06630: Predictive change point detection for heterogeneous data (published in updated forms through 2024/2025). This paper explicitly links changepoint quality to forecasting (the "Predict and Compare" framework), arguing that a changepoint is "useful" if it significantly reduces the error between a prediction and the observed data.
+
+. ResearchGate (2025)
+This refers to recent surveys and papers on Deep Learning for CPD (Change Point Detection).
+Specific Citation: Change-point detection with deep learning: A review (Frontiers of Engineering Management, 2025).
+Relevance: This review discusses how modern methods have moved away from strict "cost function" optimization (like pure Log-Likelihood) toward "Accuracy" and "F1-scores" on real-world datasets, where the goal is often "visual" or "semantic" alignment with human-labeled events.
+
+University College London's statistical science department (a hub for changepoint research).
+Real-world Counterpart: A key work from this era/institution is Haynes, K. (2016). Efficient Algorithms for Detecting Changes in Mean and Variance.
+Relevance: It explores the computational efficiency of search methods (like PELT) and acknowledges that the "penalty" choice is often a matter of convention to ensure the algorithm remains computationally "tractable" (easy to analyze) for large datasets.
+
+Metric	Theoretical Purpose	Actual Pragmatic Purpose
+AIC/BIC	Minimize Information Loss	A "stopping rule" to keep the graph from looking too messy.
+Log-Likelihood	Maximize Probabilistic Fit	A mathematically "smooth" function that algorithms can solve quickly.
+RMSE	Minimize Variance	A metric that humans can understand because it's in the same units as the data.
 
 \subsubsection{Preliminary results.}
 
