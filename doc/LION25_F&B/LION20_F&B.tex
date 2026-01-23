@@ -185,9 +185,9 @@ Finally, the state-of-the-art for CPD solution is represented by the {\it ruptur
 
 \paragraph{Pruned Exact Linear Time} (PELT) \cite{KFE12}, is an exact method for optimal multiple changepoint detection under an additive cost formulation with a penalty on the number of changepoints. PELT exploits a pruning rule that discards suboptimal candidate changepoints during the dynamic programming recursion, yielding linear expected time complexity under mild assumptions on the cost function and penalty. PELT is often regarded as a state-of-the-art exact method for large-scale offline changepoint detection.
 
-\paragraph{Dynamic programming} (DYNP), implements what is called {\em Segment Neighborhood} and in the algorithmic literature is better known as a truncated Bellman-Ford algorithm for single-source shortest path, computes the globally optimal segmentation for up to a fixed number of changepoints (or segments) by exploring all possible partitions of the time series. This approach dates back to early work by Auger and Lawrence \cite{AL89} and guarantees optimality, but its computational complexity is quadratic or worse in the length of the series.
+\paragraph{Dynamic programming} (DYNP), implements an optimal partitioning algorithm based on dynamic programming with a fixed number of change points) by exploring all possible partitions of the time series and finds the optimal segmentation with exactly a given number of changepoints (i.e., the number of segments minus 1).
 
-\paragraph{Binary segmentation} (BinSeg) is a greedy, recursive procedure that iteratively detects a single changepoint over the entire series and then applies the same procedure to the resulting subsegments. Classical binary segmentation was introduced by Scott and Knott \cite{SK74} and remains popular due to its simplicity and low computational cost. 
+%\paragraph{Binary segmentation} (BinSeg) is a greedy, recursive procedure that iteratively detects a single changepoint over the entire series and then applies the same procedure to the resulting subsegments. Classical binary segmentation was introduced by Scott and Knott \cite{SK74} and remains popular due to its simplicity and low computational cost. 
 
 \subsubsection{Cost function.}
 In the practical application of piecewise linear models, the quality of a model is often related to interpretability or forecasting utility rather than mathematical properties. While statistical literature provides a rigorous framework for identifying structural breaks, practitioners frequently find that the most useful model is the one that aligns with the "naked eye" or provides the most coherent narrative for decision-making. As noted in industry applications, a model is often deemed successful if it identifies breakpoints that correspond to known external events—such as a shift in market policy or a technical failure—regardless of whether it satisfies every formal hypothesis test \cite{Datalog}. Modern methods have moved away from strict cost function optimization toward visual or semantic alignment with human-labeled events \cite{XSW25}. 
@@ -284,41 +284,50 @@ M6/USDJPY & Finance      & 263 &  0 & 0 & 687 & 263442 & 7 \\
 \end{table}
 
 
-N1879, Total CPU time: 0.0625 seconds, Number of segments: 2
-N1881, Total CPU time: 0.1094 seconds, Number of segments: 4
-N1882, Total CPU time: 0.0469 seconds, Number of segments: 12
-N1883, Total CPU time: 0.0469 seconds, Number of segments: 15
-N1884, Total CPU time: 0.0312 seconds, Number of segments: 19
-N1918, Total CPU time: 0.0781 seconds, Number of segments: 5
-N2830, Total CPU time: 0.0312 seconds, Number of segments: 7
-N2831, Total CPU time: 0.0312 seconds, Number of segments: 10
-N2832, Total CPU time: 0.0625 seconds, Number of segments: 4
-N2833, Total CPU time: 0.0469 seconds, Number of segments: 7
-N2834, Total CPU time: 0.0469 seconds, Number of segments: 9
-Q14640, Total CPU time: 0.0156 seconds, Number of segments: 1
-Q15444, Total CPU time: 0.0312 seconds, Number of segments: 3
-Q18148, Total CPU time: 0.0469 seconds, Number of segments: 4
-Q18496, Total CPU time: 0.0469 seconds, Number of segments: 5
-Q19604, Total CPU time: 0.0469 seconds, Number of segments: 8
-Q19637, Total CPU time: 0.0312 seconds, Number of segments: 14
-Q2002, Total CPU time: 0.0781 seconds, Number of segments: 11
-Q22221, Total CPU time: 0.3594 seconds, Number of segments: 58
-Q5109, Total CPU time: 0.2969 seconds, Number of segments: 102
-Q7774, Total CPU time: 0.0781 seconds, Number of segments: 3
-Q8030, Total CPU time: 0.0312 seconds, Number of segments: 6
-ABBV, Total CPU time: 0.1094 seconds Number of segments: 19
-BTCUSD, Total CPU time: 0.1562 seconds Number of segments: 22
-EURCHF, Total CPU time: 0.1250 seconds Number of segments: 20
-EURUSD, Total CPU time: 0.1094 seconds Number of segments: 18
-EWG, Total CPU time: 0.1094 seconds Number of segments: 15 
-EWQ, Total CPU time: 0.1250 seconds Number of segments: 14
-EWZ, Total CPU time: 0.1250 seconds Number of segments: 16
-GBPUSD, Total CPU time: 0.0938 seconds Number of segments: 17
-PYPL, Total CPU time: 0.1094 seconds Number of segments: 19
-RBLX, Total CPU time: 0.0938 seconds Number of segments: 21
-ROST, Total CPU time: 0.0781 seconds Number of segments: 20
-SLV, Total CPU time: 0.1094 seconds Number of segments: 23
-USDJPY, Total CPU time: 0.1094 seconds Number of segments: 22
+\begin{table}
+	\caption{Preliminary results using AIC cost function.}\label{tab2}
+	\begin{tabular}{llc|cc|cc|cc}
+		\hline
+      & & & \multicolumn{2}{c|}{FnB} & \multicolumn{2}{c|}{PELT} & \multicolumn{2}{c}{DYNP} \\ 
+		& category & n & segments & t.cpu & segments: & t.cpu & segments: & t.cpu\\ 
+		\hline
+M3/N1879  & Industry & 144 & 8 & 0.052 &  2 & 0.062 & 8 & 0.0156\\ 
+M3/N1881  & Industry & 144 & 8 & 0.054 &  4 & 0.109 & 8 & 0.0156\\ 
+M3/N1882  & Industry & 144 & 8 & 0.052 & 12 & 0.046 & 8 & 0.015\\ 
+M3/N1883  & Industry & 144 & 8 & 0.042 & 15 & 0.046 & 8 & 0.015\\ 
+M3/N1884  & Industry & 144 & 8 & 0.06  & 19 & 0.031 & 8 & 0.031\\ 
+M3/N1918  & Industry & 144 & 8 & 0.064 &  5 & 0.078 & 8 & 0.015\\ 
+M3/N2830  &    Micro & 104 & 8 & 0.024 &  7 & 0.031 & 8 & 0\\ 
+M3/N2831  &    Micro & 104 & 8 & 0.022 & 10 & 0.031 & 8 & 0.015\\ 
+M3/N2832  &    Micro & 104 & 6 & 0.024 &  4 & 0.062 & 8 & 0\\ 
+M3/N2833  &    Micro & 104 & 8 & 0.022 &  7 & 0.046 & 8 & 0.015\\ 
+M3/N2834  &  Finance & 104 & 8 & 0.026 &  9 & 0.046 & 8 & 0\\ 
+M4/Q14640 & Industry & 115 & 2 & 0.036 &  1 & 0.015 & 8 & 0\\ 
+M4/Q15444 & Industry & 126 & 4 & 0.05  &  3 & 0.031 & 8 & 0.015\\ 
+M4/Q18148 & Industry &  71 & 5 & 0.006 &  4 & 0.046 & 8 & 0.015\\ 
+M4/Q18496 & Industry & 126 & 8 & 0.038 &  5 & 0.046 & 8 & 0\\ 
+M4/Q19604 & Industry & 123 & 8 & 0.038 &  8 & 0.046 & 8 & 0.015\\ 
+M4/Q19637 & Industry & 123 & 3 & 0.044 & 14 & 0.031 & 8 & 0.015\\ 
+M4/Q2002  &    Macro & 170 & 8 & 0.094 & 11 & 0.078 & 8 & 0.031\\ 
+M4/Q22221 &  Finance & 738 & 8 & 1.926 & 58 & 0.359 & 8 & 0.593\\ 
+M4/Q5109  &    Macro & 866 & 8 & 2.858 &102 & 0.296 & 8 & 0.828\\ 
+M4/Q7774  &    Micro & 115 & 6 & 0.026 &  3 & 0.078 & 8 & 0.015\\ 
+M4/Q8030  &    Micro &  97 & 8 & 0.022 &  6 & 0.031 & 8 & 0.015\\ 
+M6/ABBV   &  Finance & 253 & 8 & 0.196 & 19 & 0.109 & 8 & 0.062\\ 
+M6/BTCUSD &  Finance & 367 & 8 & 0.406 & 22 & 0.156 & 8 & 0.125\\
+M6/EWG    &  Finance & 253 & 8 & 0.176 & 15 & 0.109 & 8 & 0.046\\ 
+M6/EWQ    &  Finance & 253 & 8 & 0.168 & 14 & 0.125 & 8 & 0.062\\ 
+M6/EWZ    &  Finance & 253 & 8 & 0.182 & 16 & 0.125 & 8 & 0.046\\ 
+M6/GBPUSD &  Finance & 263 & 8 & 0.184 & 17 & 0.093 & 8 & 0.078\\ 
+M6/PYPL   &  Finance & 253 & 8 & 0.162 & 19 & 0.109 & 8 & 0.062\\ 
+M6/RBLX   &  Finance & 253 & 8 & 0.17  & 21 & 0.093 & 8 & 0.046\\ 
+M6/ROST   &  Finance & 253 & 8 & 0.172 & 20 & 0.078 & 8 & 0.062\\ 
+M6/SLV    &  Finance & 253 & 8 & 0.168 & 23 & 0.109 & 8 & 0.078\\ 
+M6/USDJPY &  Finance & 263 & 8 & 0.182 & 22 & 0.109 & 8 & 0.062\\ 
+		\hline
+\end{tabular}
+\end{table}
+
 
 A cost function obtained by normalizing the residual sum of squares by the square root of the segment length does not satisfy the subadditivity condition required by PELT, since splitting a segment can increase the total cost. Consequently, the correctness of PELT pruning is not guaranteed for such a cost.
 In fact, any concave normalization in segment length (such as division by the square root of the length, as in RMSE or QRMSE) breaks PELT’s subadditivity assumption.

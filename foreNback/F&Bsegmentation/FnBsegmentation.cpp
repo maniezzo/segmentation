@@ -22,33 +22,44 @@ void FnBsegmentation::run_FnB()
       default: cout << "------- ERROR IN ASSIGNING COST FUNCTION ----------";
    }
 
-   cout << "\n---------------------------------------------------- DAG" << endl;
-   // optimal solution with no constraint on the number of arcs (but with minLength)
-   DAG_SSSP();
+   bool fDAG = false;
+   if(fDAG)
+   {  cout << "\n---------------------------------------------------- DAG" << endl;
+      // optimal solution with no constraint on the number of arcs (but with minLength)
+      DAG_SSSP();
+      return;
+   }
 
-   cout << "\n---------------------------------------------------- BF" << endl;
-   // optimal solution with one constraint on the number of arcs and with minLength
-   run_BF();
+   bool fBF = true;
+   if(fBF)
+   {  cout << "\n---------------------------------------------------- BF" << endl;
+      // optimal solution with one constraint on the number of arcs and with minLength
+      run_BF();
+   }
 
-   cout << "\n---------------------------------------------------- FnB" << endl;
-   Fstage.resize(n);
-   Fexpanded.resize(n);
-   Fstage[0].insert(0, 0, {0});     // num,cost, [changepoints]
+   bool fFnB = false;
+   if(fFnB)
+   {  cout<<"\n---------------------------------------------------- FnB"<<endl;
+      Fstage.resize(n);
+      Fexpanded.resize(n);
+      Fstage[0].insert(0, 0, { 0 });     // num,cost, [changepoints]
 
-   Bstage.resize(n);
-   Bexpanded.resize(n);
-   Bstage[n-1].insert(0, 0, {n-1}); // num,cost, [changepoints]
+      Bstage.resize(n);
+      Bexpanded.resize(n);
+      Bstage[n-1].insert(0, 0, { n-1 }); // num,cost, [changepoints]
 
-   tstart = clock();
-   do
-   {  isImprovedF = forward();
-      isImprovedB = backward();
-      computeLB();
-      tend = clock();
-      ttot = (tend - tstart) / CLOCKS_PER_SEC;
-   } while((isImprovedF || isImprovedB) && ttot < maxcpu);
-   cout << "FnB: t.cpu " << ttot << endl;
-   reconstructFnBsolution();
+      tstart = clock();
+      do
+      {
+         isImprovedF = forward();
+         isImprovedB = backward();
+         computeLB();
+         tend = clock();
+         ttot = (tend-tstart)/CLOCKS_PER_SEC;
+      } while ((isImprovedF||isImprovedB)&&ttot<maxcpu);
+      cout<<"FnB: t.cpu "<<ttot<<endl;
+      reconstructFnBsolution();
+   }
 }
 
 // forward pass
@@ -456,7 +467,7 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
       paths0 = paths1;
    }
    tend = clock();
-   ttot = (tend - tstart) / CLOCKS_PER_SEC;
+   ttot = (tend-tstart)/(1.0*CLOCKS_PER_SEC);
 
    // Check for negative weight cycles: useless in DAG
 

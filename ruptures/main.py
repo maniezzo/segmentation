@@ -61,6 +61,32 @@ def go_PELT(y, isAIC=True):
    print(f"Changepoints: {result}, Number of segments: {len(result)}")
    return result
 
+def go_DYNP(y, isAIC=True):
+   y_float = np.array(y).astype(float).flatten()
+   n = len(y_float)
+   x = np.arange(n).reshape(-1, 1)
+
+   # Ruptures needs [features, target]
+   # We add a column of ones so the cost function accounts for the intercept
+   data = np.column_stack((x, np.ones_like(x), y_float))
+
+   nbrk = 7
+   if (isAIC):
+      # PELT with AIC cost
+      cost = AICcost(k_params=2).fit(data)
+      algo = rpt.Dynp(custom_cost=cost, min_size=cost.min_size).fit(data)
+      result = algo.predict(n_bkps=nbrk)
+   else:
+      # PELT with QRMSE cost
+      cost = QRMSELinearCost().fit(data)
+      algo = rpt.Pelt(custom_cost=cost, min_size=cost.min_size).fit(data)
+      result = algo.predict(n_bkps=nbrk)
+
+   # changepoints, indices of the end of each segment
+   print(f"Changepoints: {result}, Number of segments: {len(result)}")
+   return result
+
+
 def go_ruptures(y):
    # model, min_size, pen are hyperparameters
    dim = 1
@@ -83,7 +109,7 @@ def go_ruptures(y):
    print(f"Pelt: {result}")
    printResults(method,result,np.array(y,dtype=np.float64))
 
-   # dynamic programming, needs the number of points
+   # dynamic programming, needs the max number of points
    algo = rpt.Dynp(model="linear", min_size=5).fit(signal)
    result = algo.predict(n_bkps=numBreakPnts)
    rpt.display(signal, bkps, result)
@@ -209,19 +235,19 @@ def writeCsv(y, changepoints, filename="results.csv", isAIC=False):
 if __name__ == "__main__":
     matplotlib.use("TkAgg")
     lstFiles = ["N1879", "N1881", "N1882", "N1883", "N1884", "N1918", "N2830", "N2831", "N2832", "N2833", "N2834"]
-    lstFiles = ["Q14640", "Q15444", "Q18148", "Q18496", "Q19604", "Q19637", "Q2002", "Q22221", "Q5109", "Q7774", "Q8030"]
-    lstFiles = ["ABBV","BTCUSD","EURCHF","EURUSD","EWG","EWQ","EWZ","GBPUSD","PYPL","RBLX","ROST","SLV","USDJPY"]
-
-    #df = pd.read_csv("../data/M3/M3month.csv")
+    df = pd.read_csv("../data/M3/M3month.csv")
+    #lstFiles = ["Q14640", "Q15444", "Q18148", "Q18496", "Q19604", "Q19637", "Q2002", "Q22221", "Q5109", "Q7774", "Q8030"]
     #df = pd.read_csv("../data/M4/M4-selected.csv")
-    df = pd.read_csv("../data/M6/M6-selected.csv")
+    #lstFiles = ["ABBV","BTCUSD","EURCHF","EURUSD","EWG","EWQ","EWZ","GBPUSD","PYPL","RBLX","ROST","SLV","USDJPY"]
+    #df = pd.read_csv("../data/M6/M6-selected.csv")
     for fileName in lstFiles:
        x = df[df["Series"] == fileName]
        data = x.iloc[0, 6:].dropna().values.reshape(-1,1)
 
        start_cpu = time.process_time()
        isAIC = True
-       results = go_PELT(data, isAIC=isAIC)
+       #results = go_PELT(data, isAIC=isAIC)
+       results = go_DYNP(data, isAIC=isAIC)
        end_cpu = time.process_time()
        print(f"{fileName}, Total CPU time: {end_cpu - start_cpu:.4f} seconds")
 
