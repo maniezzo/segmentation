@@ -30,14 +30,14 @@ void FnBsegmentation::run_FnB()
       return;
    }
 
-   bool fBF = true;
+   bool fBF = false;
    if(fBF)
    {  cout << "\n---------------------------------------------------- BF" << endl;
       // optimal solution with one constraint on the number of arcs and with minLength
       run_BF();
    }
 
-   bool fFnB = false;
+   bool fFnB = true;
    if(fFnB)
    {  cout<<"\n---------------------------------------------------- FnB"<<endl;
       Fstage.resize(n);
@@ -170,8 +170,9 @@ bool FnBsegmentation::backward()
 
 // forward offspring generation, cost computation
 bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost, vector<int> lstPoints)
-{  double c,m,q,z;
+{  double c,m,q,z,zstage;
    bool isImproved = false;
+   int nbrk;   // num of changepoints (breakpoints)
 
    if(t1>0) 
    {  t1+=1;   // nuovo segmento parte un time point dopo la fine del precedente
@@ -181,6 +182,7 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
    tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costQRMSE(t1, t2);
    z = cost+get<4>(res);
    lstPoints.push_back(t2);
+   nbrk = lstPoints.size();
 
    if (t2==(n-1) && z<zub)
    {  zub = z;
@@ -191,6 +193,12 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
       }
    }
 
+   //zstage = get<0>( Fstage[t2].queryMinCost(nbrk) ); // cost up to t2
+   //if(zstage<z)   // conosco già una soluzione parziale migliore
+   //{  nFathomed++;
+   //   goto l0;
+   //}
+
    if(z < zub)
    {  Fstage[t2].insert(nSegm+1, z, lstPoints);
       isImproved = true;
@@ -199,14 +207,15 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
       nFathomed++;
    //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
 
-   return isImproved;
+l0:return isImproved;
 }
 
 // backward offspring generation, cost computation
 bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost, vector<int> lstPoints)
 {  int i;
-   double c,m,q,z;
+   double c,m,q,z,zstage;
    bool isImproved = false;
+   int nbrk;   // num of changepoints (breakpoints)
 
    if(t2<n-1) 
    {  t2-=1;   // nuovo segmento finisce un time point prima dell'inizio del seguente
@@ -217,6 +226,7 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
    tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costQRMSE(t1, t2);
    z = cost+get<4>(res);
    lstPoints.insert(lstPoints.begin(), t1);
+   nbrk = lstPoints.size();
 
    if (t1==0 && z<zub)
    {  zub = z;
@@ -229,6 +239,12 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
       }
    }
 
+   //zstage = get<0>( Bstage[t1].queryMinCost(nbrk) ); // cost up to t2
+   //if(zstage<z)   // conosco già una soluzione parziale migliore
+   //{  nFathomed++;
+   //   goto l0;
+   //}
+
    if(z < zub)
    {  Bstage[t1].insert(nSegm+1, z, lstPoints);
       isImproved = true;
@@ -237,7 +253,7 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
       nFathomed++;
    //cout << "t1=" << t1 << " t2=" << t2 << " nSegm="<< nSegm+1 << " cost " << cost+z << endl;
 
-   return isImproved;
+l0:return isImproved;
 }
 
 // matches the current partial solution against one from the opposite direction
