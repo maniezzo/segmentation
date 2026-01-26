@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DPtable.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="FnBsegmentation.cpp" />
@@ -134,6 +135,7 @@
     <ClCompile Include="Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DPtable.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="FnBsegmentation.h" />
     <ClInclude Include="json.h" />

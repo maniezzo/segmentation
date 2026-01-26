@@ -1,6 +1,8 @@
 #pragma once
 #include "global.h"
 #include "Stage.h"
+#include "DPtable.h"
+#include <memory>     // For std::unique_ptr
 
 class FnBsegmentation
 {
@@ -10,8 +12,8 @@ private:
 
    struct Edge { int end1, end2, segm; double cost; }; // an edge in bellman ford
 
-   vector<Stage> Fstage, Bstage; // expansion stages, unexpanded nodes
-   vector<Stage> Fexpanded, Bexpanded; // expanded nodes
+   unique_ptr<DPtable> Fstage, Bstage; // expansion stages, unexpanded nodes
+   unique_ptr<DPtable> Fexpanded, Bexpanded; // expanded nodes
    vector<int>   changepoints; // final changepoints
 
    bool forward();
