@@ -161,7 +161,7 @@ bool FnBsegmentation::backward()
 
          if(nSegm < maxNumEdges)
          {  tstart = max(0,i-minLength-maxLength);
-            for (t=i-minLength-1;t>=0;t--)
+            for (t=i-minLength;t>=0;t--)
             {  bool fGen = generateBoffspring(i, t, nSegm, z, lstPoints); // backward, t<i
                isImproved = isImproved || fGen;
             }

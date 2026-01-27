@@ -61,7 +61,7 @@ In parallel to algorithmic developments, mathematical programming formulations�
 
 Matheuristics, which integrate mathematical programming techniques within heuristic or metaheuristic frameworks, provide a promising avenue for bridging this gap. By leveraging the structural strength of exact models while selectively relaxing exhaustive search, matheuristics aim to deliver high-quality solutions with significantly reduced computational effort. In the context of CPD, however, relatively few approaches explicitly exploit this paradigm, and most existing methods fall either on the side of exact optimization or on purely algorithmic heuristics.
 
-This paper proposes a novel matheuristic for univariate changepoint detection based on a *fore–n–back* search strategy. The method starts from a rapidly generated feasible segmentation and alternates between forward construction and backward refinement phases, guided by an underlying mathematical programming formulation. This design enables the algorithm to quickly identify promising regions of the solution space while retaining a global view of the segmentation problem. Importantly, the approach is *anytime* in nature: it produces a valid solution almost immediately and progressively improves solution quality as additional computational resources become available.
+This paper proposes a novel matheuristic for univariate changepoint detection based on a {\it fore–n–back} search strategy. The method starts from a rapidly generated feasible segmentation and alternates between forward construction and backward refinement phases, guided by an underlying mathematical programming formulation. This design enables the algorithm to quickly identify promising regions of the solution space while retaining a global view of the segmentation problem. Importantly, the approach is {\it anytime} in nature: it produces a valid solution almost immediately and progressively improves solution quality as additional computational resources become available.
 
 The proposed matheuristic preserves key advantages of optimization-based CPD models. In particular, it naturally supports the inclusion of global constraints on the segmentation, such as bounds on the number of segments or minimum segment lengths, which are difficult to accommodate within classical dynamic programming frameworks. At the same time, by avoiding a full enumeration of candidate segmentations, the method circumvents the computational burden typically associated with exact solvers.
 
@@ -110,7 +110,7 @@ In order to expand level $h$ of a tree at iteration $t$, the algorithm computes 
 
 A distinctive characteristic of the Fore-and-Back algorithm is that, at each level $h$ of the tree generated at iteration $t$, it also records the value $\hat{c}^t_h$. This value corresponds to the minimum cost among the nodes in $T_h$ that do not belong to $L^t_h$. It represents the smallest cost that is expected to be incurred when completing a complementary partial solution without relying on the partial solutions that contributed to the construction of $L^t_h$.
 
-More details about the algorithm can be found in \cite{the_book}, a sample implementation of F\&B applied to the GAP problem can be downloaded from \cite{M21github}.
+More details about the algorithm can be found in \cite{the_book}, a sample implementation of Fore-and-Back applied to the GAP problem can be downloaded from \cite{M21github}.
 
 \begin{algorithm}
    \SetKwInOut{Input}{Input}
@@ -167,7 +167,7 @@ More details about the algorithm can be found in \cite{the_book}, a sample imple
 \end{algorithm}
 
 \section{Computational results}		\label{sec:computational}
-The F\&B algorithm for the CPD problem was implemented in$\text{C++}$ and executed on a Windows 11 laptop equipped with an Intel Core Ultra 7 processor and 1 TB of RAM. Particular attention was devoted to the design of the data structures used to maintain the stages at each level of the search trees. These stages were implemented using the standard library container \texttt{std::map<int, int>}, which is realized as a {\it Red–Black} tree and therefore maintains its keys in sorted order. In this structure, the key corresponds to the number {\it num} of arcs used so far in the partial solution, while the associated value stores the minimum cost observed so far for that specific {\it num} and for all larger values up to the next existing key.
+The Fore-and-Back algorithm for the CPD problem was implemented in $\text{C++}$ and executed on a Windows~11 laptop equipped with an Intel Core Ultra~7 processor and 1~TB of RAM. The computational study is preliminary, and no particular effort has yet been devoted to the use of efficient data structures or to leveraging the multi-core architecture of the machine. Consequently, the reported runtimes should be regarded as indicative rather than representative of the best achievable performance.
 
 \subsubsection{Benchmark instances.} 
 The instances in the test set were selected to be representative of a variety of application areas in which time series analysis is relevant. We leveraged benchmarks from the M forecasting competitions \cite{M26}, including instances from the M3, M4, and M6 installments. Specifically, the M3 and M4 datasets include time series from microeconomics, industry, macroeconomics, finance, demographics, and an unspecified “other” category, while the M6 dataset consists of daily adjusted close prices of the competition assets. In addition, we complemented the test set with IoT time series collected from environmental sensors, as described in \cite{M24}.
@@ -200,11 +200,11 @@ For actual purposes, the evaluation of a changepoint model often falls into two 
 
 Common cost functions such as AIC, negative log-likelihood, and RMSE are frequently employed not because they represent a “true” physical reality, but because of their computational tractability. Penalized likelihood methods provide a formal stopping rule in the search for changepoints, which does not necessarily reflect the underlying data-generating processes \cite{BA02,HTF09}. Information criteria such as AIC or BIC act as analytical tools that automate what would otherwise be a subjective model selection process by introducing a standard penalty for complexity. These metrics are best viewed as instruments for identifying useful approximations rather than a “true” model, which is virtually never contained in real-world candidate sets \cite{GXF24}.
 
-While a systematic assessment of forecasting performance lies beyond the scope of this work, we acknowledge that no single cost function captures the full spectrum of practical objectives. Among standard criteria, the log-likelihood is valued for its mathematical structure and optimization efficiency, while AIC and BIC serve to minimize information loss by penalizing complexity. Conversely, RMSE offers an intuitive measure of predictive error in the original data units. We present results for both AIC and a variant of RMSE, called QRMSE(Quasi-RMSE) \cite{M24}, which scales the sum of squared errors by the square root of the sample size rather than its mean. This scaling proved able to effectively gauge the complexity versus representativeness of the proposed model by favoring segments that maintain fit stability over longer intervals.
+While a systematic assessment of forecasting performance lies beyond the scope of this work, we acknowledge here that no single cost function captures the full spectrum of practical objectives. Among standard criteria, the log-likelihood is valued for its mathematical structure and optimization efficiency, while AIC and BIC serve to minimize information loss by penalizing complexity. Conversely, RMSE offers an intuitive measure of predictive error in the original data units. We present results for both AIC and a variant of RMSE, called QRMSE (Quasi-RMSE) \cite{M24}, which scales the sum of squared errors by the square root of the sample size rather than its mean. This scaling proved able to effectively gauge the complexity versus representativeness of the proposed model by favoring segments that maintain fit stability over longer intervals.
 
-Comment for Fig.~\ref{fig1}) and  Fig.~\ref{fig2}).
+Figure~\ref{fig1} presents two examples of the different results obtained when using AIC as cost function (subfigures \ref{fig:sub1} and \ref{fig:sub3}) or QRMSE as cost (subfigures \ref{fig:sub2} and \ref{fig:sub4}). It can be observed that QRMSE induces a regularizing effect directly through the cost assessment, thereby emphasizing aesthetic clarity. We stress that there is no “right” cost function; rather, the choice depends on the desired structure of the resulting segmentation. Moreover, most segmentation codes include a parameter that influences the cost, thereby controlling the trade-off between many well-fit segments and fewer segments with worse fit. However, this typically requires series-specific tuning (see also Table~\ref{tab1}), which is impractical in several application contexts.
 
-\begin{figure}[htbp]
+\begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.47\textwidth}
 		\includegraphics[width=\textwidth]{"N1879 costAIC.png"}
@@ -237,9 +237,66 @@ Comment for Fig.~\ref{fig1}) and  Fig.~\ref{fig2}).
 
 \subsubsection{Preliminary results.}
 
+The results presented here are preliminary, as the code is currently undergoing a revision aimed at improving its efficiency. Tables \ref{tab2} and \ref{tab2} report results on series taken from different M~Competition benchmark sets, covering multiple application domains and including cases with and without trend, seasonality, stationarity, and high S/N ratio.
+
+Two tables are presented for the two tested cost functions. The first one, Table~\ref{tab1}, makes use of AIC, a function that enjoys the subadditivity property and is coherent with most of the relevant literature. This property permits the use of the dominance criterion proposed in \cite{KFE12} and implemented in PELT and in \texttt{ruptures}' DYNP. The columns report the M benchmark and the series name, the {\em name}, the application domain that originated the series, {\it category}, the number of points in the series, $n$, followed by the number of segments ({\it segments}) and the total CPU time ({\it t.cpu}) for Fore-and-Back, PELT, and DYNP.
+
+All tests were run by optimizing the cost subject to a hard constraint on the minimum allowed segment length and a soft constraint on the maximum number of segments proposed in the model. It can be observed that, for series of this size, the computation times of the three algorithms are comparable, although PELT already appears to scale best, while Fore-and-Back begins to suffer on longer series. The main difference lies in the number of segments proposed. Even though all three algorithms use the same AIC cost function, DYNP enforces models with the exact number of segments specified in the call (8 in this case). Fore-and-Back allows fewer segments when convenient, a situation that occurs in some cases, whereas PELT being based on a penalty whose value was kept stable across all tests to avoid series-specific fitting, results in widely different number of segments.
 
 \begin{table}
-	\caption{Preliminary results using QRMSE cost function.}\label{tab1}
+	\caption{Preliminary results using AIC cost function.}\label{tab1}
+	\begin{tabular}{llc|cc|cc|cc}
+		\hline
+		& & & \multicolumn{2}{c|}{FnB} & \multicolumn{2}{c|}{PELT} & \multicolumn{2}{c}{DYNP} \\ 
+		name & category & n & segments & t.cpu & segments & t.cpu & segments & t.cpu\\ 
+		\hline
+		M3/N1879  & Industry & 144 & 8 & 0.052 &  2 & 0.062 & 8 & 0.0156\\ 
+		M3/N1881  & Industry & 144 & 8 & 0.054 &  4 & 0.109 & 8 & 0.0156\\ 
+		M3/N1882  & Industry & 144 & 8 & 0.052 & 12 & 0.046 & 8 & 0.015\\ 
+		M3/N1883  & Industry & 144 & 8 & 0.042 & 15 & 0.046 & 8 & 0.015\\ 
+		M3/N1884  & Industry & 144 & 8 & 0.06  & 19 & 0.031 & 8 & 0.031\\ 
+		M3/N1918  & Industry & 144 & 8 & 0.064 &  5 & 0.078 & 8 & 0.015\\ 
+		M3/N2830  &    Micro & 104 & 8 & 0.024 &  7 & 0.031 & 8 & 0\\ 
+		M3/N2831  &    Micro & 104 & 8 & 0.022 & 10 & 0.031 & 8 & 0.015\\ 
+		M3/N2832  &    Micro & 104 & 6 & 0.024 &  4 & 0.062 & 8 & 0\\ 
+		M3/N2833  &    Micro & 104 & 8 & 0.022 &  7 & 0.046 & 8 & 0.015\\ 
+		M3/N2834  &  Finance & 104 & 8 & 0.026 &  9 & 0.046 & 8 & 0\\ 
+		M4/Q14640 & Industry & 115 & 2 & 0.036 &  1 & 0.015 & 8 & 0\\ 
+		M4/Q15444 & Industry & 126 & 4 & 0.05  &  3 & 0.031 & 8 & 0.015\\ 
+		M4/Q18148 & Industry &  71 & 5 & 0.006 &  4 & 0.046 & 8 & 0.015\\ 
+		M4/Q18496 & Industry & 126 & 8 & 0.038 &  5 & 0.046 & 8 & 0\\ 
+		M4/Q19604 & Industry & 123 & 8 & 0.038 &  8 & 0.046 & 8 & 0.015\\ 
+		M4/Q19637 & Industry & 123 & 3 & 0.044 & 14 & 0.031 & 8 & 0.015\\ 
+		M4/Q2002  &    Macro & 170 & 8 & 0.094 & 11 & 0.078 & 8 & 0.031\\ 
+		M4/Q22221 &  Finance & 738 & 8 & 1.926 & 58 & 0.359 & 8 & 0.593\\ 
+		M4/Q5109  &    Macro & 866 & 8 & 2.858 &102 & 0.296 & 8 & 0.828\\ 
+		M4/Q7774  &    Micro & 115 & 6 & 0.026 &  3 & 0.078 & 8 & 0.015\\ 
+		M4/Q8030  &    Micro &  97 & 8 & 0.022 &  6 & 0.031 & 8 & 0.015\\ 
+		M6/ABBV   &  Finance & 253 & 8 & 0.196 & 19 & 0.109 & 8 & 0.062\\ 
+		M6/BTCUSD &  Finance & 367 & 8 & 0.406 & 22 & 0.156 & 8 & 0.125\\
+		M6/EWG    &  Finance & 253 & 8 & 0.176 & 15 & 0.109 & 8 & 0.046\\ 
+		M6/EWQ    &  Finance & 253 & 8 & 0.168 & 14 & 0.125 & 8 & 0.062\\ 
+		M6/EWZ    &  Finance & 253 & 8 & 0.182 & 16 & 0.125 & 8 & 0.046\\ 
+		M6/GBPUSD &  Finance & 263 & 8 & 0.184 & 17 & 0.093 & 8 & 0.078\\ 
+		M6/PYPL   &  Finance & 253 & 8 & 0.162 & 19 & 0.109 & 8 & 0.062\\ 
+		M6/RBLX   &  Finance & 253 & 8 & 0.17  & 21 & 0.093 & 8 & 0.046\\ 
+		M6/ROST   &  Finance & 253 & 8 & 0.172 & 20 & 0.078 & 8 & 0.062\\ 
+		M6/SLV    &  Finance & 253 & 8 & 0.168 & 23 & 0.109 & 8 & 0.078\\ 
+		M6/USDJPY &  Finance & 263 & 8 & 0.182 & 22 & 0.109 & 8 & 0.062\\ 
+		\hline
+	\end{tabular}
+\end{table}
+
+Table~\ref{tab2} presents results obtained using the QRMSE cost function. A cost function obtained by normalizing the residual sum of squares by the square root of the segment length does not satisfy the subadditivity condition required by PELT, since splitting a segment can increase the total cost. More generally, any concave normalization in the segment length (such as division by the square root of the length, as in RMSE or QRMSE) breaks PELT’s subadditivity assumption. Consequently, the correctness of PELT pruning is not guaranteed for such a cost, and we therefore report results only for Fore-and-Back, as the \texttt{ruptures} codes, although much faster, do not guarantee optimality in this case.
+
+The table columns report {\it name}, {\it category}, and $n$ as in Table~\ref{tab1}, followed by {\it t.tot}, the total CPU time of the optimization; {\it t.opt}, the time required to reach the optimal value; {\it matches}, the number of matches, i.e., solutions obtained by chaining a partial solution from a forward pass with a partial solution from a backward pass; {\it fathomed}, the number of nodes eliminated by the lower bounds computed at each node; and {\it n.brk}, the number of final breakpoints. All runs again required proposing at most 8 segments, i.e., 7 breakpoints. The impossibility of exploiting PELT’s dominance property results in a slower code; however, the table shows that the characteristic components of Fore-and-Back—namely, the matching of partial solutions and the use of primal bounds—remain effective also with this cost function.
+
+%Example: a flat series with some noise: $n_1=n_2=50$, $RSS_1=RSS_2=50$ (unit variance noise)
+%Then: One segment $C(1,100)=\frac{100}{\sqrt[]{100}}=10$, Two segments $C(1,50)+C(51,100)=\frac{50}{\sqrt[]{50}}+\frac{50}{\sqrt[]{50}}$=7.07+7.07=14.14
+%So: $C(1,100)<C(1,50)+C(51,100)$
+
+\begin{table}
+	\caption{Preliminary results using QRMSE cost function.}\label{tab2}
 	\begin{tabular}{llc|cc|cr|c}
 		\hline
 name      & category     & n   & t.tot & t.opt & matches & fathomed & n.brk \\
@@ -262,12 +319,12 @@ M4/Q18496 & Industry     & 126 &  0 & 0 & 252 & 17004 & 7 \\
 M4/Q19604 & Industry     & 123 &  0 & 0 & 263 & 18127 & 7 \\
 M4/Q19637 & Industry     & 123 &  0 & 0 & 334 & 21332 & 7 \\
 M4/Q2002  & Macro        & 170 &  0 & 0 & 519 & 103936 & 7 \\
-M4/Q22221 & Finance      & 738 & 40 &35 & 2659 & 6424871 & 7 \\
-M4/Q5109  & Macro        & 866 & 97 &84 & 1809 & 16246274 & 7 \\
+M4/Q22221 & Finance      & 738 & 14 &13 &7086 & 1811047 & 7 \\
+M4/Q5109  & Macro        & 866 & 38 &36 & 462 & 5586555 & 7 \\
 M4/Q7774  & Micro        & 115 &  0 & 0 & 102 & 18649 & 2 \\
 M4/Q8030  & Micro        &  97 &  0 & 0 & 183 & 6872 & 7 \\
 M6/ABBV   & Finance      & 253 &  0 & 0 & 974 & 270239 & 7 \\
-M6/BTCUSD & Finance      & 367 &  2 & 2 & 1157 & 675562 & 7 \\
+M6/BTCUSD & Finance      & 367 &  2 & 2 &1157 & 675562 & 7 \\
 M6/EURCHF & Finance      & 263 &  0 & 0 & 903 & 364509 & 7 \\
 M6/EURUSD & Finance      & 263 &  0 & 0 & 507 & 264444 & 7 \\
 M6/EWG    & Finance      & 253 &  0 & 0 & 719 & 185694 & 7 \\
@@ -284,61 +341,15 @@ M6/USDJPY & Finance      & 263 &  0 & 0 & 687 & 263442 & 7 \\
 \end{table}
 
 
-\begin{table}
-	\caption{Preliminary results using AIC cost function.}\label{tab2}
-	\begin{tabular}{llc|cc|cc|cc}
-		\hline
-      & & & \multicolumn{2}{c|}{FnB} & \multicolumn{2}{c|}{PELT} & \multicolumn{2}{c}{DYNP} \\ 
-		& category & n & segments & t.cpu & segments: & t.cpu & segments: & t.cpu\\ 
-		\hline
-M3/N1879  & Industry & 144 & 8 & 0.052 &  2 & 0.062 & 8 & 0.0156\\ 
-M3/N1881  & Industry & 144 & 8 & 0.054 &  4 & 0.109 & 8 & 0.0156\\ 
-M3/N1882  & Industry & 144 & 8 & 0.052 & 12 & 0.046 & 8 & 0.015\\ 
-M3/N1883  & Industry & 144 & 8 & 0.042 & 15 & 0.046 & 8 & 0.015\\ 
-M3/N1884  & Industry & 144 & 8 & 0.06  & 19 & 0.031 & 8 & 0.031\\ 
-M3/N1918  & Industry & 144 & 8 & 0.064 &  5 & 0.078 & 8 & 0.015\\ 
-M3/N2830  &    Micro & 104 & 8 & 0.024 &  7 & 0.031 & 8 & 0\\ 
-M3/N2831  &    Micro & 104 & 8 & 0.022 & 10 & 0.031 & 8 & 0.015\\ 
-M3/N2832  &    Micro & 104 & 6 & 0.024 &  4 & 0.062 & 8 & 0\\ 
-M3/N2833  &    Micro & 104 & 8 & 0.022 &  7 & 0.046 & 8 & 0.015\\ 
-M3/N2834  &  Finance & 104 & 8 & 0.026 &  9 & 0.046 & 8 & 0\\ 
-M4/Q14640 & Industry & 115 & 2 & 0.036 &  1 & 0.015 & 8 & 0\\ 
-M4/Q15444 & Industry & 126 & 4 & 0.05  &  3 & 0.031 & 8 & 0.015\\ 
-M4/Q18148 & Industry &  71 & 5 & 0.006 &  4 & 0.046 & 8 & 0.015\\ 
-M4/Q18496 & Industry & 126 & 8 & 0.038 &  5 & 0.046 & 8 & 0\\ 
-M4/Q19604 & Industry & 123 & 8 & 0.038 &  8 & 0.046 & 8 & 0.015\\ 
-M4/Q19637 & Industry & 123 & 3 & 0.044 & 14 & 0.031 & 8 & 0.015\\ 
-M4/Q2002  &    Macro & 170 & 8 & 0.094 & 11 & 0.078 & 8 & 0.031\\ 
-M4/Q22221 &  Finance & 738 & 8 & 1.926 & 58 & 0.359 & 8 & 0.593\\ 
-M4/Q5109  &    Macro & 866 & 8 & 2.858 &102 & 0.296 & 8 & 0.828\\ 
-M4/Q7774  &    Micro & 115 & 6 & 0.026 &  3 & 0.078 & 8 & 0.015\\ 
-M4/Q8030  &    Micro &  97 & 8 & 0.022 &  6 & 0.031 & 8 & 0.015\\ 
-M6/ABBV   &  Finance & 253 & 8 & 0.196 & 19 & 0.109 & 8 & 0.062\\ 
-M6/BTCUSD &  Finance & 367 & 8 & 0.406 & 22 & 0.156 & 8 & 0.125\\
-M6/EWG    &  Finance & 253 & 8 & 0.176 & 15 & 0.109 & 8 & 0.046\\ 
-M6/EWQ    &  Finance & 253 & 8 & 0.168 & 14 & 0.125 & 8 & 0.062\\ 
-M6/EWZ    &  Finance & 253 & 8 & 0.182 & 16 & 0.125 & 8 & 0.046\\ 
-M6/GBPUSD &  Finance & 263 & 8 & 0.184 & 17 & 0.093 & 8 & 0.078\\ 
-M6/PYPL   &  Finance & 253 & 8 & 0.162 & 19 & 0.109 & 8 & 0.062\\ 
-M6/RBLX   &  Finance & 253 & 8 & 0.17  & 21 & 0.093 & 8 & 0.046\\ 
-M6/ROST   &  Finance & 253 & 8 & 0.172 & 20 & 0.078 & 8 & 0.062\\ 
-M6/SLV    &  Finance & 253 & 8 & 0.168 & 23 & 0.109 & 8 & 0.078\\ 
-M6/USDJPY &  Finance & 263 & 8 & 0.182 & 22 & 0.109 & 8 & 0.062\\ 
-		\hline
-\end{tabular}
-\end{table}
-
-
-A cost function obtained by normalizing the residual sum of squares by the square root of the segment length does not satisfy the subadditivity condition required by PELT, since splitting a segment can increase the total cost. Consequently, the correctness of PELT pruning is not guaranteed for such a cost.
-In fact, any concave normalization in segment length (such as division by the square root of the length, as in RMSE or QRMSE) breaks PELT’s subadditivity assumption.
-
-Example: a flat series with some noise: $n_1=n_2=50$, $RSS_1=RSS_2=50$ (unit variance noise)
-Then: One segment $C(1,100)=\frac{100}{\sqrt[]{100}}=10$, Two segments $C(1,50)+C(51,100)=\frac{50}{\sqrt[]{50}}+\frac{50}{\sqrt[]{50}}$=7.07+7.07=14.14
-So: $C(1,100)<C(1,50)+C(51,100)$
-
 \section{Conclusions}		\label{sec:conclusions}
-Move to assesment based on forecasting qualities, not cost function fit
 
+This paper presents current results on the application of the Fore-and-Back matheuristic framework to the changepoint analysis (CPA) problem. Owing to its relevance for time series analysis, CPA has been extensively studied in the literature, and highly efficient codes are available. However, we note that most existing approaches rely on a subadditivity assumption for the cost function. While this assumption is reasonable in many contexts, it excludes families of cost functions that may be of interest in practical applications.
+
+The use of the Fore-and-Back framework allows the design of an exact algorithm for CPA, which naturally becomes an effective heuristic when run under limited computational resources. Characteristic features of the algorithm include the ability to derive bounds on the cost of completing partial solutions in a primal-only fashion and the construction of partial solutions with structural properties that guide their possible chaining.
+
+Computational tests are still ongoing at the time of writing; nevertheless, the proposed matheuristic appears to be computationally comparable with the most efficient available codes, while retaining applicability to cost functions that limit or preclude the use of alternative approaches.
+
+A future extension currently under investigation is to move toward assessments based on forecasting performance rather than on cost-function fit. This would enable the quality of a model to be quantified directly in the context of its intended application, thereby increasing the practical impact of this research.
 
 \bibliographystyle{splncs04}
 \bibliography{LION20_F&B}
