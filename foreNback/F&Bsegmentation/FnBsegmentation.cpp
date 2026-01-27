@@ -30,7 +30,7 @@ void FnBsegmentation::run_FnB()
       return;
    }
 
-   bool fBF = false;
+   bool fBF = true;
    if(fBF)
    {  cout << "\n---------------------------------------------------- BF" << endl;
       // optimal solution with one constraint on the number of arcs and with minLength
@@ -82,8 +82,9 @@ bool FnBsegmentation::forward()
 
          if(Fstage->isEmpty(i))
             continue;
+
          // remove from unexpanded and add to expanded
-         Fexpanded->updateCell(nSegm,i,z,lstPoints);
+         Fexpanded->updateCell(nSegm, i, z, lstPoints);
          Fstage->updateCell(nSegm,i,DBL_MAX,{});  // rimuove la cella da quelle non espanze
 
          hasMatch = match(true, i, nSegm, z);
@@ -92,8 +93,10 @@ bool FnBsegmentation::forward()
          if (i<(n-minLength))
          {  lb = DBL_MAX;
             for(t2=i+1;t2<n;t2++)
-               if(!Bstage->isEmpty(t2))
+            {  bool boh = Bstage->isEmpty(t2); // for some reasons, putting this inside the if below doesn't work
+               if (!boh)
                   lb = min(lb, get<0>(Bstage->queryMinCost(maxNumEdges, i+1))); // minimum of unexpanded
+            }
             if(lb==DBL_MAX) lb=0;
          }
          else
@@ -199,7 +202,8 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
    //   goto l0;
    //}
 
-   if(z < zub)
+   double zprev = get<0>(Fstage->queryMinCost(nSegm+1, t2));
+   if(z < zub && z < zprev)
    {  Fstage->updateCell(nSegm+1,t2, z, lstPoints);
       isImproved = true;
    }
@@ -245,7 +249,8 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
    //   goto l0;
    //}
 
-   if(z < zub)
+   double zprev = get<0>(Bstage->queryMinCost(nSegm+1, t1));
+   if(z < zub && z < zprev)
    {  Bstage->updateCell(nSegm+1,t1, z, lstPoints);
       isImproved = true;
    }
@@ -263,9 +268,9 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
 
    int maxt = n-1;
    if (isForward)
-      if(i<maxt)
+   {  if (i<maxt)
       {  lb = get<0>( Bexpanded->queryMinCost(maxNumEdges-numSegm,i+1) );
-         if(lb==0) goto l0; // no feasible match
+         if(lb==0 || lb==DBL_MAX) goto l0; // no feasible match
          hasMatch = true;
          numMatch++;
          if(z + lb < zub)
@@ -281,10 +286,11 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
                cout << "F) Match: new zub: "<< zub << "t.cpu " << topt << endl;
          }
       }
+   }
    else
-      if(i>0)
+      if(i<maxt)
       {  lb = get<0>( Fexpanded->queryMinCost(maxNumEdges-numSegm,i-1) );
-         if(lb==0) goto l0; // no feasible expansion
+         if(lb==0 || lb==DBL_MAX) goto l0; // no feasible expansion
          hasMatch = true;
          numMatch++;
          if(z + lb < zub)
@@ -318,8 +324,14 @@ double FnBsegmentation::computeLB()
       lb = lbf + lbb;
       if(lb > 0 && lb < iterLB) iterLB = lb;
    }
-   if(iterLB>zlb)
-   {  zlb = iterLB;
+
+   if (iterLB==DBL_MAX)
+      lb = 0;  // tabelle completamente espanse
+   else
+      lb = iterLB;
+
+   if(lb>zlb)
+   {  zlb = lb;
       if(isVerbose) cout << "New zlb: " << zlb << endl;
    }
 
