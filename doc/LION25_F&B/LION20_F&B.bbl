@@ -11,7 +11,7 @@ Makridakis competitions.
 \bibitem{AC17}
 Aminikhanghahi, S., Cook, D.J.: A survey of methods for time series change
   point detection. Knowledge and Information Systems  \textbf{51},  339--367
-  (2017). \doi{10.1007/s10115-016-0987-z}
+  (2017)
 
 \bibitem{AL89}
 Auger, I.E., Lawrence, C.E.: Algorithms for the optimal identification of
@@ -36,9 +36,8 @@ Cormen, T.H., Leiserson, C.E., Rivest, R.L., Stein, C.: Introduction to
   Algorithms. MIT Press, 3rd edn. (2009)
 
 \bibitem{Datalog}
-Engineering, D.: Piecewise regression: When one line simply isn't enough.
-  \url{https://www.datadoghq.com/blog/engineering/piecewise-regression/}
-  (2017), accessed December 2023
+{Datadog Engineering}: Piecewise regression: When one line simply isn't enough.
+  \url{https://www.datadoghq.com/blog/engineering/piecewise-regression/} (2017)
 
 \bibitem{FLS09}
 Fischetti, M., Lodi, A., Salvagnin, D.: Just {MIP} it! In: Maniezzo, V.,
@@ -57,14 +56,12 @@ Hastie, T., Tibshirani, R., Friedman, J.: The elements of statistical learning:
 \bibitem{KCHP01}
 Keogh, E.J., Chu, S., Hart, D.M., Pazzani, M.J.: An online algorithm for
   segmenting time series. In: Proceedings of the 2001 IEEE International
-  Conference on Data Mining. pp. 289--296. IEEE, San Jose, CA, USA (2001).
-  \doi{10.1109/ICDM.2001.989541}
+  Conference on Data Mining. pp. 289--296. IEEE, San Jose, CA, USA (2001)
 
 \bibitem{KCHP02}
 Keogh, E.J., Chu, S., Hart, D.M., Pazzani, M.J.: Segmenting time series: A
   survey and novel approach.
-  \url{https://api.semanticscholar.org/CorpusID:8365617} (2002), accessed
-  2025-12-01
+  \url{https://api.semanticscholar.org/CorpusID:8365617} (2002)
 
 \bibitem{KFE12}
 Killick, R., Fearnhead, P., Eckley, I.A.: Optimal detection of changepoints
@@ -90,7 +87,7 @@ Maniezzo, V.: Extended set covering for time series segmentation. In:
 \bibitem{the_book}
 Maniezzo, V., Boschetti, M.A., St{\"u}tzle, T.: Matheuristics: Algorithms and
   Implementations. EURO Advanced Tutorials on Operations Research, Springer
-  (2021). \doi{10.1007/978-3-030-64219-4}
+  (2021)
 
 \bibitem{N89}
 Natarajan, B.K.: On the use of beam search in exact inference. IEEE
@@ -108,8 +105,7 @@ Scott, A.J., Knott, M.: A cluster analysis method for grouping means in the
 
 \bibitem{TOV20}
 Truong, C., Oudre, L., Vayatis, N.: Selective review of offline change point
-  detection methods. Signal Processing  \textbf{167},  107299 (2020).
-  \doi{10.1016/j.sigpro.2019.107299}
+  detection methods. Signal Processing  \textbf{167},  107299 (2020)
 
 \bibitem{XSW25}
 Xu, R., Song, Z., Wu, J., Wang, C., Zhou, S.: Change-point detection with deep

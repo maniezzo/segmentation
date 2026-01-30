@@ -8,37 +8,37 @@ Database file #1: LION20_F&B.bib
 Warning--to sort, need author or key in M26
 You've used 23 entries,
             2850 wiz_defined-function locations,
-            763 strings with 8273 characters,
-and the built_in function-call counts, 12674 in all, are:
-= -- 1047
+            757 strings with 8132 characters,
+and the built_in function-call counts, 12586 in all, are:
+= -- 1033
 > -- 340
 < -- 25
 + -- 147
 - -- 116
-* -- 762
-:= -- 1551
-add.period$ -- 33
+* -- 750
+:= -- 1537
+add.period$ -- 29
 call.type$ -- 23
-change.case$ -- 134
+change.case$ -- 132
 chr.to.int$ -- 0
 cite$ -- 24
-duplicate$ -- 1161
-empty$ -- 1182
+duplicate$ -- 1155
+empty$ -- 1180
 format.name$ -- 133
-if$ -- 2830
+if$ -- 2812
 int.to.chr$ -- 0
 int.to.str$ -- 23
-missing$ -- 228
+missing$ -- 226
 newline$ -- 75
 num.names$ -- 48
-pop$ -- 425
+pop$ -- 427
 preamble$ -- 1
 purify$ -- 101
 quote$ -- 0
-skip$ -- 392
+skip$ -- 394
 stack$ -- 0
-substring$ -- 714
-swap$ -- 676
+substring$ -- 710
+swap$ -- 672
 text.length$ -- 25
 text.prefix$ -- 0
 top$ -- 0
@@ -46,5 +46,5 @@ type$ -- 84
 warning$ -- 1
 while$ -- 102
 width$ -- 25
-write$ -- 246
+write$ -- 236
 (There was 1 warning)
