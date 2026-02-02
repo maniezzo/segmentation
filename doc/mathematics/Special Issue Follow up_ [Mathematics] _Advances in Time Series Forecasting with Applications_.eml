@@ -1,0 +1,258 @@
+Delivered-To: vittorio.maniezzo@gmail.com
+Received: by 2002:a05:7108:5b8a:b0:50b:846f:d569 with SMTP id en10csp1494332gdb;
+        Thu, 20 Nov 2025 22:56:22 -0800 (PST)
+X-Forwarded-Encrypted: i=3; AJvYcCUW9SJO0tC1xT1z8mfc9ibxLK3xrLb4POf1SivyvXOSwLeHO2VWuNgp/c44XBIRbhQqvvdVspK58C4FA5qY6BzVCw==@gmail.com
+X-Google-Smtp-Source: AGHT+IFZH68pUGL7NkR16IdnnVCITtG17fiEKjPyHg8zEQjjs+687uw+x+/XR0T8voEOXGKIHlv2
+X-Received: by 2002:a05:690c:e3cf:b0:78a:8516:e863 with SMTP id 00721157ae682-78a8b472025mr10036197b3.16.1763708182405;
+        Thu, 20 Nov 2025 22:56:22 -0800 (PST)
+ARC-Seal: i=2; a=rsa-sha256; t=1763708182; cv=pass;
+        d=google.com; s=arc-20240605;
+        b=bFHdkF440KHxM3ULMxN9NJS2+NpHOsW0e3KhuX5rwof8QV2HzXMtnNVNyj2ATvywdX
+         eP0bopR05D6IpJFDKkX6FKkMQiFANVsdRskR9r56m/aMQlplXxXE+F0k9EH5b1tkEMw3
+         W/ml7XewkyJu3HWNe1B+Ab4RRwhcnM/dLqehL1mE8FTgHxk1b/gKRxz4TMf7/TpLObXp
+         D+24r+H3uURZtwXYiPUf/vdT2gsw1KGRDzY2BdncFz02e9eun5vy7y0vRFu702Zpy5EC
+         a76lOUfmjxGEe5VpBfo0PeyG6JJlx5wQA6uuDCBIFdBtRhB0n/4pg8ZR0ucGYUaA58AZ
+         SlXw==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:subject:content-language:from:cc:to
+         :user-agent:mime-version:date:message-id:dkim-signature:dkim-filter
+         :authentication-results-original:resent-from:dkim-signature;
+        bh=8ShfLSkxa4KNd6EQEUwAKWj6u3L05cXfYkP6Mk3rDCg=;
+        fh=3lepVAaFnNgx1BEZqJF4ippQ5g2Z43jSKy2INfK0Qm0=;
+        b=Ywi6RLue2uRk2l+vIhLZ3NYZh/bBFAr7FsXNx8ycKSMfmR6OUHPaRZZSvQvtNqYFOC
+         mxUqEOSoRykIFZvX9zgCvLvxKQxRS/bv7nkxc0RwfzDJTLM1Y4q1KaINMGZRj/JbrZqf
+         QArUd3eI4Uh6MEzAjQXtU9eaINAJHm+yK/4C9drcfsFlohMvRewZ0MEGmCRHbD/dF7o2
+         IiRUQlsi2JfgoT9/mlW7PXlTRC/ikcRoBqR+PiQRB207SpOHBx79QJIR4QlRoS5y+6fk
+         8NPpsPvZcZR0mucW+dmhBVFmqAl+49vzDMS/EpBsG99xadTBLoq5bwITJZ9Z1j337Z4o
+         dZ7A==;
+        dara=google.com
+ARC-Authentication-Results: i=2; mx.google.com;
+       dkim=pass header.i=@liveunibo.onmicrosoft.com header.s=selector2-liveunibo-onmicrosoft-com header.b=ozbWTtbG;
+       dkim=pass header.i=@mdpi.com header.s=EB98F24C-DECB-11E5-856C-FD3CBF5F7692 header.b=TU0aUFFW;
+       arc=pass (i=1 spf=pass spfdomain=mdpi.com dkim=pass dkdomain=mdpi.com dmarc=pass fromdomain=mdpi.com);
+       spf=pass (google.com: domain of vittorio.maniezzo+srs=0tpub=55=mdpi.com=harrison.chen@unibo.it designates 2a01:111:f403:c20f::7 as permitted sender) smtp.mailfrom="vittorio.maniezzo+SRS=0tPuB=55=mdpi.com=harrison.chen@unibo.it";
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=mdpi.com
+Return-Path: <vittorio.maniezzo+SRS=0tPuB=55=mdpi.com=harrison.chen@unibo.it>
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazlp170130007.outbound.protection.outlook.com. [2a01:111:f403:c20f::7])
+        by mx.google.com with ESMTPS id 00721157ae682-78a79894b08si20172507b3.96.2025.11.20.22.56.22
+        for <vittorio.maniezzo@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 22:56:22 -0800 (PST)
+Received-SPF: pass (google.com: domain of vittorio.maniezzo+srs=0tpub=55=mdpi.com=harrison.chen@unibo.it designates 2a01:111:f403:c20f::7 as permitted sender) client-ip=2a01:111:f403:c20f::7;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@liveunibo.onmicrosoft.com header.s=selector2-liveunibo-onmicrosoft-com header.b=ozbWTtbG;
+       dkim=pass header.i=@mdpi.com header.s=EB98F24C-DECB-11E5-856C-FD3CBF5F7692 header.b=TU0aUFFW;
+       arc=pass (i=1 spf=pass spfdomain=mdpi.com dkim=pass dkdomain=mdpi.com dmarc=pass fromdomain=mdpi.com);
+       spf=pass (google.com: domain of vittorio.maniezzo+srs=0tpub=55=mdpi.com=harrison.chen@unibo.it designates 2a01:111:f403:c20f::7 as permitted sender) smtp.mailfrom="vittorio.maniezzo+SRS=0tPuB=55=mdpi.com=harrison.chen@unibo.it";
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=mdpi.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zU0PmGzuEGsip4V8/5F1370Rop9zS+RyuUyoD1I03+XXLOtBwWQiFYnqdN7eFkLZZPtRCoXjhcVozTrKfBV/9xI8nU3/U/5h04IaHKhD07Dx88gDSExSKu7gRXSFMe50ZxQsTFf+qUmATWD+jU9SD9343FiS/+oJNsyeoDiLB/VrUcASpGtB2eb24VlFDYiB7sIpuxzTD4IVuDwam53txMQSNCtcFlTBPxins/BZHwPUFhQz/lx68WQtJHf+4aOcb+sRCb9YNK9+PC2wq910i8Ds1hj6/4aJ/rbsTC8qoJlz1fBp7aeqI6aDTPC9gfW0zqrlxfqiy/E5GQ19YSQPqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8ShfLSkxa4KNd6EQEUwAKWj6u3L05cXfYkP6Mk3rDCg=;
+ b=difJI7fxO78SbBTSHh4h8klzhjPCmGTKKxCDPGTm4O1bFemTCyRgJQNBNHR7qN/fDWAQbGcDMzVGD2jsyMqrWWun/28Buhsq0wWJPQKKHEsYjvNOA/jQ7tnOc6PVbeeakMAcORnqTiUKZCXDBCcomzRh0ImHcC9r1+Nyv5PYVsLyim/djgYIlthNkuChhQvrT5+Jyt+37Gpwi0sfpb4mzA8jR4drJNC1M5fV4+S+F9KA+eLlp7A9vt3rnz8HJmOmFCulRCDdk5PJXcCR1D+bHh+xprQtHiJFJBmo219MyuSuDmHyXKIsylm7MRzI0N3jIYWNhcGjhFi6AZl+0TMXAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 212.243.204.81) smtp.rcpttodomain=unibo.it smtp.mailfrom=mdpi.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=mdpi.com;
+ dkim=pass (signature was verified) header.d=mdpi.com; arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=liveunibo.onmicrosoft.com; s=selector2-liveunibo-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8ShfLSkxa4KNd6EQEUwAKWj6u3L05cXfYkP6Mk3rDCg=;
+ b=ozbWTtbGppoiWrMm5H6TYNOgrAhSLXNVdc8IJT/CdSKjXyf/5hrtOtCboE8rA78sZIjs2x/r1NaUJWNQubXddBHMF7IwiG9qJLox3+ozbBWKGD9bV1n8PeExX+NvpBQTE9whHxxTdyWY5AlC4DhvShlY9wptSwpSymG9fWo+Ypo=
+Resent-From: <vittorio.maniezzo@unibo.it>
+Received: from AS4P250CA0013.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:5df::15)
+ by DB9PR01MB11642.eurprd01.prod.exchangelabs.com (2603:10a6:10:60d::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Fri, 21 Nov
+ 2025 06:56:17 +0000
+Received: from AMS0EPF000001AA.eurprd05.prod.outlook.com
+ (2603:10a6:20b:5df:cafe::5b) by AS4P250CA0013.outlook.office365.com
+ (2603:10a6:20b:5df::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.12 via Frontend Transport; Fri,
+ 21 Nov 2025 06:56:14 +0000
+Authentication-Results: spf=pass (sender IP is 212.243.204.81)
+ smtp.mailfrom=mdpi.com; dkim=pass (signature was verified)
+ header.d=mdpi.com;dmarc=pass action=none header.from=mdpi.com;
+Received-SPF: Pass (protection.outlook.com: domain of mdpi.com designates
+ 212.243.204.81 as permitted sender) receiver=protection.outlook.com;
+ client-ip=212.243.204.81; helo=mail.mdpi.com; pr=C
+Received: from mail.mdpi.com (212.243.204.81) by
+ AMS0EPF000001AA.mail.protection.outlook.com (10.167.16.150) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.9
+ via Frontend Transport; Fri, 21 Nov 2025 06:56:17 +0000
+Received: from localhost (localhost [127.0.0.1])
+	by mail.mdpi.com (Postfix) with ESMTP id 447111C681D19;
+	Fri, 21 Nov 2025 07:56:17 +0100 (CET)
+Authentication-Results-Original: mail.mdpi.com (amavis); dkim=pass (1024-bit
+ key) header.d=mdpi.com
+Received: from mail.mdpi.com ([127.0.0.1])
+ by localhost (mail.mdpi.com [127.0.0.1]) (amavis, port 10032) with ESMTP
+ id NezRZtYIhmAI; Fri, 21 Nov 2025 07:56:17 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.mdpi.com (Postfix) with ESMTP id EBAA81C681C75;
+	Fri, 21 Nov 2025 07:56:16 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.mdpi.com EBAA81C681C75
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mdpi.com;
+	s=EB98F24C-DECB-11E5-856C-FD3CBF5F7692; t=1763708177;
+	bh=8ShfLSkxa4KNd6EQEUwAKWj6u3L05cXfYkP6Mk3rDCg=;
+	h=Message-ID:Date:MIME-Version:To:From;
+	b=TU0aUFFW9GedHC6zGC6TrT9fqU65ILpB3IkKb5KbBpR0bNn2YzCA/ycaOBlOEsW2B
+	 q1y6KDgczYOd7V2y5369J9/i+nAtKw+yHc8vS/JtCmipPUeeM5ydhJpQFki2zKKN7J
+	 u3i0QRJ0bIAI85mI53/SIHypAa8m0qS9GQjGsak8=
+X-Virus-Scanned: amavis at mdpi.com
+Received: from mail.mdpi.com ([127.0.0.1])
+ by localhost (mail.mdpi.com [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id FmZOZyKYwHMX; Fri, 21 Nov 2025 07:56:16 +0100 (CET)
+Message-ID: <78fae97a-bda2-4678-84df-8bd4b1cb02b8@mdpi.com>
+Date: Fri, 21 Nov 2025 14:56:15 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: vittorio.maniezzo@unibo.it
+Cc: mathematics@mdpi.com, Waddah Saeed <waddah.waheeb@gmail.com>
+From: "harrison.chen@mdpi.com" <harrison.chen@mdpi.com>
+Content-Language: en-US
+Subject: Special Issue Follow up: [Mathematics] "Advances in Time Series
+ Forecasting with Applications"
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Return-Path: harrison.chen@mdpi.com
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: e99647dc-1b08-454a-bf8c-699181b389ab:0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS0EPF000001AA:EE_|DB9PR01MB11642:EE_
+X-MS-Office365-Filtering-Correlation-Id: b9676f69-1190-45d0-2d5f-08de28cb11cd
+X-LD-Processed: e99647dc-1b08-454a-bf8c-699181b389ab,ExtFwd
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 0
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|9140799003|376014|61400799027|48200799018|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VnZsVGE4dzlEcm8rTktLNmVMcFVEZVllVXd1ekE4NEJnRm9iYVhna1FZL0Vu?=
+ =?utf-8?B?UmhNSFZuTDNpd0RzM0pEVDVyNCs3S0VqN3dmTHNhT2hON0Nmb3luRy9MNWx0?=
+ =?utf-8?B?eDFpMEttdjJLWTBZLzFHd2xHbjhKS1BRREZUU0lWSW5BeEk1dFhaZ0s0THF2?=
+ =?utf-8?B?elBMQXNqRzBPVTZyYWxOanhKMTJwRXNRbi9tK2lMYXFwaFg1SXBDTURmTEdl?=
+ =?utf-8?B?SEhtT2RWQUhqdUovOFY4eEhBb29BZVR1LzMvV0JKRldxckc0TjUyZWhTY0hu?=
+ =?utf-8?B?UmpKSk9FM0ZEWFhRanZIcS9uanJZWGxKZmdXckdQc3d4N01YeVpCdGF4ME53?=
+ =?utf-8?B?VUxjeHE4RENEZHYrcG12QlZXRWNSWnpVQTRoR2RBdG9ZVW5tcFgwMWxDL3JY?=
+ =?utf-8?B?Ukp6UGdJc0sySENpUjdyb2RkRUdtNy9OK2NGMHVLRjdtdWcrQjM0c0xoV3RB?=
+ =?utf-8?B?YU8raEpvMkxBaXhyQWY5aVdiT2VkcDErTHFkSjY1TVFxZEkvTTl5bjhJK3o3?=
+ =?utf-8?B?eDZnWTM4M05EVnhoS3k0UDcxWmZpaER1MkNwNFc5dFFpZWJIYjNLdjdiRER3?=
+ =?utf-8?B?Z1JXc2dJU0QxSGdKZmE1eGxmZXRjTHBYR3Z0bDN4R2VGQkdOVHpFc1YyanFo?=
+ =?utf-8?B?NEROeGlPZWp4dmU2VHFNQkVueExJNERNN3hPUVQzdTNKZmwwSVJ0Q0w4NU9r?=
+ =?utf-8?B?QmgyY3RmOWFzM1pZdmJIcFp4dUxTdG1iSUpvRHI0ZWFlZE9VWUJOaVlCQVlQ?=
+ =?utf-8?B?emRKdWlWNVp0cW51Z044QnZyNWp4Y0JnNk1qUTQwQlBia1J0S2hLYnlvaHZ1?=
+ =?utf-8?B?VkluWDhFaS93Y2FvNERRcitsbGlnbjlMQ3RvNUc4TEZ2a0ZUYzJCcVdselZK?=
+ =?utf-8?B?N0hSRTBtUWtCZ3FuV290eEFHT3NFS1NVM2dkdHNsM2JxZ0x6YnhxZk5FWEtz?=
+ =?utf-8?B?cG1va29NcHZWaXBEYWdEd3lsVHYzcVZWaEx0YzVnNzBvV2ZzVGtHazd0SERm?=
+ =?utf-8?B?WGIvK3BNTUZiR1YzRDFUNndxN0lxUURKUnlrWmF2dkVxVmxDeXVBdXF5Q2da?=
+ =?utf-8?B?bTBkNURiSXpaRlBZWWhEYzFjektCdnVXaEVxaCtkYk1aS3pyM1lBMGdsWnd2?=
+ =?utf-8?B?MVlFR1d2SEZwZE1IZjd2VEFUOFpEMUlyMmhtamt5N2pJU2NlclFnRWFxeVQ4?=
+ =?utf-8?B?K05hd21LT3pJK3FxaklMNGJ4Z1pzQVB6Um9FamdsbnN6bGFTZnRnYzZ6bkpr?=
+ =?utf-8?B?MktaN0pDY1hBNGNrSVUyMWxUY3QrQ1IyRzl5d2pWMno3R3FiY0txbUVXWXN3?=
+ =?utf-8?B?a01iZ0tuMWw3YzVIWGlWYWppUlovUXY1Uzd0SkdNMmZMSmJBekZMUWtQK1di?=
+ =?utf-8?B?NDRaQmI5QXgzcFFTb0RvSXM5cE5mR1kxbTB4VDQrK24vdXQxOXZWZTROdVUr?=
+ =?utf-8?B?M2hFL1V1c2Fta0RzSTBwb1pBcUdhdFdRamhYRUM4NmI0OXBlMk1YODRTR2Ix?=
+ =?utf-8?B?T1BhcHd0cHRGaTZMU1k3S3JJMWw3ZjZ0NUNPYnh4OWNwQW1ja2tBRU5RK2VY?=
+ =?utf-8?B?UUtFOWZjOWI3d2tyc29BQ0crajlhYjlvNmExQndPQ0o5RWVHMFF5WCt0a3ly?=
+ =?utf-8?B?TTBId1VCRklBTHlSTUQzOFlrajJETVFxLzlRWC9YcWMrbm00VGhEbTk0bnZi?=
+ =?utf-8?B?UUlIR1d0aVkwVS84T1RITUhqaHNoSVRRZjl3RVlxbmRHWUY4RUhXU2trUFFi?=
+ =?utf-8?B?SVc0Z3pQNkVURGdwRWhaSTBUZ3Z3Q0wwOTdtZys2VmIwaGZwTjduelZwN29D?=
+ =?utf-8?B?OWZPY3JSVkNOb0t4OWgzZ3lIVlIzTmhCeUFSNmo4OTA2NlJtSER4RnNkRnZ2?=
+ =?utf-8?B?VWYxY1hUY3REcHVuOWYzcXppL0RsUnc5aGRpbEJ3N2hYRlRuVTZiazg5c0ZF?=
+ =?utf-8?B?blFPdzhZWlJ5d1VoMHhJRWVFaUhRZW5IN2QzbmxLOENUUEx2WDZzdUhTbFJL?=
+ =?utf-8?B?SzJONHJYc3Z4SjZwMkd5ZGxpdFVWQTJNY0lwREZ4S29yWE5FYjdVMWRzaWtS?=
+ =?utf-8?B?ZHNScVczU09vZVd3MGpXcVppQjB1dmo0S1J2OUFaRDVzL3J4TnJKWVNxVytC?=
+ =?utf-8?B?c3k1VG8yeGh0T1J2V2pPSlZoOVlqang1OVB6VWlDYXo1RER1MERGejlQM0ZY?=
+ =?utf-8?B?Um1uVlNOQnN2aDUvaW9Sam1PTlI5aUM4Sll4TkJyZU5vWGdXeERlU3pWcFU5?=
+ =?utf-8?B?ajVEelRPcTdKNjFGWWhFMkZSU1lldEsxbTU3c045SDVIQ2dxaHZZcURpUGJu?=
+ =?utf-8?B?bW8wOTh2ZWhHRk5sbkNHTVRreTFWZW9nZ0ljbFhIU2w4ZEx4QnpvRStNM1VG?=
+ =?utf-8?B?K0c0TnpzRnVGWFErRlN3eVQwOXZrT3F2YytrQjV5a283Z0VZTVJ5ODdENnhv?=
+ =?utf-8?B?Szl1L2d6TjVZVXBpbDhzNmU3eGJqelpnaHNwUjlQSndzMHppbkdjeHVtRHdO?=
+ =?utf-8?B?NTNrUm52clUrQjFHeTltWmtKdTRyb3dnVHFQNGplZVczU2pvVFBoVmRmMlk0?=
+ =?utf-8?B?MlhrWktLYjUzRUlpN2ZrS1B3SDBMREdZYThhbkFBRGxJb3ZuVSsvSVVuVmxh?=
+ =?utf-8?B?NWVjWkFKMW9uK0VyOW9vQWliVndGN1kyQzNCMmZGTXpyNDY5NnA0cnZOcGVu?=
+ =?utf-8?B?Vjg1d2ZsTFAzWVdRcVZhNnNyOXNvOUFXY3NkODY4WjZXWE8vUmFSZ0VndXJS?=
+ =?utf-8?B?bE5mZ0tZLzVjNHhKYS9WNVJsOVMzcU5xTElWY2FmeWRrNG1zamFDQXVnbnMv?=
+ =?utf-8?B?blRXL3lNTk9YS2hGS1hwRVZmT1RIdytVdmlkUW1QQytBb0tQTmFNOFB1WGhW?=
+ =?utf-8?B?Wk4xejByOTlKWDhBcnhDS3g5djd3WUN3MHByQTRPWGU3ZldCcjd0S1lIcjIz?=
+ =?utf-8?B?Q1k0VmtoRUNkMEpHT0prSG0ycHBVSUFIdFE1eko3TDhONU8xTXkybmxjV3NH?=
+ =?utf-8?B?aDF3RmVPZE5lZVRSME9sUGM3VkZWNU9kZmVuVDJLZURsQ285RUhNbTF2S1du?=
+ =?utf-8?B?L3U3Zi84R1BmdEpnPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:212.243.204.81;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.mdpi.com;PTR:mail.mdpi.com;CAT:NONE;SFS:(13230040)(9140799003)(376014)(61400799027)(48200799018)(13003099007);DIR:OUT;SFP:1102;
+X-ExternalRecipientOutboundConnectors: e99647dc-1b08-454a-bf8c-699181b389ab
+X-MS-Exchange-ForwardingLoop:
+	vittorio.maniezzo@unibo.it;e99647dc-1b08-454a-bf8c-699181b389ab
+X-OriginatorOrg: live.unibo.it
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 06:56:17.4508
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9676f69-1190-45d0-2d5f-08de28cb11cd
+X-MS-Exchange-CrossTenant-Id: e99647dc-1b08-454a-bf8c-699181b389ab
+X-MS-Exchange-CrossTenant-AuthSource: AMS0EPF000001AA.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR01MB11642
+
+Dear Prof. Maniezzo,
+
+I hope this e-mail finds you well.
+
+Thank you very much for your interest in contributing to the Special
+Issue =E2=80=9CAdvances in Time Series Forecasting with Applications=E2=80=
+=9D. Should
+you wish to submit one of your valuable works, we would be pleased to
+offer a 100% discount on the Article Processing Charge.
+
+We would be most grateful if you could kindly let us know your
+anticipated submission date at your convenience.
+
+Thank you once again for your kind interest. We look forward to hearing
+from you soon.
+
+Kind regards,
+
+Mr. Harrison Chen
+Section Managing Editor
+Mathematics (http://www.mdpi.com/journal/mathematics)
+
+NEWS: Latest CiteScore for Mathematics is 4.6 (Q1)
+       Impact Factor for Mathematics is 2.2 (Q1, 29/483)
+---------------------
+Read the Hot Papers in Mathematics:
+1. Ensemble Methods in Customer Churn Prediction: A Comparative Analysis
+of the State-of-the-Art
+https://doi.org/10.3390/math11051137
+2. Exploiting Cross-Scale Attention Transformer and Progressive Edge
+Refinement for Retinal Vessel Segmentation
+https://doi.org/10.3390/math12020264
+3. End-to-End Power Models for 5G Radio Access Network Architectures
+with a Perspective on 6G
+https://doi.org/10.3390/math13030466
+---------------------
+MDPI Branch Office, Beijing
+Floor 4, Beijing Gengfang International Building
+No 13. Huayuan Road, Haidian District, 100088 Beijing, China
+Tel./Fax: +86 010-6280 0830
+------------------------------------
+MDPI
+Mathematics Editorial Office
+E-mail: mathematics@mdpi.com
+http://www.mdpi.com/journal/mathematics/
+
+https://www.mdpi.com
+Data Protection Notes: https://www.mdpi.com/about/data-protection
+
+MDPI's headquarters are located in Basel, Switzerland. More information
+is available here: https://www.mdpi.com/about/contact
+------------------------------------
+Disclaimer: The information and files contained in this message are
+confidential and intended
+solely for the use of the individual or entity to whom they are
+addressed. If you have received
+this message in error, please notify me and delete this message from
+your system. You may not
+copy this message in its entirety or in part, or disclose its contents
+to anyone
