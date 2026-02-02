@@ -5,75 +5,73 @@ from gurobipy import GRB
 
 # bilinear model, low segments low andpoint, high upper endpoint, cost segment cost
 # choose segments and their slopes and intercepts, bilinear (quadratic) constraints
-def run_SPP(name,low,high,cost,naxNseg):
-    nseg    = len(cost)  # num of segments
-    npoints = high[-1]   # num of points to cover
-    status_dict = {
+def run_SPP(name,y,low,high,cost,naxNseg):
+   nseg    = len(cost)  # num of segments
+   npoints = int(high[-1])   # num of points to cover
+   status_dict = {
         GRB.OPTIMAL: "OPTIMAL",
         GRB.INFEASIBLE: "INFEASIBLE",
         GRB.UNBOUNDED: "UNBOUNDED",
         GRB.LOADED: "LOADED"
-    }
-    lstSegm = coveringSegments(low,high) # quali segmenti coprono i time points
-    sol = []
+   }
+   lstSegm = coveringSegments(low,high) # quali segmenti coprono i time points
+   sol = []
 
-    m = gp.Model("bilinear")
-    e    = m.addVars(npoints, vtype=GRB.CONTINUOUS, lb=0, name="e")  # errors
-    ybar = m.addVars(npoints, vtype=GRB.CONTINUOUS, lb=0, name="yb") # prediction
-    m    = m.addVars(nseg, vtype=GRB.CONTINUOUS, lb=0, name="m")  # slopes
-    b    = m.addVars(nseg, vtype=GRB.CONTINUOUS, lb=0, name="b")  # intercepts
-    xi   = m.addVars(nseg, vtype=GRB.BINARY, name="xi")           # segment selection
-    z    = m.addVars(npoints*nseg, vtype=GRB.BINARY, name="z")    # segment cover
+   m = gp.Model("bilinear")
+   e    = m.addVars(npoints, vtype=GRB.CONTINUOUS, lb=0, name="e")  # errors
+   ybar = m.addVars(npoints, vtype=GRB.CONTINUOUS, lb=0, name="yb") # prediction
+   mk   = m.addVars(nseg, vtype=GRB.CONTINUOUS, lb=0, name="m")  # slopes
+   bk   = m.addVars(nseg, vtype=GRB.CONTINUOUS, lb=0, name="b")  # intercepts
+   xi   = m.addVars(nseg, vtype=GRB.BINARY, name="xi")           # segment selection
+   z    = m.addVars(npoints*nseg, vtype=GRB.BINARY, name="z")    # segment cover
 
-    # Objective
-    m.setObjective(gp.quicksum(e[i] for i in range(npoints)), GRB.MINIMIZE)
+   # Objective
+   m.setObjective(gp.quicksum(e[i] for i in range(npoints)), GRB.MINIMIZE)
     
-    constrs = {}
-    # Constraints, predictions
-    for j in range(npoints):
-        constrs[j] = m.addConstr(gp.quicksum(x[i] for i in range(nseg) if (j>=low[i] and j<=high[i])) == 1, name=f"cover_{j}")
+   constrs = {}
+   # Constraints
+   # predictions
+   for t in range(npoints):
+     constrs[t] = m.addConstr(gp.quicksum((mk[lstSegm[t][k]]*xi[k]*t+bk[lstSegm[t][k]]*xi[k]) for k in range(len(lstSegm[t]))) == ybar[t], name=f"ybar_{t}")
+   
+   # errors
+   for t in range(npoints):
+      constrs[npoints+t] = m.addConstr((e[t]-y[t]+ybar[t]) >= 0, name=f"e1_{t}")
+   for t in range(npoints):
+      constrs[2*npoints+t] = m.addConstr((e[t]+y[t]-ybar[t]) >= 0, name=f"e2_{t}")
+    
+   # unique covering
+   for t in range(npoints):
+      constrs[3*npoints+t] = m.addConstr(gp.quicksum(z[nseg*t + k] for k in lstSegm[t]) == 1, name=f"z_{t}")
+   
+   for t in range(npoints):
+      for k in range(nseg):
+         constrs[4*npoints+t*nseg+k] = m.addConstr(z[nseg*t + k] >= xi[k], name=f"zxi_{k}_{t}")
+   
+   m.update()
+   if (npoints < 20):
+      m.write("bilinearL1.lp")
+       
+   m.optimize()
+   print("IP Status:", status_dict.get(m.status, f"Status {m.status}"))
+    
+   if m.status == GRB.OPTIMAL:
+      print("Solution feasible and optimal")
+      print("MIP Objective:", m.ObjVal)
+      # Optimal values
+      for i in range(npoints):
+         if(e[i].X > 0):
+            sol.append(i)
+   elif m.status == GRB.INFEASIBLE:
+      print("Problem is infeasible")
+      m.computeIIS()
+      m.write("model.ilp")  # .ilp shows conflicting constraints
+   elif m.status == GRB.UNBOUNDED:
+      print("Problem is unbounded")
+   else: # ???
+      print(f"Status: {m.status} - {gp.GRB.status[m.status]}")
 
-    m.optimize()
-    print("LP Status:", status_dict.get(m.status, f"Status {m.status}"))
-    
-    # LP Duals (Pi) and Reduced Costs (RC)
-    print("LP Objective:", m.ObjVal)
-    for j in range(npoints):
-        print(f"Dual for constraint {j}: {constrs[j].Pi}")
-    for i in range(nseg):
-        print(f"Reduced cost x[{i}]: {x[i].RC}")
-    
-    # IP, integer version
-    for var in x.values():
-        var.vtype = GRB.BINARY
-    m.optimize()
-    print("IP Status:", status_dict.get(m.status, f"Status {m.status}"))
-    
-    # Add cardinality constraint (same code if after LP)
-    m.addConstr(gp.quicksum(x[i] for i in range(nseg)) <= naxNseg, name=f"naxNseg")
-    if (npoints < 20):
-       m.write("SPPcover.lp")
-
-    m.optimize()  # re-solve with added constraint
-    print("New IP Status:", status_dict.get(m.status, f"Status {m.status}"))
-    
-    if m.status == GRB.OPTIMAL:
-        print("Solution feasible and optimal")
-        print("MIP Objective:", m.ObjVal)
-        # Optimal values
-        for i in range(nseg):
-            if(x[i].X > 0):
-                sol.append(i)
-    elif m.status == GRB.INFEASIBLE:
-        print("Problem is infeasible")
-        m.computeIIS()
-        m.write("model.ilp")  # .ilp shows conflicting constraints
-    elif m.status == GRB.UNBOUNDED:
-        print("Problem is unbounded")
-    else: # ???
-        print(f"Status: {m.status} - {gp.GRB.status[m.status]}")
-
-    return sol
+   return sol
 
 # calcola per ogni t una lista dei segmenti che lo coprono
 def coveringSegments(low,high):
@@ -122,9 +120,10 @@ if __name__ == '__main__':
    low  = df.loc[:,'low'].values
    high = df.loc[:,'hi'].values
    cost = df.loc[:,'cost'].values
+   y    = dfpoints.loc[:,'test'].values
    maxNseg = 4
    tstart  = time.time()
-   sol     = run_SPP(name,low,high,cost,maxNseg)
+   sol     = run_SPP(name,y,low,high,cost,maxNseg)
    tend = time.time()
    tcpu = tend-tstart
    
