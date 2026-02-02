@@ -1,6 +1,5 @@
 \ Model SPPcover
 \ LP format - for model browsing. Use MPS format to capture full model detail.
-\ Signature: 0x26003b0aae111112
 Minimize
   7.07444 x[0] + 5.00806 x[1] + 3.79311 x[2] + 2.65477 x[3] + 2.73281 x[4]
    + 4.05356 x[5] + 3.27096 x[6] + 12.8925 x[7] + 16.544 x[8]

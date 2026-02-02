@@ -1,12 +1,12 @@
-import numpy as np, pandas as pd
+import numpy as np, pandas as pd, time
 import matplotlib.pyplot as plt
 import gurobipy as gp
 from gurobipy import GRB
 
 # SPP model, low segments low andpoint, high upper endpoint, cost segment cost
 def run_SPP(name,low,high,cost,naxNseg):
-    nseg = len(cost)  # num of segments
-    npoints = high[-1] # num of points to cover
+    nseg    = len(cost)  # num of segments
+    npoints = high[-1]   # num of points to cover
     status_dict = {
         GRB.OPTIMAL: "OPTIMAL",
         GRB.INFEASIBLE: "INFEASIBLE",
@@ -16,7 +16,7 @@ def run_SPP(name,low,high,cost,naxNseg):
     sol = []
 
     m = gp.Model("SPPcover")
-    x = m.addVars(nseg, vtype=GRB.CONTINUOUS, lb=0, ub=1, name="x")  # Relaxed
+    x = m.addVars(nseg, vtype=GRB.CONTINUOUS, lb=0, ub=1, name="x")  # linear relaxation
     
     # Objective
     m.setObjective(gp.quicksum(cost[i] * x[i] for i in range(nseg)), GRB.MINIMIZE)
@@ -36,24 +36,24 @@ def run_SPP(name,low,high,cost,naxNseg):
     for i in range(nseg):
         print(f"Reduced cost x[{i}]: {x[i].RC}")
     
-    # Now solve integer version
+    # IP, integer version
     for var in x.values():
         var.vtype = GRB.BINARY
     m.optimize()
     print("IP Status:", status_dict.get(m.status, f"Status {m.status}"))
     
-    # Add constraint after both solves (same code after LP)
+    # Add cardinality constraint (same code if after LP)
     m.addConstr(gp.quicksum(x[i] for i in range(nseg)) <= naxNseg, name=f"naxNseg")
     if (npoints < 20):
        m.write("SPPcover.lp")
 
-    m.optimize()  # re-solve
+    m.optimize()  # re-solve with added constraint
     print("New IP Status:", status_dict.get(m.status, f"Status {m.status}"))
     
     if m.status == GRB.OPTIMAL:
         print("Solution feasible and optimal")
         print("MIP Objective:", m.ObjVal)
-        print("Optimal values:")
+        # Optimal values
         for i in range(nseg):
             if(x[i].X > 0):
                 sol.append(i)
@@ -63,15 +63,17 @@ def run_SPP(name,low,high,cost,naxNseg):
         m.write("model.ilp")  # .ilp shows conflicting constraints
     elif m.status == GRB.UNBOUNDED:
         print("Problem is unbounded")
-    else:
+    else: # ???
         print(f"Status: {m.status} - {gp.GRB.status[m.status]}")
 
     return sol
 
+# plot della soluzione
 def plotSol(sol,dfdata,dfpoints):
-   ymin = dfpoints.iloc[:,1].min()
-   ymax = dfpoints.iloc[:,1].max()
+   ymin   = dfpoints.iloc[:,1].min()
+   ymax   = dfpoints.iloc[:,1].max()
    yrange = ymax-ymin
+
    fig, ax = plt.subplots(figsize=(10,6))
    ax.plot(dfpoints.iloc[:,1],marker='.',linewidth=0,color='blue')
    for i in sol:
@@ -103,8 +105,11 @@ if __name__ == '__main__':
    high = df.loc[:,'hi'].values
    cost = df.loc[:,'cost'].values
    maxNseg = 4
-   sol = run_SPP(name,low,high,cost,maxNseg)
+   tstart  = time.time()
+   sol     = run_SPP(name,low,high,cost,maxNseg)
+   tend = time.time()
+   tcpu = tend-tstart
    
    # ----------------------- results output section
    plotSol(sol,df,dfpoints)
-   print('fine')
+   print(f'fine, t.cpu = {tcpu:.2f}')
