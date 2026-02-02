@@ -25,9 +25,7 @@ def run_SPP(name,low,high,cost,naxNseg):
     constrs = {}
     for j in range(npoints):
         constrs[j] = m.addConstr(gp.quicksum(x[i] for i in range(nseg) if (j>=low[i] and j<=high[i])) == 1, name=f"cover_{j}")
-    
-    if(npoints < 20):
-        m.write("SPPcover.lp")
+
     m.optimize()
     print("LP Status:", status_dict.get(m.status, f"Status {m.status}"))
     
@@ -46,6 +44,9 @@ def run_SPP(name,low,high,cost,naxNseg):
     
     # Add constraint after both solves (same code after LP)
     m.addConstr(gp.quicksum(x[i] for i in range(nseg)) <= naxNseg, name=f"naxNseg")
+    if (npoints < 20):
+       m.write("SPPcover.lp")
+
     m.optimize()  # re-solve
     print("New IP Status:", status_dict.get(m.status, f"Status {m.status}"))
     
