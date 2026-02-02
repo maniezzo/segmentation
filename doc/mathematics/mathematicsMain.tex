@@ -220,19 +220,19 @@ Many changepoint frameworks encode these ideas via global penalization rather th
 These are the constraints that "operate over the whole segmentation" and are discussed in the global constraint catalogues and CP-based changepoint detection literature (Beldiceanu, Régin; O'Hearn; Gionis; Killick; etc.), as well as in bioinformatics segmentation and shape-constrained segmentation. The main global constraints identified in the segmentation literature (CP + changepoint detection + structural break models) are:
 
 \begin{itemize}
-	\item Segment-count constraints (you already use); In MIP: $Σ d_t ≤ K$.
+	\item Segment-count constraints (you already use); In MIP: $\sum d_t \leq K$.
 	\item Constraints on the distribution of segment lengths (global AMONG/NVALUES) Global-length constraint	Constraint on the multiset of segment lengths, not per-segment one-by-one:
-	(a) Total length equality (trivial): $Σ length_i = T$
+	(a) Total length equality (trivial): $\sum length_i = T$
 		But more interesting:
 	(b) Length profile constraints
 	Examples seen in CP segmentation papers:
 	AMONG/LENGTH-NVALUES constraints on the set of lengths
-	e.g., number of distinct segment lengths ≤ L
+	e.g., number of distinct segment lengths leq L
 	SUM of lengths in certain categories, e.g.:
-	number of long segments ≤ α, number of short segments ≤ β.
+	number of long segments $\leq \alpha$, number of short segments $\leq \beta$.
 	\item Constraints on the global pattern of changes (REGULAR, PEAK/VALLY count) Used in shape-constrained segmentation, speech segmentation, and bioinformatics.
 	A peak is an increase followed by a decrease in segment means (or vice versa).
-	Global constraint: $PEAK_COUNT ≤ P$.
+	Global constraint: $PEAK_COUNT \leq P$.
 	\item Global monotonicity or global shape constraints. Not per segment, but a global pattern constraint:
 	Entire segmentation must be monotone nondecreasing, or
 	Must follow a user-specified pattern (e.g., up → plateau → down). 
@@ -243,22 +243,22 @@ These are the constraints that "operate over the whole segmentation" and are dis
 	Must alternate increase/decrease in a specific regular pattern.
 	Change types must follow periodic structure (e.g., stable → volatile → stable).
 	\item Global cost budgets / global total variation constraints. A constraint on the sum of segment costs, similar to a global knapsack or global linear constraint:
-	Sum of all segment penalties ≤ B
-	Sum of divergences ≤ B
-	Total variation ≤ B (global TV constraint)
-	\item Global constraint on number of distinct regimes. Constraint: Number of unique $regimes ≤ R$.
+	Sum of all segment penalties leq B
+	Sum of divergences leq B
+	Total variation leq B (global TV constraint)
+	\item Global constraint on number of distinct regimes. Constraint: Number of unique $regimes \leq R$.
 	Used in regime-switching, hidden-state segmentation, and multiple-change models.
-	\item Global maxima/minima on segment attributes (e.g., amplitude range). $Max jump ≤ Δmax$,
-	$Min jump ≥ Δmin$,
-	Or bound the range of all segment means:	$max(μ_i) – min(μ_i) ≤ R$.
+	\item Global maxima/minima on segment attributes (e.g., amplitude range). $Max jump \leq \Delta_max$,
+	$Min jump \leq \Delta_min$,
+	Or bound the range of all segment means:	$max(\mu_i) – min(\mu_i) \leq R$.
 	\item Global forbidden-pattern constraints. A global constraint that forbids entire patterns:
-	No more than α alternations of direction.
+	No more than $\alpha$ alternations of direction.
 	No pattern like “short–long–short” repeated.
 	Prevent certain segment-type sequences entirely.
 	This is essentially a global pattern-avoidance constraint
 	\item Global window-based count constraints. If each segment has some attribute $a_i$ (e.g., slope, variance, change point score), enforce:
-	$Σ a_i ≤ A$,
-	or$ A_min ≤ Σ a_i ≤ A_max$.
+	$\sum a_i \leq A$,
+	or$ A_min \leq \sum a_i \leq A_max$.
 	Examples in segmentation:
 	Global constraint on total curvature.
 	Global constraint on total number of outliers explained by segmentation.
@@ -410,8 +410,10 @@ The sensed variables used here are: the steam pressure (Vapor-Pressure-Avg), the
 We complemented these datasets with two others from different domains: economics (bitcoin-US dollar exchange rate, BTC-USD) and healthcare (COVID infections in Italy, Covid-Italia-22) to get a first indication of the generality of the approach across domains.
 
 \begin{table}[H]
+	\centering
+	%\raggedleft
 \caption{Data series results}\label{tab:series}%
-\begin{adjustwidth}{-\extralength}{0cm}
+%\begin{adjustwidth}{-\extralength}{0cm}
 \begin{tabular}{@{}ccccccrrr}
 \toprule
 {\it Dataseries}	& {\it npoints} & {\it nruns} & {\it nsegm} & {\it truns} & {\it tsolve} & {\it QMSE} & {\it QMSE1} & {\it QMSE2}\\
@@ -431,7 +433,7 @@ BTC-USD              &  366 &  60378 & 12 &  3 &    4 &  1.88e7 &7.51e7 & 2.42e7
 Covid-Italia-22      &  507 & 109746 &  5 &  - &   11 & 5070.95 &    na & na \\
 \bottomrule
 \end{tabular}
-\end{adjustwidth}
+%\end{adjustwidth}
 \end{table}
 
 

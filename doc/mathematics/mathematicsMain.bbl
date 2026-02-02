@@ -92,6 +92,14 @@ Bertsimas, D.; King, A.; Mazumder, R.
 \newblock Best subset selection via a modern optimization lens.
 \newblock {\em Annals of Statistics} {\bf 2016}, {\em 44},~813--852.
 
+\bibitem[Prokhorov et~al.(2025)Prokhorov, Radchenko, Semenov, and
+  Skrobotov]{PRSS25}
+Prokhorov, A.; Radchenko, P.; Semenov, A.; Skrobotov, A.
+\newblock Change-Point Detection in Time Series Using Mixed Integer Programming
+  {\bf 2025}.
+\newblock  \href{http://arxiv.org/abs/2408.05665}{{\normalfont
+  [arXiv:econ.EM/2408.05665]}}.
+
 \bibitem[Balinski(1969)]{B69}
 Balinski, M.L.
 \newblock {\em Integer Programming: Methods, Uses, Computation}; Academic
@@ -101,14 +109,6 @@ Balinski, M.L.
 Schrijver, A.
 \newblock {\em Combinatorial Optimization: Polyhedra and Efficiency}; Springer,
    2003.
-
-\bibitem[Prokhorov et~al.(2025)Prokhorov, Radchenko, Semenov, and
-  Skrobotov]{PRSS25}
-Prokhorov, A.; Radchenko, P.; Semenov, A.; Skrobotov, A.
-\newblock Change-Point Detection in Time Series Using Mixed Integer Programming
-  {\bf 2025}.
-\newblock  \href{http://arxiv.org/abs/2408.05665}{{\normalfont
-  [arXiv:econ.EM/2408.05665]}}.
 
 \bibitem[Fischetti et~al.(2009)Fischetti, Lodi, and Salvagnin]{FLS09}
 Fischetti, M.; Lodi, A.; Salvagnin, D.
