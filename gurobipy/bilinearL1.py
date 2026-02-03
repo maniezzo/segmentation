@@ -6,24 +6,23 @@ from gurobipy import GRB
 # bilinear model, low segments low andpoint, high upper endpoint, cost segment cost
 # choose segments and their slopes and intercepts, bilinear (quadratic) constraints
 def run_SPP(name,y,low,high,cost,naxNseg):
-   nseg    = len(cost)  # num of segments
-   npoints = int(high[-1])   # num of points to cover
+   nseg    = len(cost)         # num of segments
+   npoints = int(high[-1])+1   # num of points to cover
    status_dict = {
-        GRB.OPTIMAL: "OPTIMAL",
+        GRB.OPTIMAL:    "OPTIMAL",
         GRB.INFEASIBLE: "INFEASIBLE",
-        GRB.UNBOUNDED: "UNBOUNDED",
-        GRB.LOADED: "LOADED"
+        GRB.UNBOUNDED:  "UNBOUNDED",
+        GRB.LOADED:     "LOADED"
    }
    lstSegm = coveringSegments(low,high) # quali segmenti coprono i time points
    sol = []
 
    m = gp.Model("bilinear")
    e    = m.addVars(npoints, vtype=GRB.CONTINUOUS, lb=0, name="e")  # errors
-   ybar = m.addVars(npoints, vtype=GRB.CONTINUOUS, lb=0, name="yb") # prediction
-   mk   = m.addVars(nseg, vtype=GRB.CONTINUOUS, lb=0, name="m")  # slopes
-   bk   = m.addVars(nseg, vtype=GRB.CONTINUOUS, lb=0, name="b")  # intercepts
+   ybar = m.addVars(npoints, vtype=GRB.CONTINUOUS, name="yb") # prediction
+   mk   = m.addVars(nseg, vtype=GRB.CONTINUOUS, name="m")  # slopes
+   bk   = m.addVars(nseg, vtype=GRB.CONTINUOUS, name="b")  # intercepts
    xi   = m.addVars(nseg, vtype=GRB.BINARY, name="xi")           # segment selection
-   z    = m.addVars(npoints*nseg, vtype=GRB.BINARY, name="z")    # segment cover
 
    # Objective
    m.setObjective(gp.quicksum(e[i] for i in range(npoints)), GRB.MINIMIZE)
@@ -32,7 +31,7 @@ def run_SPP(name,y,low,high,cost,naxNseg):
    # Constraints
    # predictions
    for t in range(npoints):
-     constrs[t] = m.addConstr(gp.quicksum((mk[lstSegm[t][k]]*xi[k]*t+bk[lstSegm[t][k]]*xi[k]) for k in range(len(lstSegm[t]))) == ybar[t], name=f"ybar_{t}")
+     constrs[t] = m.addConstr(gp.quicksum((mk[lstSegm[t][k]]*xi[lstSegm[t][k]]*t+bk[lstSegm[t][k]]*xi[lstSegm[t][k]]) for k in range(len(lstSegm[t]))) == ybar[t], name=f"ybar_{t}")
    
    # errors
    for t in range(npoints):
@@ -42,14 +41,10 @@ def run_SPP(name,y,low,high,cost,naxNseg):
     
    # unique covering
    for t in range(npoints):
-      constrs[3*npoints+t] = m.addConstr(gp.quicksum(z[nseg*t + k] for k in lstSegm[t]) == 1, name=f"z_{t}")
-   
-   for t in range(npoints):
-      for k in range(nseg):
-         constrs[4*npoints+t*nseg+k] = m.addConstr(z[nseg*t + k] >= xi[k], name=f"zxi_{k}_{t}")
-   
+      constrs[3*npoints+t] = m.addConstr(gp.quicksum(xi[k] for k in lstSegm[t]) == 1, name=f"xi_{t}")
+
    m.update()
-   if (npoints < 20):
+   if (npoints <= 20):
       m.write("bilinearL1.lp")
        
    m.optimize()
@@ -59,9 +54,9 @@ def run_SPP(name,y,low,high,cost,naxNseg):
       print("Solution feasible and optimal")
       print("MIP Objective:", m.ObjVal)
       # Optimal values
-      for i in range(npoints):
-         if(e[i].X > 0):
-            sol.append(i)
+      for i in range(nseg):
+         if(xi[i].X > 0):
+            sol.append({"x":i, "m":mk[i].X, "q":bk[i].X})
    elif m.status == GRB.INFEASIBLE:
       print("Problem is infeasible")
       m.computeIIS()
@@ -92,8 +87,8 @@ def plotSol(sol,dfdata,dfpoints):
 
    fig, ax = plt.subplots(figsize=(10,6))
    ax.plot(dfpoints.iloc[:,1],marker='.',linewidth=0,color='blue')
-   for i in sol:
-      t1, t2, m, q = dfdata.loc[i,'low'], dfdata.loc[i,'hi'], dfdata.loc[i,'m'], dfdata.loc[i,'q']
+   for i in range(len(sol)):
+      t1, t2, m, q = dfdata.loc[sol[i]['x'],'low'], dfdata.loc[sol[i]['x'],'hi'], sol[i]['m'], sol[i]['q']
       x = [t1, t2]
       y = [m * t1 + q, m * t2 + q]
       print(t1,t2,x)
