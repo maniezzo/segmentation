@@ -43,6 +43,10 @@ def run_SPP(name,y,low,high,cost,naxNseg):
    for t in range(npoints):
       constrs[3*npoints+t] = m.addConstr(gp.quicksum(xi[k] for k in lstSegm[t]) == 1, name=f"xi_{t}")
 
+   # max num segments
+   maxNseg = 2
+   constrs[4*npoints] = m.addConstr(gp.quicksum(xi[k] for k in range(nseg)) <= maxNseg, name=f"maxN")
+
    m.update()
    if (npoints <= 20):
       m.write("bilinearL1.lp")
