@@ -18,6 +18,7 @@ def run_SPP(name,y,low,high,cost,naxNseg):
    sol = []
 
    m = gp.Model("bilinear")
+   m.setParam("NonConvex", 2) # nonconvex quadratic / bilinear constraints
    e    = m.addVars(npoints, vtype=GRB.CONTINUOUS, lb=0, name="e")  # errors
    ybar = m.addVars(npoints, vtype=GRB.CONTINUOUS, name="yb") # prediction
    mk   = m.addVars(nseg, vtype=GRB.CONTINUOUS, name="m")  # slopes
