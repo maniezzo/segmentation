@@ -2,8 +2,8 @@
 %  For support, please attach all files needed for compiling as well as the log file, and specify your operating system, LaTeX version, and LaTeX editor.
 
 %=================================================================
-\documentclass[mathematics,article,submit,pdftex,moreauthors]{mdpi}
-%\documentclass[preprints,article,submit,pdftex,moreauthors]{Definitions/mdpi}
+%\documentclass[mathematics,article,submit,pdftex,moreauthors]{mdpi}
+\documentclass[preprints,article,submit,pdftex,moreauthors]{Definitions/mdpi}
 % For posting an early version of this manuscript as a preprint, you may use "preprints" as the journal. Changing "submit" to "accept" before posting will remove line numbers.
 
 %--------------------
@@ -75,7 +75,7 @@
 %\newcommand{\orcidauthorB}{0000-0000-0000-000X} % Add \orcidB{} behind the author's name
 
 % Authors, for the paper (add full first names)
-\Author{Vittorio Maniezzo $^{1}$\orcidA{0000-0002-1220-1235} and Lisa Vecchi $^{2}$}
+\Author{Vittorio Maniezzo $^{1}$\orcidA{0000-0002-1220-1235} and Lisa Vecchi $^{2}$\orcidB{0009-0004-0388-4988}}
 
 %\longauthorlist{yes}
 
@@ -383,6 +383,59 @@ Boston University
 
 Global CP constraints (REGULAR, COUNT, etc.)	Rossi et al. (2006) Handbook of Constraint Programming	Catalog of global constraints that can enforce global structure. 
 cs.uwaterloo.ca
+
+\subsection{Additional constraints}  \label{subsec:additional_constraints}
+
+\subsubsection{Segment-level constraints} \label{subsubsec:segment_level_constraint}
+
+Segment-level constraints restrict the admissible properties of each segment independently of the rest of the segmentation. 
+
+Typical segment-level constraints include:
+\begin{itemize}
+	
+	\item Minimum and maximum segment length.
+	Bounds on the length of each segment prevent over-fragmentation and excessively long segments. For a segment defined by start and end indices $(s,e)$, this constraint is expressed as
+	\begin{equation}
+		\ell_{\min} \leq e - s + 1 \leq \ell_{\max}.
+	\end{equation}
+	
+	\item Minimum spacing between changepoints.
+	Enforce a minimum gap of at least $L$ points between consecutive changepoints. It can be written as
+	    \begin{equation}
+		e - s + 1 \geq L ,
+	\end{equation}
+	
+	\item Slope constraints.
+	When segments are modeled via linear regression, constraints can be imposed on segment-specific parameters, such as the slope $\beta_{s,e}$. Typical examples include bounded slopes, 
+	\begin{equation}
+		|\beta_{s,e}| \leq \beta_{\max},
+	\end{equation}
+	or directional constraints enforcing locally non-decreasing or non-increasing behavior. 
+	
+	\item Boundary exclusion.
+	Changepoints can be disallowed in the first and last $K$ observations of the series to ensure stable parameter estimation. This can be enforced by restricting admissible start and end indices:
+	    \begin{equation}
+		s \geq K + 1 \quad \text{and} \quad e \leq N - K ,
+	\end{equation}
+	where $N$ denotes the length of the series.
+	
+	\item Admissible breakpoint positions.
+	Changepoints may be restricted to a predefined set $\mathcal{A} \subseteq \{1,\dots,N\}$  of admissible positions, such as calendar or seasonal markers. In this case, segment boundaries must satisfy:
+	    \begin{equation}
+		s,e \in \mathcal{A}.
+	\end{equation}
+	
+\end{itemize}
+
+\subsubsection{Global series constraints} \label{subsubsec:global_series_constraints}
+
+In constrast to segment-level constraints, global series constraints impose conditions that couple multiple segments and operate on the segmentation as a whole. 
+
+Typical global constraints include:
+\begin{itemize}
+	
+	
+\end{itemize}
 
 
 \section{Computational experience} 			\label{sec:computation}
