@@ -2,8 +2,8 @@
 %  For support, please attach all files needed for compiling as well as the log file, and specify your operating system, LaTeX version, and LaTeX editor.
 
 %=================================================================
-%\documentclass[mathematics,article,submit,pdftex,moreauthors]{mdpi}
-\documentclass[preprints,article,submit,pdftex,moreauthors]{Definitions/mdpi}
+\documentclass[mathematics,article,submit,pdftex,moreauthors]{mdpi}
+%\documentclass[preprints,article,submit,pdftex,moreauthors]{Definitions/mdpi}
 % For posting an early version of this manuscript as a preprint, you may use "preprints" as the journal. Changing "submit" to "accept" before posting will remove line numbers.
 
 %--------------------
@@ -386,18 +386,23 @@ cs.uwaterloo.ca
 
 \subsection{Additional constraints}  \label{subsec:additional_constraints}
 
+In many real-world applications, the analyst is not only interested in minimizing a fitting error, but also in enforcing interpretable and domain-driven properties on the resulting segmentation.
+The literature proposed many constraints that could be requested on the single segments of the model or on the whole modelled series.
+
 \subsubsection{Segment-level constraints} \label{subsubsec:segment_level_constraint}
 
 Segment-level constraints restrict the admissible properties of each segment independently of the rest of the segmentation. 
 
+Let a segment be defined by its start and end indices $(s,e)$, with length $\ell_{s,e} = e - s + 1$, slope $\beta_{s,e}$ (in the case of linear regression), and fitting cost $c_{s,e}$. 
 Typical segment-level constraints include:
 \begin{itemize}
 	
 	\item Minimum and maximum segment length.
-	Bounds on the length of each segment prevent over-fragmentation and excessively long segments. For a segment defined by start and end indices $(s,e)$, this constraint is expressed as
+	Bounds on the length of each segment prevent over-fragmentation and excessively long segments. This constraint is expressed as
 	\begin{equation}
 		\ell_{\min} \leq e - s + 1 \leq \ell_{\max}.
 	\end{equation}
+	Minimum segment length constraints are commonly imposed in exact and approximate changepoint detection methods through parameters such as \texttt{min-size}.
 	
 	\item Minimum spacing between changepoints.
 	Enforce a minimum gap of at least $L$ points between consecutive changepoints. It can be written as
@@ -430,10 +435,58 @@ Typical segment-level constraints include:
 \subsubsection{Global series constraints} \label{subsubsec:global_series_constraints}
 
 In constrast to segment-level constraints, global series constraints impose conditions that couple multiple segments and operate on the segmentation as a whole. 
+Mixed-Integer Programming formulations naturally support this class of constraints through linear inequalities linking multiple segment-selection variables.
+
+Let $d_t \in \{0,1\}$ be the changepoint indicator at position $t$, and let $K$ be the total number of segments. 
 
 Typical global constraints include:
 \begin{itemize}
+	\item Global bound on the number of segments.
+	A global bound on the number of selected segments controls the overall model complexity. This constraint can be written as 
+	\begin{equation}
+		\sum_t d_t \le K_{\max}.
+	\end{equation}
+	Constrained dynamic programming algorithms under this setting are discussed in \cite{hocking2017constrained}.
 	
+	\item Global budget on segmentation cost. 
+	The total cost of the segmentation can be bounded:
+	\begin{equation}
+		\sum_{j} c_j x_j \le B,
+	\end{equation}
+	where $c_j$ denotes the cost of segment $j$. 
+	
+	\item Global total variation.
+	A bound on the aggregate magnitude of all changes across the series:
+	\begin{equation}
+		\sum_{t} |\mu_{t^+} - \mu_{t^-}| \le C_{\max},
+	\end{equation}
+	where $\mu_{t^-}$ and $\mu_{t^+}$ denote the segment parameters before and after a changepoint.
+	
+	\item Global monotonicity or shape constraint.
+	The entire sequence of segment parameters must satisfy a prescribed global ordering,
+	\begin{equation}
+		\mu_1 \le \mu_2 \le \dots \le \mu_K,
+	\end{equation}
+	or follow a predefined shape such as up-down or down-up. These constraints impose a structural pattern on the whole segmentation.
+	Monotonicity-constrained segmentation and related shape-restricted models are studied in \cite{hocking2017constrained}.
+	
+	\item Global pattern constraints on change directions.
+	Constraints on the sequence of increase/decrease signs across all changepoints, such as limiting the number of alternations or enforcing a regular pattern:
+	\begin{equation}
+		\text{ALT\_COUNT} \le A_{\max}.
+	\end{equation}
+	Pattern constraints on the directions of successive changes, including enforced up-down alternation (PeakSeg model) are explicitly formulated via dynamic programming in \cite{hocking2017constrained}
+	
+	\item Window-based global count constraints.
+	Bounds on the number of changepoints within large predefined windows:
+	\begin{equation}
+		L_w \le \sum_{t \in W} d_t \le U_w,
+	\end{equation}
+	where $W$  is the time interval. These constraints regulate the distribution of changepoints over the entire series.
+		
+		
+
+
 	
 \end{itemize}
 

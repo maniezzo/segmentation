@@ -122,6 +122,12 @@ Maniezzo, V.; Boschetti, M.A.; St{\"u}tzle, T.
   Tutorials on Operations Research, Springer,  2021.
 \newblock {\url{https://doi.org/10.1007/978-3-030-64219-4}}.
 
+\bibitem[Hocking et~al.(2017)Hocking, Rigaill, Fearnhead, and
+  Bourque]{hocking2017constrained}
+Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
+\newblock A Log-Linear Time Algorithm for Constrained Changepoint Detection.
+\newblock {\em arXiv preprint arXiv:1703.03352} {\bf 2017}.
+
 \bibitem[sma()]{smartlagoon}
 The Smartlagoon Project.
 \newblock \url{https://www.smartlagoon.eu/}.
