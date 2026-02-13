@@ -92,8 +92,8 @@ def plotSol(sol,dfdata,dfpoints):
 
 if __name__ == '__main__':
    # ---------------------- data reading section
-   dirpath   = "../data/"
-   runspath  = "home/test_runs.csv" # file con tutti i segmenti
+   dirpath   = "/Users/lisavecchi/Desktop/segmentation/data/M3/N1879.csv"
+   runspath  = "/Users/lisavecchi/Desktop/segmentation/data/M3/N1879_runs.csv" # file con tutti i segmenti
    name      = runspath.split('/')[-1].rsplit('.', 1)[0]
    dataapath = dirpath + runspath
    df = pd.read_csv(dataapath,usecols=[1,2,3,4,5])   # i segmenti fra cui scegliere
