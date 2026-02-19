@@ -1,55 +1,31 @@
-%  LaTeX support: latex@mdpi.com
-%  For support, please attach all files needed for compiling as well as the log file, and specify your operating system, LaTeX version, and LaTeX editor.
-
-%=================================================================
-\documentclass[mathematics,article,submit,pdftex,moreauthors]{mdpi}
+\documentclass[preprints,article,submit,pdftex,moreauthors]{Definitions/mdpi}
 %\documentclass[preprints,article,submit,pdftex,moreauthors]{Definitions/mdpi}
 % For posting an early version of this manuscript as a preprint, you may use "preprints" as the journal. Changing "submit" to "accept" before posting will remove line numbers.
-
-%--------------------
-% Class Options:
-%--------------------
-%----------
-% journal
-%----------
-% Choose between the following MDPI journals:
-% mathematics
-
-%---------
-% article
-%---------
-% The default type of manuscript is "article"
 
 %----------
 % submit
 %----------
 % The class option "submit" will be changed to "accept" by the Editorial Office when the paper is accepted.
 
-%---------
-% pdftex
-%---------
-% The option pdftex is for use with pdfLaTeX. Remove "pdftex" for (1) compiling with LaTeX & dvi2pdf (if eps figures are used) or for (2) compiling with XeLaTeX.
-
 %=================================================================
 % MDPI internal commands - do not modify
-\firstpage{1}
-\makeatletter
-\setcounter{page}{\@firstpage}
+\firstpage{1} 
+\makeatletter 
+\setcounter{page}{\@firstpage} 
 \makeatother
 \pubvolume{1}
 \issuenum{1}
 \articlenumber{0}
-\pubyear{2025}
-\copyrightyear{2025}
+\pubyear{2026}
+\copyrightyear{2026}
 %\externaleditor{Firstname Lastname} % More than 1 editor, please add `` and '' before the last editor name
-\datereceived{ }
+\datereceived{ } 
 \daterevised{ } % Comment out if no revised date
-\dateaccepted{ }
-\datepublished{ }
+\dateaccepted{ } 
+\datepublished{ } 
 %\datecorrected{} % For corrected papers: "Corrected: XXX" date in the original paper.
 %\dateretracted{} % For retracted papers: "Retracted: XXX" date in the original paper.
-\hreflink{https://doi.org/} % If needed use \linebreak
-%\doinum{}
+%\doinum{} % Used for some special journals, like molbank
 %\pdfoutput=1 % Uncommented for upload to arXiv.org
 %\CorrStatement{yes}  % For updates
 %\longauthorlist{yes} % For many authors that exceed the left citation part
@@ -58,21 +34,26 @@
 %=================================================================
 % Add packages and commands here. The following packages are loaded in our class file: fontenc, inputenc, calc, indentfirst, fancyhdr, graphicx, epstopdf, lastpage, ifthen, float, amsmath, amssymb, lineno, setspace, enumitem, mathpazo, booktabs, titlesec, etoolbox, tabto, xcolor, colortbl, soul, multirow, microtype, tikz, totcount, changepage, attrib, upgreek, array, tabularx, pbox, ragged2e, tocloft, marginnote, marginfix, enotez, amsthm, natbib, hyperref, cleveref, scrextend, url, geometry, newfloat, caption, draftwatermark, seqsplit
 % cleveref: load \crefname definitions after \begin{document}
-
-%=================================================================
-% Please use the following mathematics environments: Theorem, Lemma, Corollary, Proposition, Characterization, Property, Problem, Example, ExamplesandDefinitions, Hypothesis, Remark, Definition, Notation, Assumption
-%% For proofs, please use the proof environment (the amsthm package is loaded by the MDPI class).
+	\usepackage[algo2e,linesnumbered,ruled]{algorithm2e} 
+	\usepackage{tabularx}       % automatic column width
+	\usepackage{mathtools}  
+	\usepackage{amsfonts}       % mathbb
+	\usepackage{xfrac}          % slanted fractions
+	\usepackage{bm}             % bold greeks 
+	\usepackage{setspace}       % for controlled interline
+	\usepackage{graphicx}
+	\usepackage{amsmath}        % multiline formulas
+	\usepackage{array}          % for better column control
+	\usepackage{xcolor}         % for coloring blocks of text
+	\usepackage{rotating} 		 % for rotating wide tables
 
 %=================================================================
 % Full title of the paper (Capitalized)
 \Title{Optimal Covering Changepoint Analysis}
 
-% MDPI internal command: Title for citation in the left column
-\TitleCitation{MIP Linear Change Point Analysis}
-
 % Author Orchid ID: enter ID or remove command
 \newcommand{\orcidauthorA}{0000-0002-1220-1235} % Add \orcidA{} behind the author's name
-%\newcommand{\orcidauthorB}{0000-0000-0000-000X} % Add \orcidB{} behind the author's name
+\newcommand{\orcidauthorB}{0000-0000-0000-000X} % Add \orcidB{} behind the author's name
 
 % Authors, for the paper (add full first names)
 \Author{Vittorio Maniezzo $^{1}$\orcidA{0000-0002-1220-1235} and Lisa Vecchi $^{2}$\orcidB{0009-0004-0388-4988}}
@@ -82,27 +63,13 @@
 % MDPI internal command: Authors, for metadata in PDF
 \AuthorNames{Vittorio Maniezzo and Lisa Vecchi}
 
-% Author citation:
-\AuthorCitation{Maniezzo, V.; Vecchi, L.}
-
 % Affiliations / Addresses (Add [1] after \address if there is only one affiliation.)
 \address{%
-$^{1}$ \quad Department of Computer Science, University of Bologna, Italy; vittorio.maniezzo@unibo.it\\
-$^{2}$ \quad Affiliation 2; e-mail@e-mail.com}
+	$^{1}$ \quad Department of Computer Science, University of Bologna, Italy; vittorio.maniezzo@unibo.it\\
+	$^{2}$ \quad Affiliation 2; e-mail@e-mail.com}
 
 % Contact information of the corresponding author
 \corres{Correspondence: vittorio.maniezzo@unibo.it}
-
-% Current address and/or shared authorship
-%\firstnote{Current address: Affiliation.}
-% Current address should not be the same as any items in the Affiliation section.
-
-%\secondnote{These authors contributed equally to this work.}
-% The commands \thirdnote{} till \eighthnote{} are available for further notes.
-
-%\simplesumm{} % Simple summary
-
-%\conference{EURO 2024} % An extended version of a conference paper
 
 % Abstract (Do not insert blank lines, i.e. \\)
 \abstract{Detecting changepoints in time series is a fundamental task in statistical modeling and data-driven decision-making. We introduce a novel set covering-based model for changepoint detection that leverages combinatorial optimization to identify an optimal set of segments explaining the observed data.
@@ -111,16 +78,10 @@ Our formulation guarantees global optimality under this flexible cost structure,
 The increased efficiency of standard MILP solvers, coupled with tailored dominance rules, ensures practical scalability, achieving computational efficiency on datasets with several thousands of observations. Extensive experiments demonstrate that our approach outperforms state-of-the-art methods in both accuracy and runtime, offering a robust and interpretable solution for optimal changepoint detection.}
 
 % Keywords
-\keyword{Time series, Set covering, segmentation, change point detection.}
+\keyword{Time series; Set covering; segmentation; change point detection}
 
-% The fields PACS, MSC, and JEL may be left empty or commented out if not applicable
-%\PACS{J0101}
-%\MSC{}
-%\JEL{}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction} 							\label{sec:intro}
 
 Changepoint detection (CPD) is the task of identifying abrupt changes in the statistical properties of a time series and constitutes a foundational problem across statistics, machine learning, and signal processing \cite{LMS14,AC17,TOV20}. The objective of CPD is to partition a temporal sequence into contiguous, non-overlapping segments, each characterized by internally homogeneous behavior. Such segmentation enables a clearer understanding of the underlying data-generating process and facilitates the application of targeted analytical or predictive models at the segment level. As a result, effective changepoint detection plays a critical role not only in descriptive analysis, but also in forecasting, anomaly detection, and data-driven decision-making.
@@ -184,7 +145,7 @@ In summary, existing optimal CPD models exhibit a clear trade-off between comput
 The proposed SC-CPD framework occupies a complementary position in this landscape. By combining a set-covering formulation with modern MILP techniques and problem-specific preprocessing, it delivers global optimality while substantially expanding the class of constraints that can be handled in a principled and scalable manner. This positions SC-CPD as a flexible and extensible optimization framework for changepoint detection in applications where global structure and domain-specific requirements play a central role.
 
 
-\section{An extended set covering model} \label{sec:SCPmodel}
+\section{An extended set covering model}  \label{sec:SCPmodel}
 The core idea of the model presented here is to list all subsequences of series values that satisfy specific structural constraints, in the following denoted as {\it feasible runs} of  values, quantify a quality measure of each run, and select the subset of runs that collectively cover the entire series while minimizing a cost of the difference between actual and model data (the model {\it residuals}) or maximizing a model fitness measure. This is the core of the model, further constraints can be added to accommodate specific desiderata on the model, taking advantage of the modeling flexibility of mixed-integer programming and the effectiveness of state-of-the-art general MIP solvers \cite{FLS09}.
 
 A Set Partitioning Problem (SPP) is at the core of the model, where the objective is to minimize the cost of the residuals and the constraints ensure that each point of the series has a corresponding one in the model. Note that no assumption is made about the nature of the model of the segments, it can be linear regression, giving rise to piecewise linear regression, but also any other nonlinear model. It is also possible to use different models for different runs at no cost to the optimization process. The SPP is defined over a set $X=[x_j]$, $j=1,\ldots,nruns$ of binary decision variables, each associated with one of the runs, i.e., of the segments. The generation of feasible runs can already implement some dominance, e.g. avoiding the generation of runs with too few or too many values. The cost $c_j$ of each run can be computed according to any of the fitness measures proposed in the literature, including $R^2$, SER, $\chi^2$, RMSE, simple variance etc. The constraints ensure that each point of the series is covered by a selected run.
@@ -714,22 +675,20 @@ Entry 2		& Data			& Data\\
 \end{tabularx}
 \end{table}
 
-\section[\appendixname~\thesection]{}
-All appendix sections must be cited in the main text. In the appendices, Figures, Tables, etc. should be labeled, starting with ``A''---e.g., Figure A1, Figure A2, etc.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\isPreprints{}{% This command is only used for ``preprints''.
+\isPreprints{}{% This command is only used for ``preprints''.
 \begin{adjustwidth}{-\extralength}{0cm}
-%} % If the paper is ``preprints'', please uncomment this parenthesis.
+} % If the paper is ``preprints'', please uncomment this parenthesis.
 %\printendnotes[custom] % Un-comment to print a list of endnotes
 
 \reftitle{References}
-
 
 % References, variant A: external bibliography
 \bibliography{mathematicsMain.bib}
 
 \PublishersNote{}
+\isPreprints{}{% This command is only used for ``preprints''.
 \end{adjustwidth}
+} % If the paper is ``preprints'', please uncomment this parenthesis.
 \end{document}
 
