@@ -146,20 +146,30 @@ The proposed SC-CPD framework occupies a complementary position in this landscap
 
 
 \section{An extended set covering model}  \label{sec:SCPmodel}
-The core idea of the model presented here is to list all subsequences of series values that satisfy specific structural constraints, in the following denoted as {\it feasible runs} of  values, quantify a quality measure of each run, and select the subset of runs that collectively cover the entire series while minimizing a cost of the difference between actual and model data (the model {\it residuals}) or maximizing a model fitness measure. This is the core of the model, further constraints can be added to accommodate specific desiderata on the model, taking advantage of the modeling flexibility of mixed-integer programming and the effectiveness of state-of-the-art general MIP solvers \cite{FLS09}.
+The model adopts a set partitioning perspective: all subsequences satisfying predefined structural properties—termed feasible runs—are generated and scored according to a segment-specific quality metric. The segmentation problem is then formulated as the selection of a collection of runs that forms a partition of the time index set while optimizing a global objective function based on residual loss or model fit. The resulting mixed-integer linear program provides a flexible framework in which additional modeling requirements can be seamlessly encoded via linear constraints and handled by state-of-the-art MIP solvers \cite{FLS09}.
 
-A Set Partitioning Problem (SPP) is at the core of the model, where the objective is to minimize the cost of the residuals and the constraints ensure that each point of the series has a corresponding one in the model. Note that no assumption is made about the nature of the model of the segments, it can be linear regression, giving rise to piecewise linear regression, but also any other nonlinear model. It is also possible to use different models for different runs at no cost to the optimization process. The SPP is defined over a set $X=[x_j]$, $j=1,\ldots,nruns$ of binary decision variables, each associated with one of the runs, i.e., of the segments. The generation of feasible runs can already implement some dominance, e.g. avoiding the generation of runs with too few or too many values. The cost $c_j$ of each run can be computed according to any of the fitness measures proposed in the literature, including $R^2$, SER, $\chi^2$, RMSE, simple variance etc. The constraints ensure that each point of the series is covered by a selected run.
+A Set Partitioning Problem (SPP) lies at the core of the formulation. The objective is to minimize an aggregate residual-based cost, while the constraints enforce that each time index of the series is covered exactly once by the selected segments. No restriction is imposed on the functional form of the segment model: it may consist of linear regression (yielding piecewise linear regression), but also of nonlinear or nonparametric specifications. Moreover, different runs may be associated with different model classes without altering the structure of the optimization problem.
 
-Unfortunately, the number of feasible runs for a real-world application can be very large, and the SPP can take an unacceptable amount of time to solve. Therefore, we relax the equality constraints into inequalities, transforming the problem into a Set Covering Problem (SCP), which can typically be solved in much higher dimensions, at the cost of having multiple runs covering some of the series points, therefore requiring a postprocessing to get a feasible segmentation. The resulting TSSC (standing for Time Series Set Covering) model is the following, where coefficients $a_{ij}$ are 0/1 coefficients taking the value of 1 if and only if run $j$ covers the $i$-th series point, $i \in \{1,\ldots,npoints\}$ and $j \in \{1,\ldots\,nruns\}$.
+Formally, let $X = [x_j]$, $j = 1,\ldots,nruns$, denote the binary decision variables, where $x_j = 1$ if run $j$ is selected and $x_j = 0$ otherwise. Feasible runs may be generated so as to incorporate preliminary dominance rules, for instance by excluding segments that are too short or too long. Each run $j$ is assigned a cost $c_j$, computed according to any suitable goodness-of-fit or loss metric proposed in the literature, including $R^2$, SER, $\chi^2$, RMSE, variance-based criteria, etc. The covering constraints ensure that every series point is included in exactly one selected run.
+
+The resulting Time Series Set Partitioning (TSSP) model is defined as follows. Let $a_{ij} \in \{0,1\}$ be a coefficient equal to 1 if and only if run $j$ covers time index $i$, for $i = 1,\ldots,npoints$ and $j = 1,\ldots,nruns$.
 
 \begin{alignat}{4}
-(TSSC) \hspace{0.5cm} z_{TSSC} = \min &\; \sum_{j=1}^{nruns} c_j x_{j}  \label{eq:SCPobj} \\
-s.t. &\; \sum_{j=1}^{nruns}a_{ij}x_{j} \geq 1, & \hspace{1.5cm} i=1,\dots,npoints  \label{eq:SCPcov} \\
- &\; \sum_{j=1}^{nruns} x_{j} \leq maxruns \label{eq:SCPext}\\
- &\; x_j \in \{0,1\}, &\; j=1,\dots,nruns  \label{eq:SCPvar}
+	(TSSP) \hspace{0.5cm} z_{TSSC} = \min &\; \sum_{j=1}^{nruns} c_j x_{j}  \label{eq:SCPobj} \\
+	s.t. &\; \sum_{j=1}^{nruns}a_{ij}x_{j} \geq 1, & \hspace{1.5cm} i=1,\dots,npoints  \label{eq:SCPcov} \\
+	&\; \sum_{j=1}^{nruns} x_{j} = maxruns \label{eq:SPPext}\\
+	&\; x_j \in \{0,1\}, &\; j=1,\dots,nruns  \label{eq:SCPvar}
 \end{alignat}
 
-State-of-the-art MIP solvers are very effective on SCP, but very large instances can still require high computational times. We have therefore also implemented a Lagrangian matheuristic \cite{the_book} on the TSSC problem, relaxing all constraints (\ref{eq:SCPcov}) by associating a Lagrangian penalty $\lambda_i$ to each $i$-th constraint, $1 \leq i \leq npoints$, and keeping only constraint (\ref{eq:SCPext}) in the model. This results in model LTSSC (standing for Lagrangian TSSC) and we solved it by a subgradient algorithm, where the subproblem is very easy to solve, requiring to select at most the $maxruns$ most negative variables at each subgradient iteration. A simple fixing heuristic takes the incumbent subproblem solution at each iteration, which can be infeasible because it does not cover all relaxed constraints, and adds selected variables until it becomes feasible.
+Unfortunately, in real-world applications the number of feasible runs can be very large, making the resulting SPP computationally demanding and, in some cases, intractable within acceptable time limits. From a polyhedral perspective, the set partitioning formulation is typically tighter but also harder to explore computationally, as the equality constraints induce a more restrictive feasible region and a combinatorially demanding branching structure. To mitigate this issue, we relax the equality constraints \ref{eq:SPPext} into inequalities, thereby transforming the formulation into a Set Covering Problem (SCP). The covering polyhedron is generally easier to handle algorithmically and can be solved in significantly larger dimensions, albeit with a weaker linear programming relaxation. 
+
+The relaxation allows multiple runs to cover the same series points, and therefore a postprocessing phase is required to extract a feasible segmentation from the (possibly overlapping) covering solution. The resulting set covering formulation is denoted by TSSC.
+
+State-of-the-art MIP solvers are highly effective on SCP formulations; however, very large instances may still entail substantial computational effort. To further enhance scalability, we implemented a Lagrangian matheuristic \cite{the_book} for the TSSC problem. Specifically, we relax all covering constraints (\ref{eq:SCPcov}) by associating a Lagrangian multiplier $\lambda_i$ with each constraint, $1 \leq i \leq npoints$, while retaining only the relaxed covering constraint in the formulation. 
+
+The resulting Lagrangian model, denoted by LTSSC (Lagrangian TSSC), is solved via a subgradient optimization scheme. The corresponding Lagrangian subproblem is computationally simple: at each iteration, it amounts to selecting at most the $maxruns$ variables with the most negative reduced costs. A simple fixing heuristic is embedded within the procedure: the incumbent solution of the subproblem, which may be infeasible with respect to the relaxed covering constraints, is iteratively augmented by adding selected variables until feasibility is restored. The overall Lagrangian set covering matheuristic is referred to as LTSSC.
+
+Finally, postprocessing is required to transform any SCP solution into a feasible SPP segmentation. This can be accomplished in linear time by scanning each region of overlapping runs and identifying the splitting point that minimizes the total cost obtained by assigning the preceding observations to the preceding segment and the subsequent observations to the following segment.
 
 \subsection{Global series constraints}    \label{subsec:globconstraints}
 
@@ -451,10 +461,9 @@ Typical global constraints include:
 	
 \end{itemize}
 
-
 \section{Computational experience} 			\label{sec:computation}
 
-We implemented models TSSC and LTSSC in C++ and ran them on a Windows 11 Intel i7 machine equipped with 32 Gb of RAM. The MIP solver used was CPLEX 22.11. All codes and data are available from the project repository.
+We implemented models TSSP, TSSC and LTSSC in C++ and ran them on a Windows 11 Intel i7 machine equipped with 32 Gb of RAM. The MIP solver used was CPLEX 22.11. All codes and data are available from the project repository.
 
 \subsection{Cost function}		\label{subsec:costfunc}
 
@@ -550,11 +559,23 @@ Not surprisingly, the set partitioning model could always produce the better sol
     \hfill%
     \subfloat[Covid Italy 2022]{%
         \includegraphics[width=0.45\linewidth]{negativeBinFit.eps}%
-        \label{fig:covid}%
+        \label{fig:health}%
         }%
     \caption{Economics and healthcare dataseries}
     \label{fig:nonenv}
 \end{figure*}
+
+We emphasize that the validity of the proposed framework is not restricted to piecewise linear regression: any parametric or nonparametric trend function can be adopted for computing the segment-specific error cost. Figure \ref{fig:covid} illustrates the segmentation obtained by applying the model to the time series of total infected patients in Italy during the first year and a half (500 data points) of the Covid-19 pandemic. The epidemic evolved through successive waves, each of which can be effectively approximated by a trend following a negative binomial pattern. Accordingly, the formulation of Section \ref{sec:SCPmodel} is applied by computing, for each feasible run, the fitting error associated with a negative binomial model. The subsequent optimization procedure remains unchanged.
+
+As a final remark, the changepoints identified on this Covid-19 series admit a clear epidemiological interpretation, as they correspond to phases in which a new wave of contagion emerged or was reasonably expected to emerge.
+
+\begin{figure*}[ht]
+	\centering
+	\includegraphics[width=0.75\linewidth]{negativeBinFit.eps}%
+	\caption{Covid diffusion in Italy}
+   \label{fig:covid}%
+\end{figure*}
+
 
 %% Example of a page in landscape format (with table and table footnote).
 %\startlandscape
@@ -593,32 +614,6 @@ Current results have already proven useful in the motivating application domain,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{6pt}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% optional
-%\supplementary{The following supporting information can be downloaded at:  \linksupplementary{s1}, Figure S1: title; Table S1: title; Video S1: title.}
-
-% Only for journal Methods and Protocols:
-% If you wish to submit a video article, please do so with any other supplementary material.
-% \supplementary{The following supporting information can be downloaded at: \linksupplementary{s1}, Figure S1: title; Table S1: title; Video S1: title. A supporting video article is available at doi: link.}
-
-% Only used for preprtints:
-% \supplementary{The following supporting information can be downloaded at the website of this paper posted on \href{https://www.preprints.org/}{Preprints.org}.}
-
-% Only for journal Hardware:
-% If you wish to submit a video article, please do so with any other supplementary material.
-% \supplementary{The following supporting information can be downloaded at: \linksupplementary{s1}, Figure S1: title; Table S1: title; Video S1: title.\vspace{6pt}\\
-%\begin{tabularx}{\textwidth}{lll}
-%\toprule
-%\textbf{Name} & \textbf{Type} & \textbf{Description} \\
-%\midrule
-%S1 & Python script (.py) & Script of python source code used in XX \\
-%S2 & Text (.txt) & Script of modelling code used to make Figure X \\
-%S3 & Text (.txt) & Raw data from experiment X \\
-%S4 & Video (.mp4) & Video demonstrating the hardware in use \\
-%... & ... & ... \\
-%\bottomrule
-%\end{tabularx}
-%}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \authorcontributions{All authors contributed equally to all phases of the work}
@@ -629,7 +624,7 @@ Current results have already proven useful in the motivating application domain,
 
 \dataavailability{We encourage all authors of articles published in MDPI journals to share their research data. In this section, please provide details regarding where data supporting reported results can be found, including links to publicly archived datasets analyzed or generated during the study. }
 
-\acknowledgments{“During the preparation of this manuscript/study, the author(s) used GenAI only for the purposes of syntax and style checking.”}
+\acknowledgments{“During the preparation of this manuscript/study, the authors used GenAI only for the purposes of syntax and style checking.”}
 
 \conflictsofinterest{``The authors declare no conflicts of interest.'' }
 
@@ -640,15 +635,13 @@ Current results have already proven useful in the motivating application domain,
 %\entrylink{The Link to this entry published on the encyclopedia platform.}
 
 \abbreviations{Abbreviations}{
-The following abbreviations are used in this manuscript:
-\\
-
+The following abbreviations are used in this manuscript:\\
 \noindent
 \begin{tabular}{@{}ll}
 MDPI & Multidisciplinary Digital Publishing Institute\\
 DOAJ & Directory of open access journals\\
-TLA & Three letter acronym\\
-LD & Linear dichroism
+MIP  & Mixed Integer Programming\\
+NP   & Nondeterministic Polynomial
 \end{tabular}
 }
 
@@ -659,7 +652,6 @@ LD & Linear dichroism
 \appendixstart
 \appendix
 \section[\appendixname~\thesection]{}
-\subsection[\appendixname~\thesubsection]{}
 The appendix is an optional section that can contain details and data supplemental to the main text---for example, explanations of experimental details that would disrupt the flow of the main text but nonetheless remain crucial to understanding and reproducing the research shown; figures of replicates for experiments of which representative data are shown in the main text can be added here if brief, or as Supplementary Data. Mathematical proofs of results not central to the paper can be added as an appendix.
 
 \begin{table}[H]
@@ -679,10 +671,8 @@ Entry 2		& Data			& Data\\
 \isPreprints{}{% This command is only used for ``preprints''.
 \begin{adjustwidth}{-\extralength}{0cm}
 } % If the paper is ``preprints'', please uncomment this parenthesis.
-%\printendnotes[custom] % Un-comment to print a list of endnotes
 
 \reftitle{References}
-
 % References, variant A: external bibliography
 \bibliography{mathematicsMain.bib}
 
