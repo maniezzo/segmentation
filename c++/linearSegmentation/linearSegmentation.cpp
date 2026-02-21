@@ -1068,7 +1068,8 @@ int readConfig()
 
 int main(int argc, char** argv)
 {  bool   fLagrangian = false;
-   bool   fGurobi     = true;
+   bool   fGurobi     = false;
+   bool   fCPLEX      = !(fLagrangian || fGurobi);
    int    solstat, n_brk=-1;
    double objval=-1, tCpuOpt, cost = 0;
 
@@ -1127,8 +1128,12 @@ int main(int argc, char** argv)
    else if(fGurobi)
    {  x = goGurobi(y,lstOLS);
    }
-   else
+   else if(fCPLEX)
       x = goCPLEX(y,lstOLS);
+   else
+   {  cout << "Manca il solver" << endl;
+      goto TERMINATE;
+   }
 
    //postProcess(lstOLS, x, minlag);
    tend = clock();

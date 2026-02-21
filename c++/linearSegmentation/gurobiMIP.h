@@ -1,5 +1,5 @@
 #pragma once
-#include "gurobi_c++.h"
+#include <gurobi_c++.h>
 #include "global.h"
 
 int populateGurobiByRow(GRBModel& model,
