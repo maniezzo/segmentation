@@ -369,20 +369,20 @@ Typical segment-level constraints include:
 \begin{itemize}
 	
 	\item Minimum and maximum segment length.
-	Bounds on the length of each segment prevent over-fragmentation and excessively long segments. This constraint is expressed as
+	Bounds on the length of each segment prevent over-fragmentation and excessively long segments. In optimal partitioning approaches,  minimum segment size constraints can be naturally incorporated. For instance, the PELT algorithm proposed in \cite{KFE12} allows restricting the set of admissible segmentations by enforcing a lower bound on segment length. This constraint is expressed as
 	\begin{equation}
 		\ell_{\min} \leq e - s + 1 \leq \ell_{\max}.
 	\end{equation}
 	Minimum segment length constraints are commonly imposed in exact and approximate changepoint detection methods through parameters such as \texttt{min-size}.
 	
 	\item Minimum spacing between changepoints.
-	Enforce a minimum gap of at least $L$ points between consecutive changepoints. It can be written as
+	Enforce a minimum gap of at least $L$ points between consecutive changepoints. Some methods such as PELT \cite{KFE12} accomodate this type of restriction by limiting admissible segment endpoints according to a predefined minimum segment size. This constraint can be written as
 	    \begin{equation}
 		e - s + 1 \geq L ,
 	\end{equation}
 	
 	\item Slope constraints.
-	When segments are modeled via linear regression, constraints can be imposed on segment-specific parameters, such as the slope $\beta_{s,e}$. Typical examples include bounded slopes, 
+	When segments are modeled via linear regression, constraints can be imposed on segment-specific parameters, such as the slope $\beta_{s,e}$. In particular, constrained changepoint detection under affine inequality restrictions between segment parameters has been studied in \cite{hocking2017constrained}. Typical examples include bounded slopes, 
 	\begin{equation}
 		|\beta_{s,e}| \leq \beta_{\max},
 	\end{equation}
@@ -396,11 +396,11 @@ Typical segment-level constraints include:
 	where $N$ denotes the length of the series.
 	
 	\item Admissible breakpoint positions.
-	Changepoints may be restricted to a predefined set $\mathcal{A} \subseteq \{1,\dots,N\}$  of admissible positions, such as calendar or seasonal markers. In this case, segment boundaries must satisfy:
+	Changepoints may be restricted to a predefined set $\mathcal{A} \subseteq \{1,\dots,N\}$  of admissible positions, such as calendar or seasonal markers. For example, in the Ruptures framework \cite{TOV20} , the jump parameter enforces that changepoints can only be selected on a subsampled grid of indices, effectively reducing the admissible set of breakpoint locations. In this case, segment boundaries must satisfy:
 	    \begin{equation}
 		s,e \in \mathcal{A}.
 	\end{equation}
-	
+	These restrictions are useful both for computational efficiency and for incorporating prior structural information into the segmentation model.
 \end{itemize}
 
 \subsubsection{Global series constraints} \label{subsubsec:global_series_constraints}
@@ -424,14 +424,14 @@ Typical global constraints include:
 	\begin{equation}
 		\sum_{j} c_j x_j \le B,
 	\end{equation}
-	where $c_j$ denotes the cost of segment $j$. 
+	where $c_j$ denotes the cost of segment $j$. This formulation corresponds to the constrained counterpart of penalized segmentation model \cite{KFE12}, obtained via Lagrangian duality.
 	
 	\item Global total variation.
 	A bound on the aggregate magnitude of all changes across the series:
 	\begin{equation}
 		\sum_{t} |\mu_{t^+} - \mu_{t^-}| \le C_{\max},
 	\end{equation}
-	where $\mu_{t^-}$ and $\mu_{t^+}$ denote the segment parameters before and after a changepoint.
+	where $\mu_{t^-}$ and $\mu_{t^+}$ denote the segment parameters before and after a changepoint. This constraint controls the overall amount of structural variation in the segmentation and limits the cumulative magnitude of successive jumps between adjacent segment parameters. It is closely related to total variation regularization and to the fused lasso formulation of \cite{tibshirani2005sparsity}, where an $\ell_1$ penalty is applied to successive parameter differences. 
 	
 	\item Global monotonicity or shape constraint.
 	The entire sequence of segment parameters must satisfy a prescribed global ordering,
@@ -446,7 +446,7 @@ Typical global constraints include:
 	\begin{equation}
 		\text{ALT\_COUNT} \le A_{\max}.
 	\end{equation}
-	Pattern constraints on the directions of successive changes, including enforced up-down alternation (PeakSeg model) are explicitly formulated via dynamic programming in \cite{hocking2017constrained}
+	Pattern constraints on the directions of successive changes, including enforced up-down alternation (PeakSeg model) are explicitly formulated via dynamic programming in \cite{hocking2017constrained}.
 	
 	\item Window-based global count constraints.
 	Bounds on the number of changepoints within large predefined windows:
