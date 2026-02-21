@@ -116,6 +116,13 @@ Fischetti, M.; Lodi, A.; Salvagnin, D.
   Vo{\ss}, S., Eds.; Springer,  2009; Vol.~10, {\em Annals of Information
   Systems}, pp. 1--20.
 
+\bibitem[Maniezzo()]{M24}
+Maniezzo, V.
+\newblock Extended Set Covering for Time Series Segmentation.
+\newblock In Proceedings of the 15th Metaheuristics International Conference,
+  MIC 2024; Saveaux, M., Ed. Springer, Vol. 14753, {\em Lecture Notes in
+  Computer Science}, pp. 193.--199.
+
 \bibitem[Maniezzo et~al.(2021)Maniezzo, Boschetti, and St{\"u}tzle]{the_book}
 Maniezzo, V.; Boschetti, M.A.; St{\"u}tzle, T.
 \newblock {\em Matheuristics: Algorithms and Implementations}; EURO Advanced

@@ -49,7 +49,7 @@
 
 %=================================================================
 % Full title of the paper (Capitalized)
-\Title{Optimal Covering Changepoint Analysis}
+\Title{Optimal Partitioning Changepoint Analysis}
 
 % Author Orchid ID: enter ID or remove command
 \newcommand{\orcidauthorA}{0000-0002-1220-1235} % Add \orcidA{} behind the author's name
@@ -165,11 +165,22 @@ Unfortunately, in real-world applications the number of feasible runs can be ver
 
 The relaxation allows multiple runs to cover the same series points, and therefore a postprocessing phase is required to extract a feasible segmentation from the (possibly overlapping) covering solution. The resulting set covering formulation is denoted by TSSC.
 
-State-of-the-art MIP solvers are highly effective on SCP formulations; however, very large instances may still entail substantial computational effort. To further enhance scalability, we implemented a Lagrangian matheuristic \cite{the_book} for the TSSC problem. Specifically, we relax all covering constraints (\ref{eq:SCPcov}) by associating a Lagrangian multiplier $\lambda_i$ with each constraint, $1 \leq i \leq npoints$, while retaining only the relaxed covering constraint in the formulation. 
+State-of-the-art MIP solvers are highly effective on SCP formulations; however, very large instances may still entail substantial computational effort. To further enhance scalability, \cite{M24} proposed a Lagrangian matheuristic \cite{the_book} for the TSSC problem where  all covering constraints (\ref{eq:SCPcov}) are relaxed by associating a Lagrangian multiplier $\lambda_i$ with each constraint, $1 \leq i \leq npoints$, while retaining only the relaxed covering constraint in the formulation. 
+The resulting Lagrangian model is solved via a subgradient optimization scheme. The corresponding Lagrangian subproblem is computationally simple: at each iteration, it amounts to selecting at most the $maxruns$ variables with the most negative reduced costs. A simple fixing heuristic is embedded within the procedure: the incumbent solution of the subproblem, which may be infeasible with respect to the relaxed covering constraints, is iteratively augmented by adding selected variables until feasibility is restored. This relaxation makes it possible to easily include constraints such as the maximum number of segments allowed. However, in most cases, additional constraints must be added to the subproblem or relaxed themselves, which makes the approach impractical.
 
-The resulting Lagrangian model, denoted by LTSSC (Lagrangian TSSC), is solved via a subgradient optimization scheme. The corresponding Lagrangian subproblem is computationally simple: at each iteration, it amounts to selecting at most the $maxruns$ variables with the most negative reduced costs. A simple fixing heuristic is embedded within the procedure: the incumbent solution of the subproblem, which may be infeasible with respect to the relaxed covering constraints, is iteratively augmented by adding selected variables until feasibility is restored. The overall Lagrangian set covering matheuristic is referred to as LTSSC.
+In any case, after solving a set covering relaxation, postprocessing is required to transform any SCP solution into a feasible SPP segmentation. This can be accomplished in linear time by scanning each region of overlapping runs and identifying the splitting point that minimizes the total cost obtained by assigning the preceding observations to the preceding segment and the subsequent observations to the following segment.
 
-Finally, postprocessing is required to transform any SCP solution into a feasible SPP segmentation. This can be accomplished in linear time by scanning each region of overlapping runs and identifying the splitting point that minimizes the total cost obtained by assigning the preceding observations to the preceding segment and the subsequent observations to the following segment.
+
+\subsection{Cost function}		\label{subsec:costfunc}
+
+Models TSSP and TSSC are suitable for offline (or anytime) analysis assuming additive costs. The model is independent on the specific function used to quantify the cost associated with each segment. The CPD literature proposes different cost functions, including negative log-likelihood (Horvath 1993; Chen and Gupta 2000), quadratic loss or cumulative sums (e.g., Inclan and Tiao 1994; Rigaill 2010), but any statistical measure of fit can be used for the task. Each measure favors different characteristics of the model and the results can be widely different.
+
+In the practical CPD applications, the quality of a model is often related to interpretability ofnthe results rather
+than mathematical properties, the most useful model is the one that aligns with the "naked eye" or provides the most coherent narrative for decision-making. The usefulness of a function depends on its aesthetic clarity or on its predictive accuracy. In order to align with visual expectation, most selection approaches allow for penalizations that permit to align the results to visual expectations. The resulting functions can be viewed as instruments for identifying useful approximations rather than a {\em true} model, which is virtually never contained in real-world candidate sets [10].
+
+However, user-defined penalizations assume a human feedback that, given the nature of the problem, should be tailored as a per-series input. In order to facilitate the automation of the CPD analysis, we tested a number of alternative cost functions, both coming from information-theoretic and optimization contribution, aiming at a reasonably resilient alternative.
+
+Many different cost functions, see figure \ref{fig:costfunctions}.
 
 \subsection{Global series constraints}    \label{subsec:globconstraints}
 
@@ -463,11 +474,7 @@ Typical global constraints include:
 
 \section{Computational experience} 			\label{sec:computation}
 
-We implemented models TSSP, TSSC and LTSSC in C++ and ran them on a Windows 11 Intel i7 machine equipped with 32 Gb of RAM. The MIP solver used was CPLEX 22.11. All codes and data are available from the project repository.
-
-\subsection{Cost function}		\label{subsec:costfunc}
-
-Many different cost functions, see figure \ref{fig:costfunctions}.
+We implemented models TSSP and TSSC in C++ and ran them on a Windows 11 Intel i7 machine equipped with 32 Gb of RAM. The MIP solver used was CPLEX 22.11. All codes and data are available from the project repository.
 
 \begin{figure}[h]
 	\centering
