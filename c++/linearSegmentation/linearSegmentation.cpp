@@ -1044,8 +1044,7 @@ void compressTableau(vector<tuple<int, int, double, double, double>> lstOLS)
 
 // datafile etc.
 int readConfig()
-{
-   int i, j, idcost;
+{  int i, j, idcost;
    string line;
 
    //cout << "Running from " << exePath() << endl;
@@ -1066,105 +1065,165 @@ int readConfig()
    return idcost;
 }
 
+// controlla se ho già risolto l'istanza
+bool entryExists(string filename, string& name, string& costFun)
+{
+   ifstream file(filename);
+   if (!file.is_open()) 
+      throw std::runtime_error("Cannot open file: " + filename);
+
+   string line;
+   while (getline(file, line)) 
+   {
+      stringstream ss(line);
+      string field0, field1;
+
+      // Read first two CSV fields
+      if (!getline(ss, field0, ',')) continue;
+      if (!getline(ss, field1, ',')) continue;
+
+      if (field0 == name && field1 == costFun) 
+         return true;
+   }
+
+   return false;
+}
+
 int main(int argc, char** argv)
 {  bool   fLagrangian = false;
-   bool   fGurobi     = false;
+   bool   fGurobi     = true;
    bool   fCPLEX      = !(fLagrangian || fGurobi);
    int    solstat, n_brk=-1;
    double objval=-1, tCpuOpt, cost = 0;
 
    int     i, j, n, idcost, cont;
    clock_t tstart, tend, truns, tMIP;
+   string  costFunc;
 
    std::cout << std::fixed; // prevent scientific notation output
    idcost = readConfig();   // cost function:  R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC
-
-   double alpha = 0.05;
-   string dataFile = baseDir + dsName + ".csv";
-   string segmentFileName = baseDir + dsName + "_runs.csv";
-
-   string costFunc;
-   ofstream dsFile(baseDir + dsName + "_segments.csv");
-   vector<int> ids;
-   vector<double> x,y;
-   vector<tuple<int, int, double, double, double>> lstOLS;
-
-   n = readData(dataFile, ids, y);
-   cout << "read " << n << " values" << endl;
-   int minlag = max(5, n / 20);
-
-   tstart = clock();
-   lstOLS = computeRuns(minlag, y, idcost);
-   switch (idcost)
+   for(int idc = 0; idc < 10; idc++)
    {
-      case 0: costFunc = "costR2"; break;
-      case 1: costFunc = "costMSE"; break;
-      case 2: costFunc = "costChi2"; break;
-      case 3: costFunc = "costSER"; break;
-      case 4: costFunc = "costVar"; break;
-      case 5: costFunc = "costRMSE"; break;
-      case 6: costFunc = "costQRMSE"; break;
-      case 7: costFunc = "costQRMSEn"; break;
-      case 8: costFunc = "costAIC"; break;
-      case 9: costFunc = "costBIC"; break;
-      default: cout << "ERROR 1" << endl;
-   }
-   n = lstOLS.size();
-   truns = clock();
-   double tCpuRuns = (truns - tstart) / CLOCKS_PER_SEC;
-   cout << "CPU time for runs: " << tCpuRuns << endl;
-
-   writeListOLS(lstOLS, dsName); // write csv file with candidate segments
-   compressTableau(lstOLS);      // calcola tableau per righe e per colonne, compresse (lista indici)
-   tstart = clock();
-
-   if (fLagrangian)
-   {  cost = lagrangian(INT_MAX, lstOLS, minlag, alpha);
-      tMIP = clock();
-      tCpuOpt = (tMIP - truns) / CLOCKS_PER_SEC;
-      cout << "CPU time for Lagr: " << tCpuOpt << endl;
-      goto TERMINATE;
-   }
-   else if(fGurobi)
-   {  x = goGurobi(y,lstOLS);
-   }
-   else if(fCPLEX)
-      x = goCPLEX(y,lstOLS);
-   else
-   {  cout << "Manca il solver" << endl;
-      goto TERMINATE;
-   }
-
-   //postProcess(lstOLS, x, minlag);
-   tend = clock();
-   tCpuOpt = (tend-tstart)/CLOCKS_PER_SEC;
-
-   cont = 0;
-   dsFile << "id,low,hi,m,q," << costFunc << endl;
-   for (j = 0; j < x.size(); j++)
-      if (x[j] > 0.01)
-      {
-         cout << cont << ") column " << j << " value=" << x[j];
-         cout << " segm: " << get<0>(lstOLS[j]) << ","
-            << get<1>(lstOLS[j]) << ","
-            << get<2>(lstOLS[j]) << ","
-            << get<3>(lstOLS[j]) << ","
-            << get<4>(lstOLS[j]) << endl;
-         dsFile << j << "," << get<0>(lstOLS[j]) << ","
-            << get<1>(lstOLS[j]) << ","
-            << get<2>(lstOLS[j]) << ","
-            << get<3>(lstOLS[j]) << ","
-            << get<4>(lstOLS[j]) << endl;
-         cont++;
-         cost += get<4>(lstOLS[j]);
+      idcost = idc;
+      switch (idcost)
+      {  case 0: costFunc = "costR2";     break;
+         case 1: costFunc = "costMSE";    break;
+         case 2: costFunc = "costChi2";   break;
+         case 3: costFunc = "costSER";    break;
+         case 4: costFunc = "costVar";    break;
+         case 5: costFunc = "costRMSE";   break;
+         case 6: costFunc = "costQRMSE";  break;
+         case 7: costFunc = "costQRMSEn"; break;
+         case 8: costFunc = "costAIC"; break;
+         case 9: costFunc = "costBIC"; break;
+         default: cout << "ERROR 1" << endl;
       }
-   dsFile.close();
-   n_brk = cont - 1;
-   cout << "Final number of segments: " << cont << " cost " << cost << endl;
 
-   cout << (fLagrangian ? "Lagrangian " : "MIP ") << dsName <<
-      " n_runs " << n << " t_runs " << tCpuRuns <<
-      " SCP objval " << objval << " final cost " << std::setprecision(6) << cost << " n_brk " << n_brk << " t_opt " << tCpuOpt << endl;
+      double alpha = 0.05;
+      string dataFile = baseDir + dsName + ".csv";
+      string segmentFileName = baseDir + dsName + "_runs.csv";
+      if(entryExists("risultati.csv",dsName,costFunc))
+      {  cout << dsName << " " << costFunc << " Istanza gia' risolta" << endl;
+         continue;
+      }
 
+      vector<int> ids;
+      vector<double> x,y;
+      vector<tuple<int, int, double, double, double>> lstOLS;
+
+      n = readData(dataFile, ids, y);
+      cout << "read " << n << " values" << endl;
+      int minlag = max(5, n / 20);
+
+      tstart = clock();
+
+      // se segmenti già calcolati li legge, altrimenti li calcola
+      ifstream f(baseDir + dsName + "_runs.csv");
+      if(f.good())
+      {  
+         string line;
+         getline(f, line); // headers
+         while (getline(f, line)) 
+         {
+            stringstream ss(line); 
+            string field; 
+            int a, b, c; 
+            double d, e; 
+            // Read first 5 comma-separated fields 
+            getline(ss, field, ',');  a = stoi(field); 
+            getline(ss, field, ',');  b = stoi(field); 
+            getline(ss, field, ',');  c = stoi(field); 
+            getline(ss, field, ',');  d = stod(field); 
+            getline(ss, field, ',');  e = stod(field); 
+            lstOLS.emplace_back(a, b, c, d, e);
+         }
+         f.close();
+      }
+      else
+         lstOLS = computeRuns(minlag, y, idcost);
+
+      n = lstOLS.size();
+      truns = clock();
+      double tCpuRuns = (truns - tstart) / CLOCKS_PER_SEC;
+      cout << "CPU time for runs: " << tCpuRuns << endl;
+
+      ofstream dsFile(baseDir + dsName + "_segments.csv");
+      ofstream resFile("risultati.csv", std::ios::app); // Open in append mode, risultati totali
+      writeListOLS(lstOLS, dsName); // write csv file with candidate segments
+      compressTableau(lstOLS);      // calcola tableau per righe e per colonne, compresse (lista indici)
+      tstart = clock();
+
+      if (fLagrangian)
+      {  cost = lagrangian(INT_MAX, lstOLS, minlag, alpha);
+         tMIP = clock();
+         tCpuOpt = (tMIP - truns) / CLOCKS_PER_SEC;
+         cout << "CPU time for Lagr: " << tCpuOpt << endl;
+         goto TERMINATE;
+      }
+      else if(fGurobi)
+      {  x = goGurobi(y,lstOLS);
+      }
+      else if(fCPLEX)
+         x = goCPLEX(y,lstOLS);
+      else
+      {  cout << "Manca il solver" << endl;
+         goto TERMINATE;
+      }
+
+      //postProcess(lstOLS, x, minlag);
+      tend = clock();
+      tCpuOpt = (tend-tstart)/CLOCKS_PER_SEC;
+
+      cont = 0;
+      dsFile << "id,low,hi,m,q," << costFunc << endl;
+      resFile << dsName << "," << costFunc << "," << tCpuOpt << ",";
+      for (j = 0; j < x.size(); j++)
+         if (x[j] > 0.01)
+         {
+            cout << cont << ") column " << j << " value=" << x[j];
+            cout << " segm: " << get<0>(lstOLS[j]) << ","
+               << get<1>(lstOLS[j]) << ","
+               << get<2>(lstOLS[j]) << ","
+               << get<3>(lstOLS[j]) << ","
+               << get<4>(lstOLS[j]) << endl;
+            dsFile << j << "," << get<0>(lstOLS[j]) << ","
+               << get<1>(lstOLS[j]) << ","
+               << get<2>(lstOLS[j]) << ","
+               << get<3>(lstOLS[j]) << ","
+               << get<4>(lstOLS[j]) << endl;
+            resFile << get<0>(lstOLS[j]) << "," << get<1>(lstOLS[j]) << ",";
+            cont++;
+            cost += get<4>(lstOLS[j]);
+         }
+      resFile << endl;
+      dsFile.close();
+      resFile.close();
+      n_brk = cont - 1;
+      cout << "Final number of segments: " << cont << " cost " << cost << endl;
+
+      cout << (fLagrangian ? "Lagrangian " : "MIP ") << dsName <<
+         " n_runs " << n << " t_runs " << tCpuRuns <<
+         " SCP objval " << objval << " final cost " << std::setprecision(6) << cost << " n_brk " << n_brk << " t_opt " << tCpuOpt << endl;
+   }
 TERMINATE: cout << "Fine" << endl;
 }  /* END main */
