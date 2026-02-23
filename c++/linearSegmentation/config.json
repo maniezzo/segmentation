@@ -1,6 +1,6 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "m3\\N1881",
+	"dsName"  : "M3\\N1881",
 	"maxIter" : 500,
 	"maxTime" : 300,
    "idcost"  : 6,    "commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC"

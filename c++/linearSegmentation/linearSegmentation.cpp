@@ -513,7 +513,7 @@ vector<tuple<int, int, double, double, double>> computeRuns(int minlag, vector<d
          lstOLS.push_back(tup);
          cont++;
          if (low % 250 == 0)
-            cout << "Computing cost for low=" << low << " num cols=" << cont << endl;
+            cout << "Compute runs, cost for low=" << low << " up " << up << " num cols=" << cont << endl;
       }
    return lstOLS;
 }
@@ -1096,12 +1096,13 @@ int main(int argc, char** argv)
    int    solstat, n_brk=-1;
    double objval=-1, tCpuOpt, cost = 0;
 
-   int     i, j, n, idcost, cont;
+   int     i, j, n, idcost, cont, ntot;
    clock_t tstart, tend, truns, tMIP;
    string  costFunc;
 
    std::cout << std::fixed; // prevent scientific notation output
    idcost = readConfig();   // cost function:  R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC
+   ntot = 10; // max num of segmenti (sara' in config)
    for(int idc = 0; idc < 10; idc++)
    {
       idcost = idc;
@@ -1138,7 +1139,7 @@ int main(int argc, char** argv)
       tstart = clock();
 
       // se segmenti già calcolati li legge, altrimenti li calcola
-      ifstream f(baseDir + dsName + "_runs.csv");
+      ifstream f(baseDir + dsName + "Z_runs.csv");
       if(f.good())
       {  
          string line;
@@ -1147,9 +1148,10 @@ int main(int argc, char** argv)
          {
             stringstream ss(line); 
             string field; 
-            int a, b, c; 
+            int dummy, a, b, c; 
             double d, e; 
             // Read first 5 comma-separated fields 
+            getline(ss, field, ',');  // dummy id 
             getline(ss, field, ',');  a = stoi(field); 
             getline(ss, field, ',');  b = stoi(field); 
             getline(ss, field, ',');  c = stoi(field); 
@@ -1160,7 +1162,9 @@ int main(int argc, char** argv)
          f.close();
       }
       else
-         lstOLS = computeRuns(minlag, y, idcost);
+      {  lstOLS = computeRuns(minlag, y, idcost);
+         writeListOLS(lstOLS, dsName); // write csv file with candidate segments
+      }
 
       n = lstOLS.size();
       truns = clock();
@@ -1169,7 +1173,6 @@ int main(int argc, char** argv)
 
       ofstream dsFile(baseDir + dsName + "_segments.csv");
       ofstream resFile("risultati.csv", std::ios::app); // Open in append mode, risultati totali
-      writeListOLS(lstOLS, dsName); // write csv file with candidate segments
       compressTableau(lstOLS);      // calcola tableau per righe e per colonne, compresse (lista indici)
       tstart = clock();
 
@@ -1181,10 +1184,10 @@ int main(int argc, char** argv)
          goto TERMINATE;
       }
       else if(fGurobi)
-      {  x = goGurobi(y,lstOLS);
+      {  x = goGurobi(y,lstOLS,ntot);
       }
       else if(fCPLEX)
-         x = goCPLEX(y,lstOLS);
+         x = goCPLEX(y,lstOLS,ntot);
       else
       {  cout << "Manca il solver" << endl;
          goto TERMINATE;

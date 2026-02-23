@@ -1,7 +1,7 @@
 #include "cplexMIP.h"
 
 // Cplex, to populate by row, we first create the columns, and then add the rows.
-int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS)
+int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS, int ntot)
 {  int status,numrows,numcols,numnz,i,j,n,m;
    vector<double> obj;
    vector<double> lb;
@@ -56,11 +56,26 @@ int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int
             rmatval.push_back(1.0); 
             numnz++;
          }
-      sense.push_back('G');
+      sense.push_back('E');
       rhs.push_back(1.0);
       if(i%10 == 0 || i==m-1)
          cout << "Constr" << i << endl;
    }
+
+   // maxnum constraint
+   rmatbeg.push_back(numnz); numrows++;
+   ostringstream osstr;
+   osstr << "ntot";
+   rowname.push_back(osstr.str());
+   for (j=0;j<n;j++)
+   {
+      rmatind.push_back(j); 
+      rmatval.push_back(1.0); 
+      numnz++;
+   }
+   sense.push_back('L');
+   rhs.push_back(ntot);
+   cout << "Constr ntot"<< endl;
 
    // vector<string> to char**
    char** rname = new char* [rowname.size()];
@@ -76,7 +91,7 @@ int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int
 } 
 
 
-vector<double> goCPLEX(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS)
+vector<double> goCPLEX(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS, int ntot)
 {  int i,j;
    int       cur_numrows=-1, cur_numcols=-1;
    int       status = 0;
@@ -125,7 +140,7 @@ vector<double> goCPLEX(vector<double> y, vector<tuple<int, int, double, double, 
    }
 
    // Now populate the problem with the data.
-   status = populatebyrow(env, lp, y, lstOLS);
+   status = populatebyrow(env, lp, y, lstOLS, ntot);
    if (status)
    {  cout << "Failed to populate problem." << endl;
       goto TERMINATE;

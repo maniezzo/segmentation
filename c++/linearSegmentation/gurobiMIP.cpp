@@ -28,7 +28,8 @@ int populateGurobiByRow(GRBModel& model,
    const vector<double>& y,
    const vector<tuple<int,int,double,double,double>>& lstOLS,
    vector<GRBVar>& xVars,
-   vector<GRBConstr>& constrs)
+   vector<GRBConstr>& constrs,
+   int ntot)
 {
    try 
    {  int n = (int)lstOLS.size();
@@ -58,6 +59,16 @@ int populateGurobiByRow(GRBModel& model,
          constrs.push_back(c);
       }
       model.update();
+
+      // vincolo cardinalità totale
+      GRBLinExpr sum = 0.0;  // Ensure this is GRBLinExpr
+      for (int j = 0; j < n; ++j)
+         sum += xVars[j];
+      string cname = "ntot";
+      GRBConstr c = model.addConstr(sum <= ntot, cname);  // <<<<<<<<<<<<<<<<<<< PARTITIONING OPPURE COVERING == oppure <=
+      constrs.push_back(c);
+      model.update();
+
       return 0;
    } 
    catch (GRBException& e) 
@@ -71,7 +82,7 @@ int populateGurobiByRow(GRBModel& model,
 }
 
 // Main function
-vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS) 
+vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS, int ntot) 
 {
    clock_t tstart, truns, tMIP;
    vector<double> xnil;
@@ -90,7 +101,7 @@ vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double,
       vector<GRBVar> xVars;
       vector<GRBConstr> constrs;
 
-      int status = populateGurobiByRow(model, y, lstOLS, xVars, constrs);
+      int status = populateGurobiByRow(model, y, lstOLS, xVars, constrs, ntot);
       if (status) 
       {  cout << "Failed to populate model." << endl;
          goto TERMINATE;
@@ -102,6 +113,9 @@ vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double,
       int numRows = model.get(GRB_IntAttr_NumConstrs);
       int numCols = model.get(GRB_IntAttr_NumVars);
       cout << "LP: rows=" << numRows << " cols=" << numCols << endl;
+
+      if (numCols < 200)
+         model.write("problem.lp");
 
       double objval = model.get(GRB_DoubleAttr_ObjVal);
       cout << "LP objective = " << objval << endl;
@@ -140,9 +154,6 @@ vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double,
             //cout<<"x["<<j<<"] = "<<x[j]<<endl;
          }
       }
-
-      if (numCols < 200)
-         model.write("problem.lp");
       return x;
    } 
    catch (GRBException& e) 
