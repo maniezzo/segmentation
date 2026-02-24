@@ -1,7 +1,7 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "M3\\N1881",
+	"dsName"  : "M6\\BTCUSD",
 	"maxIter" : 500,
 	"maxTime" : 300,
-   "idcost"  : 6,    "commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC"
+    "idcost"  : 6,    "commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC"
 }
