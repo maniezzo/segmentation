@@ -333,9 +333,8 @@ tuple<int, int, double, double, double> costVar(int low, int up, vector<double> 
 
 // cost as RMSE
 tuple<int, int, double, double, double> costRMSE(int low, int up, vector<double> y)
-{
-   int i, n;
-   double m, q, r, sumres2 = 0, sumchi = 0;
+{  int i, n;
+   double m, q, r, yhat, sumres2 = 0, sumchi = 0;
    vector<int> x;
    vector<double> ypred, residuals;
 
@@ -344,31 +343,20 @@ tuple<int, int, double, double, double> costRMSE(int low, int up, vector<double>
       x.push_back(low + i);
 
    tie(m, q) = linearRegression(x, y);
-   for (i = 0; i < n; i++)
-   {  ypred.push_back(m * x[i] + q);
-      r = y[i] - ypred[i];
-      residuals.push_back(r);
+   for (int i = 0; i < n; ++i) 
+   {  yhat = m * x[i] + q;
+      r = y[i] - yhat;
       sumres2 += r * r;
-      sumchi += r * r / ypred[i];
    }
 
-   // compute variance
-   double sum = accumulate(begin(residuals), end(residuals), 0.0);
-   double media = sum / residuals.size();
-   double accum = 0.0;
-   for_each(begin(residuals), end(residuals), [&](const double d) {
-      accum += (d - media) * (d - media);
-      });
-
-   double costRMSE = accum / sqrt(n - 1);
+   double costRMSE = std::sqrt(sumres2 / n);       // RMSE over n points
    return { low, up, m, q, costRMSE };
 }
 
 // cost as quasi RMSE
 tuple<int, int, double, double, double> costQRMSE(int low, int up, vector<double> y)
-{
-   int i, n;
-   double m, q, r, sumres2 = 0, sumchi = 0;
+{  int i, n;
+   double m, q, r, yhat, sumres2 = 0, sumchi = 0;
    vector<int> x;
    vector<double> ypred, residuals;
 
@@ -377,21 +365,20 @@ tuple<int, int, double, double, double> costQRMSE(int low, int up, vector<double
       x.push_back(low + i);
 
    tie(m, q) = linearRegression(x, y);
-   for (i = 0; i < n; i++)
-   {
-      ypred.push_back(m * x[i] + q);
-      r = y[i] - ypred[i];
-      residuals.push_back(r);
+   for (int i = 0; i < n; ++i) 
+   {  yhat = m * x[i] + q;
+      r = y[i] - yhat;
       sumres2 += r * r;
    }
-   double costQRMSE = sumres2 / sqrt(n);
+
+   double costQRMSE = sqrt(sumres2 / sqrt(n));       // QRMSE over n points
    return { low, up, m, q, costQRMSE };
 }
 
 // cost as quasi RMSE multiplied by n
 tuple<int, int, double, double, double> costQRMSEn(int low, int up, vector<double> y)
 {  int i, n;
-   double m, q, r, sumres2 = 0, sumchi = 0;
+   double m, q, r, yhat, sumres2 = 0, sumchi = 0;
    vector<int> x;
    vector<double> ypred, residuals;
 
@@ -400,14 +387,13 @@ tuple<int, int, double, double, double> costQRMSEn(int low, int up, vector<doubl
       x.push_back(low + i);
 
    tie(m, q) = linearRegression(x, y);
-   for (i = 0; i < n; i++)
-   {
-      ypred.push_back(m * x[i] + q);
-      r = y[i] - ypred[i];
-      residuals.push_back(r);
+   for (int i = 0; i < n; ++i) 
+   {  yhat = m * x[i] + q;
+      r = y[i] - yhat;
       sumres2 += r * r;
    }
-   double costQRMSEn = n*sumres2 / sqrt(n);
+
+   double costQRMSEn = n*sqrt(sumres2 / sqrt(n));     
    return { low, up, m, q, costQRMSEn };
 }
 
@@ -1134,7 +1120,7 @@ int main(int argc, char** argv)
 
       n = readData(dataFile, ids, y);
       cout << "read " << n << " values" << endl;
-      int minlag = max(5, n / 20);
+      int minlag = max(10, n / 20);
 
       tstart = clock();
 
@@ -1171,7 +1157,7 @@ int main(int argc, char** argv)
       double tCpuRuns = (truns - tstart) / CLOCKS_PER_SEC;
       cout << "CPU time for runs: " << tCpuRuns << endl;
 
-      ofstream dsFile(baseDir + dsName + "_segments.csv");
+      ofstream dsFile(baseDir + dsName + "_" + costFunc + "_segments.csv");
       ofstream resFile("risultati.csv", std::ios::app); // Open in append mode, risultati totali
       compressTableau(lstOLS);      // calcola tableau per righe e per colonne, compresse (lista indici)
       tstart = clock();
