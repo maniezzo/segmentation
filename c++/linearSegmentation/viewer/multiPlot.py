@@ -32,7 +32,7 @@ if __name__ == "__main__":
    dfRes = pd.DataFrame(rows)
    print(dfRes.head())
    
-   name = "M6/ABBV"
+   name = "M6/USDJPY"
    dfRes = dfRes[dfRes["name"] == name]
    
    path = "../../../data/"

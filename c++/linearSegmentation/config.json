@@ -1,6 +1,6 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "M6\\BTCUSD",
+	"dsName"  : "M6\\USDJPY",
 	"maxIter" : 500,
 	"maxTime" : 300,
     "idcost"  : 6,    "commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC"

@@ -7,7 +7,7 @@ using namespace hexaly;
 vector<double> goHexaly(const vector<double>& y,
    const vector<tuple<int, int, double, double, double>>& lstOLS,
    int ntot,
-   int timeLimitSeconds = 10,   // optional
+   int timeLimitSeconds = 600,  // optional
    bool relaxLP = false,        // false => MIP-style (boolean) solve; true => [0,1] relaxation
    bool partitioning = true     // true => ==1 ; false => <=1
 );

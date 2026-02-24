@@ -1078,8 +1078,8 @@ bool entryExists(string filename, string& name, string& costFun)
 
 int main(int argc, char** argv)
 {  bool   fLagrangian = false;
-   bool   fGurobi     = false;
-   bool   fHexaly     = true;
+   bool   fGurobi     = true;
+   bool   fHexaly     = false;
    bool   fCPLEX      = !(fLagrangian || fGurobi || fHexaly);
    int    solstat, n_brk=-1;
    double objval=-1, tCpuOpt, cost = 0;
