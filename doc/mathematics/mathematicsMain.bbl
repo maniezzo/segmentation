@@ -135,6 +135,13 @@ Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
 \newblock A Log-Linear Time Algorithm for Constrained Changepoint Detection.
 \newblock {\em arXiv preprint arXiv:1703.03352} {\bf 2017}.
 
+\bibitem[Tibshirani et~al.(2005)Tibshirani, Saunders, Rosset, Zhu, and
+  Knight]{tibshirani2005sparsity}
+Tibshirani, R.; Saunders, M.; Rosset, S.; Zhu, J.; Knight, K.
+\newblock Sparsity and smoothness via the fused lasso.
+\newblock {\em Journal of the Royal Statistical Society: Series B (Statistical
+  Methodology)} {\bf 2005}.
+
 \bibitem[sma()]{smartlagoon}
 The Smartlagoon Project.
 \newblock \url{https://www.smartlagoon.eu/}.

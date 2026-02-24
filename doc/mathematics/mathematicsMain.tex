@@ -175,12 +175,26 @@ In any case, after solving a set covering relaxation, postprocessing is required
 
 Models TSSP and TSSC are suitable for offline (or anytime) analysis assuming additive costs. The model is independent on the specific function used to quantify the cost associated with each segment. The CPD literature proposes different cost functions, including negative log-likelihood (Horvath 1993; Chen and Gupta 2000), quadratic loss or cumulative sums (e.g., Inclan and Tiao 1994; Rigaill 2010), but any statistical measure of fit can be used for the task. Each measure favors different characteristics of the model and the results can be widely different.
 
-In the practical CPD applications, the quality of a model is often related to interpretability ofnthe results rather
-than mathematical properties, the most useful model is the one that aligns with the "naked eye" or provides the most coherent narrative for decision-making. The usefulness of a function depends on its aesthetic clarity or on its predictive accuracy. In order to align with visual expectation, most selection approaches allow for penalizations that permit to align the results to visual expectations. The resulting functions can be viewed as instruments for identifying useful approximations rather than a {\em true} model, which is virtually never contained in real-world candidate sets [10].
+In practical applications of changepoint detection (CPD), model quality is often judged less by its formal optimality properties and more by the interpretability of the resulting segmentation. In many real-world settings, the most useful segmentation is not necessarily the one that minimizes a given objective function, but rather the one that aligns with human perception of structural changes or provides a coherent narrative for subsequent decision-making. Accordingly, the utility of a cost function may depend as much on the clarity and explanatory power of its segmentation as on its predictive accuracy.
 
-However, user-defined penalizations assume a human feedback that, given the nature of the problem, should be tailored as a per-series input. In order to facilitate the automation of the CPD analysis, we tested a number of alternative cost functions, both coming from information-theoretic and optimization contribution, aiming at a reasonably resilient alternative.
+To reconcile algorithmic outputs with visual or domain-based expectations, many selection procedures incorporate penalty terms that regulate the number of detected changepoints. These penalizations effectively allow practitioners to adjust the segmentation to better match subjective expectations. However, the resulting models should be regarded as practically useful approximations rather than representations of an underlying “true” model, which is unlikely to be included among the finite set of candidate models considered in practice [10].
 
-Many different cost functions, see figure \ref{fig:costfunctions}.
+A further limitation of user-defined penalization schemes is that they implicitly require human feedback. In heterogeneous datasets, appropriate penalty calibration often needs to be tailored on a per-series basis, which limits scalability and automation. To reduce this dependency on manual tuning, we evaluated several alternative cost functions drawn from both information-theoretic and optimization-based frameworks, with the aim of identifying a more robust and resilient formulation suitable for automated CPD analysis.
+
+We evaluated a broad range of cost functions, including AIC, BIC, Chi-square statistics, MSE, QRMSE, $R^2$, RMSE, SER, and simple variance; comparative visual results on a M6 benchmark instance are reported in Figure \ref{fig:costfunctions}. No single criterion consistently dominates the others across all benchmark instances. Performance varies depending on the underlying signal structure, noise characteristics, and segment length distribution, supporting the claim that cost-function performance is inherently context-dependent.
+
+For the subsequent analysis, we focus on two representative and complementary criteria: AIC and QRMSE. AIC is well established in the CPD literature, particularly through its equivalence to penalized negative log-likelihood formulations, and provides a theoretically grounded likelihood-based benchmark.
+
+QRMSE (Quasi-RMSE) \cite{M24}, by contrast, lies between MSE and RMSE in terms of segment-length sensitivity. Relative to MSE, it places less emphasis on short segments, while avoiding the stronger preference for long segments induced by RMSE. This intermediate behavior makes it attractive in applications where neither aggressive segmentation nor excessive smoothing is desirable.
+
+Importantly, although QRMSE is additive across segments and can therefore be used within optimal partitioning frameworks, it does not satisfy the inequality condition required for pruning in algorithms such as PELT. In particular, the cost of a merged segment may be lower than the sum of the costs of two adjacent subsegments. This violation prevents the use of the pruning guarantees that underpin the computational efficiency of such methods, limiting the practical applicability of QRMSE in large-scale settings.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\linewidth]{ROST_global}
+	\caption{Alternative cost functions on series ROST of benchmark M6}
+	\label{fig:costfunctions}
+\end{figure}
 
 \subsection{Global series constraints}    \label{subsec:globconstraints}
 
@@ -476,14 +490,9 @@ Typical global constraints include:
 
 We implemented models TSSP and TSSC in C++ and ran them on a Windows 11 Intel i7 machine equipped with 32 Gb of RAM. The MIP solver used was CPLEX 22.11. All codes and data are available from the project repository.
 
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=0.9\linewidth]{CostFunctions}
-	\caption{Alternative cost functions}
-	\label{fig:costfunctions}
-\end{figure}
+\subsection{Dynamic programming approaches} \label{subsec:DPcodes}
 
-
+PELT, SN ecc.
 
 \subsection{Benchmarking and Comparative Performance} \label{subsec:benchmarking}
 
@@ -658,21 +667,6 @@ NP   & Nondeterministic Polynomial
 
 \appendixstart
 \appendix
-\section[\appendixname~\thesection]{}
-The appendix is an optional section that can contain details and data supplemental to the main text---for example, explanations of experimental details that would disrupt the flow of the main text but nonetheless remain crucial to understanding and reproducing the research shown; figures of replicates for experiments of which representative data are shown in the main text can be added here if brief, or as Supplementary Data. Mathematical proofs of results not central to the paper can be added as an appendix.
-
-\begin{table}[H]
-\caption{This is a table caption.\label{tab5}}
-%\newcolumntype{C}{>{\centering\arraybackslash}X}
-\begin{tabularx}{\textwidth}{CCC}
-\toprule
-\textbf{Title 1}	& \textbf{Title 2}	& \textbf{Title 3}\\
-\midrule
-Entry 1		& Data			& Data\\
-Entry 2		& Data			& Data\\
-\bottomrule
-\end{tabularx}
-\end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \isPreprints{}{% This command is only used for ``preprints''.

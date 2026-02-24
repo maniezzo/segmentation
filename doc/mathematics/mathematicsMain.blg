@@ -7,45 +7,45 @@ Reallocating 'name_of_file' (item size: 1) to 20 items.
 Database file #1: mathematicsMain.bib
 Warning--empty journal in PRSS25
 Warning--empty year in M24
-You've used 24 entries,
+You've used 25 entries,
             2887 wiz_defined-function locations,
-            733 strings with 7728 characters,
-and the built_in function-call counts, 9413 in all, are:
-= -- 844
-> -- 481
+            737 strings with 7959 characters,
+and the built_in function-call counts, 9805 in all, are:
+= -- 872
+> -- 518
 < -- 17
-+ -- 217
-- -- 128
-* -- 765
-:= -- 1415
-add.period$ -- 74
-call.type$ -- 24
-change.case$ -- 24
-chr.to.int$ -- 24
-cite$ -- 27
-duplicate$ -- 469
-empty$ -- 814
-format.name$ -- 173
-if$ -- 2023
++ -- 233
+- -- 138
+* -- 799
+:= -- 1479
+add.period$ -- 77
+call.type$ -- 25
+change.case$ -- 25
+chr.to.int$ -- 25
+cite$ -- 28
+duplicate$ -- 487
+empty$ -- 839
+format.name$ -- 185
+if$ -- 2102
 int.to.chr$ -- 1
-int.to.str$ -- 24
-missing$ -- 26
-newline$ -- 123
-num.names$ -- 73
-pop$ -- 240
+int.to.str$ -- 25
+missing$ -- 27
+newline$ -- 128
+num.names$ -- 76
+pop$ -- 254
 preamble$ -- 0
-purify$ -- 24
+purify$ -- 25
 quote$ -- 0
-skip$ -- 283
+skip$ -- 295
 stack$ -- 0
-substring$ -- 442
-swap$ -- 113
+substring$ -- 444
+swap$ -- 116
 text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 159
+type$ -- 166
 warning$ -- 2
-while$ -- 81
+while$ -- 83
 width$ -- 0
-write$ -- 297
+write$ -- 308
 (There were 2 warnings)
