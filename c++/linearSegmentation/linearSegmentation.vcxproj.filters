@@ -30,6 +30,9 @@
     <ClCompile Include="cplexMIP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="hexalyMIP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="json.h">
@@ -45,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cplexMIP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hexalyMIP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

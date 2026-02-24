@@ -2,6 +2,7 @@
 #include "linearSegmentation.h"
 #include "gurobiMIP.h"
 #include "cplexMIP.h"
+#include "hexalyMIP.h"
 #include "json.h"
 
 // checks the feasibility of a solution
@@ -1077,8 +1078,9 @@ bool entryExists(string filename, string& name, string& costFun)
 
 int main(int argc, char** argv)
 {  bool   fLagrangian = false;
-   bool   fGurobi     = true;
-   bool   fCPLEX      = !(fLagrangian || fGurobi);
+   bool   fGurobi     = false;
+   bool   fHexaly     = true;
+   bool   fCPLEX      = !(fLagrangian || fGurobi || fHexaly);
    int    solstat, n_brk=-1;
    double objval=-1, tCpuOpt, cost = 0;
 
@@ -1171,6 +1173,9 @@ int main(int argc, char** argv)
       }
       else if(fGurobi)
       {  x = goGurobi(y,lstOLS,ntot);
+      }
+      else if(fHexaly)
+      {  x = goHexaly(y,lstOLS,ntot);
       }
       else if(fCPLEX)
          x = goCPLEX(y,lstOLS,ntot);
