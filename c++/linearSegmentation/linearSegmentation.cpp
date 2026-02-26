@@ -1179,24 +1179,22 @@ int main(int argc, char** argv)
       {
          idcost = idc;
          switch (idcost)
-         {
-         case 0: costFunc = "costR2";     break;
-         case 1: costFunc = "costMSE";    break;
-         case 2: costFunc = "costChi2";   break;
-         case 3: costFunc = "costSER";    break;
-         case 4: costFunc = "costVar";    break;
-         case 5: costFunc = "costRMSE";   break;
-         case 6: costFunc = "costQRMSE";  break;
-         case 7: costFunc = "costQRMSEn"; break;
-         case 8: costFunc = "costAIC"; break;
-         case 9: costFunc = "costBIC"; break;
-         default: cout<<"ERROR 1"<<endl;
+         {  case 0: costFunc = "costR2";     break;
+            case 1: costFunc = "costMSE";    break;
+            case 2: costFunc = "costChi2";   break;
+            case 3: costFunc = "costSER";    break;
+            case 4: costFunc = "costVar";    break;
+            case 5: costFunc = "costRMSE";   break;
+            case 6: costFunc = "costQRMSE";  break;
+            case 7: costFunc = "costQRMSEn"; break;
+            case 8: costFunc = "costAIC"; break;
+            case 9: costFunc = "costBIC"; break;
+            default: cout<<"ERROR 1"<<endl;
          }
 
          string runsFileName = baseDir+dsName+costFunc+"_runs.csv";
          if (entryExists("risultati.csv", dsName, costFunc, (f3_4 ? idrow : -1)))
-         {
-            cout<<dsName<<" "<<costFunc<<"_"<<(f3_4 ? to_string(idrow) : "-1")<<" Istanza gia' risolta"<<endl;
+         {  cout<<dsName<<" "<<costFunc<<"_"<<(f3_4 ? to_string(idrow) : "-1")<<" Istanza gia' risolta"<<endl;
             continue;
          }
 
@@ -1229,8 +1227,7 @@ int main(int argc, char** argv)
             f.close();
          }
          else
-         {
-            lstOLS = computeRuns(minlag, y, idcost);
+         {  lstOLS = computeRuns(minlag, y, idcost);
             writeListOLS(lstOLS, dsName); // write csv file with candidate segments
          }
 
@@ -1254,18 +1251,15 @@ int main(int argc, char** argv)
             goto TERMINATE;
          }
          else if (fGurobi)
-         {
-            x = goGurobi(y, lstOLS, ntot);
+         {  x = goGurobi(y, lstOLS, ntot);
          }
          else if (fHexaly)
-         {
-            x = goHexaly(y, lstOLS, ntot);
+         {  x = goHexaly(y, lstOLS, ntot);
          }
          else if (fCPLEX)
             x = goCPLEX(y, lstOLS, ntot);
          else
-         {
-            cout<<"Manca il solver"<<endl;
+         {  cout<<"Manca il solver"<<endl;
             goto TERMINATE;
          }
 
