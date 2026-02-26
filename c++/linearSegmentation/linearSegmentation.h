@@ -21,4 +21,4 @@ bool checkFeas(vector<int> sol, vector<tuple<int, int, double, double, double>> 
 double calculateRSS(const std::vector<double>& y, const std::vector<double>& y_pred);
 tuple<int, int, double, double, double> costAIC(int low, int up, vector<double> y);
 tuple<int, int, double, double, double> costBIC(int low, int up, vector<double> y);
-bool entryExists(string& filename, string& name, string& costFun);
+bool entryExists(string& filename, string& name, string& costFun, int idrow = -1);

@@ -4,5 +4,7 @@
 	"maxIter" : 500,
 	"maxTime" : 300,
     "idcost"  : 6,    "commentCost"  : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC",
-	"solver"  : "h",  "commentSolver": " c cplex, g gurobi, h hexaly"
+	"solver"  : "h",  "commentSolver": " c cplex, g gurobi, h hexaly",
+	"ntot"    : 10,   "commentNtot"  : "max numero di segmenti accettato",
+	"minlength": 8,   "commentMinl"  : "min numero fi punti in un segmento"
 }
