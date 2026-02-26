@@ -1,7 +1,8 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "M6\\USDJPY",
+	"dsName"  : "mathtests\\M3_4_sample",
 	"maxIter" : 500,
 	"maxTime" : 300,
-    "idcost"  : 6,    "commentCost" : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC"
+    "idcost"  : 6,    "commentCost"  : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC",
+	"solver"  : "h",  "commentSolver": " c cplex, g gurobi, h hexaly"
 }

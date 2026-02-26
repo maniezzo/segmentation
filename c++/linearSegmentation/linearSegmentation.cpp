@@ -156,6 +156,39 @@ l0:      cont++;
    return n;
 }
 
+int readM3_4(string dataFileName, vector<int>& X, vector<double>& Y, int idrow)
+{  int i, cont, id,n=0;
+   double d;
+   string line;
+   vector<string> elem;
+
+   // leggo i punti
+   ifstream f;
+   string dataSetFile = dataFileName;
+   cout << "Opening datafile " << dataSetFile << endl;
+   f.open(dataSetFile);
+   if (f.is_open())
+   {
+      getline(f, line);  // headers
+      cout << line << endl;
+      elem = split(line, ',');
+
+      while (getline(f, line))
+      {  cont = 0;
+         elem = split(line, ',');
+         id = stoi(elem[0]);
+         X.push_back(id);
+         d = stod(elem[1]);
+         Y.push_back(d);
+l0:      cont++;
+   }
+   f.close();
+   n = Y.size();  // number of input records
+   }
+   else cout << "Cannot open dataset input file\n";
+   return n;
+}
+
 // OLS line through vector of points
 tuple<double,double> linearRegression(vector<int> x, vector<double> y)
 {  int n, i;
@@ -1044,6 +1077,7 @@ int readConfig()
 
    baseDir = JSV["basedir"].ToString();
    dsName  = JSV["dsName"].ToString();
+   solver  = JSV["solver"].ToString()[0];
    maxIter = JSV["maxIter"].ToInt();
    maxTime = JSV["maxTime"].ToInt();
    idcost  = JSV["idcost"].ToInt();
@@ -1078,9 +1112,9 @@ bool entryExists(string filename, string& name, string& costFun)
 
 int main(int argc, char** argv)
 {  bool   fLagrangian = false;
-   bool   fGurobi     = true;
+   bool   fGurobi     = false;
    bool   fHexaly     = false;
-   bool   fCPLEX      = !(fLagrangian || fGurobi || fHexaly);
+   bool   fCPLEX      = false;
    int    solstat, n_brk=-1;
    double objval=-1, tCpuOpt, cost = 0;
 
@@ -1108,9 +1142,17 @@ int main(int argc, char** argv)
          default: cout << "ERROR 1" << endl;
       }
 
+      switch (solver)
+      {  case 'c': fCPLEX  = true; break;
+         case 'g': fGurobi = true; break;
+         case 'h': fHexaly = true; break;
+         case 'l': fLagrangian = true; break;
+         default : cout << "ERROR 2" << endl; break;
+      }
+
       double alpha = 0.05;
       string dataFile = baseDir + dsName + ".csv";
-      string segmentFileName = baseDir + dsName + "_runs.csv";
+      string runsFileName = baseDir + dsName + costFunc + "_runs.csv";
       if(entryExists("risultati.csv",dsName,costFunc))
       {  cout << dsName << " " << costFunc << " Istanza gia' risolta" << endl;
          continue;
@@ -1120,17 +1162,22 @@ int main(int argc, char** argv)
       vector<double> x,y;
       vector<tuple<int, int, double, double, double>> lstOLS;
 
-      n = readData(dataFile, ids, y);
+      if (dsName.find("M3_4_series")!=std::string::npos) 
+      {
+         n = readM3_4(dataFile, ids, y, 1);
+      } 
+      else 
+         n = readData(dataFile, ids, y);
+
       cout << "read " << n << " values" << endl;
       int minlag = max(10, n / 20);
 
       tstart = clock();
 
       // se segmenti già calcolati li legge, altrimenti li calcola
-      ifstream f(baseDir + dsName + "Z_runs.csv");
+      ifstream f(baseDir + dsName + costFunc + "_runs.csv");
       if(f.good())
-      {  
-         string line;
+      {  string line;
          getline(f, line); // headers
          while (getline(f, line)) 
          {

@@ -1,7 +1,8 @@
 #include "global.h"
-std::string baseDir = "";
-std::string dsName = "";
-std::vector<std::vector<int>> colids;
-std::vector<std::vector<int>> rowids;
+string baseDir = "";
+string dsName = "";
+char solver = 'h';
+vector<vector<int>> colids;
+vector<vector<int>> rowids;
 int maxIter = 0;
 int maxTime = 0;
