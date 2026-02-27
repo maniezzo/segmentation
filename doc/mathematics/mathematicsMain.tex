@@ -501,31 +501,57 @@ The computational results reported here, still to be considered as preliminary, 
 The sensed variables used here are: the steam pressure (Vapor-Pressure-Avg), the average wind speed (WS-ms-Avg), water temperature measured by a thermistor at the depth of 0.5m (ThermTemp1-Avg), water temperature measured by oximeter at different depths (1m - Wtemp-C1-Avg, 3m - Wtemp-C2-Avg), water temperature measured by conductimeter at the depth of 1m (SDI-Temp-1m), minimum current in the battery (IBatt-Min), average and maximum temperature obtained by a datalogger panel temp thermocouple (PTemp-C-Avg, PTemp-C-Max) and average charging voltage (V-in-chg-Avg). The overall dataset was recorded from August 2022 to April 2023.
 We complemented these datasets with two others from different domains: economics (bitcoin-US dollar exchange rate, BTC-USD) and healthcare (COVID infections in Italy, Covid-Italia-22) to get a first indication of the generality of the approach across domains.
 
+
 \begin{table}[H]
-	\centering
-	%\raggedleft
-\caption{Data series results}\label{tab:series}%
-%\begin{adjustwidth}{-\extralength}{0cm}
-\begin{tabular}{@{}ccccccrrr}
+\centering
+\caption{Data series results, QRMSE cost}\label{tab:seriesQRMSE}%
+\begin{tabular}{@{}cllrrrrrrrr}
 \toprule
-{\it Dataseries}	& {\it npoints} & {\it nruns} & {\it nsegm} & {\it truns} & {\it tsolve} & {\it QMSE} & {\it QMSE1} & {\it QMSE2}\\
+Benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm & max.nsegm & avg.t & max.t \\
 \midrule
-Vapor-Pressure-Avg   &  194 &  15400 &  6 &  0 &    1 &    0.90 &  1.14 & 1.03\\
-Vapor-Pressure-Avg-2 & 1139 & 618828 &  7 & 30 &  832 &    2.85 &  3.26 & 3.32 \\
-WS-ms-Avg            & 1139 & 618828 &  2 & 30 & 1136 &     162 &193.03 &210.80 \\
-ThermTemp1-Avg       &  194 &  15400 &  8 &  0 &    1 &    5.12 &  5.98 & na* \\
-Wtemp-C1-Avg         & 1139 & 618828 & 19 & 30 & 1212 &   13.89 & 22.63 & na* \\
-Wtemp-C2-Avg         &  194 &  15400 &  8 &  0 &    1 &   50.75 & 68.15 & na*\\
-SDI-Temp-1m          & 1139 & 618828 & 21 & 30 & 1354 &   15.06 & 25.06 & na* \\
-IBatt-Min            &  194 &  15400 &  3 &  0 &    1 & 3.19e-3 & 5.29e-3 & 3.27e-3 \\
-PTemp-C-Avg          &  194 &  15400 &  5 &  0 &    1 &   46.40 & 68.56 & 58.12 \\
-PTemp-C-Max          &  194 &  15400 &  4 &  0 &    1 &  114.24 &139.61 & 125.09 \\
-V-in-chg-Avg         &  194 &  15400 &  2 &  0 &    1 &    9.20 &  9.38 & 9.38 \\
-BTC-USD              &  366 &  60378 & 12 &  3 &    4 &  1.88e7 &7.51e7 & 2.42e7 \\
-Covid-Italia-22      &  507 & 109746 &  5 &  - &   11 & 5070.95 &    na & na \\
+		M3 & Demographic  & QRMSE & 122.6 & 138 & 7073.2 & 8646 & 3.8 & 7 & 0.6 & 1 \\
+		M3 & Finance      & QRMSE & 124.8 & 144 & 7267.6 & 9453 & 3.6 & 9 & 0 & 0 \\
+		M3 & Industry     & QRMSE & 139 & 144 & 8789.2 & 9453 & 1 & 1 & 0 & 0 \\
+		M3 & Macro        & QRMSE & 128 & 144 & 7532.2 & 9453 & 2 & 5 & 0 & 0 \\
+		M3 & Micro        & QRMSE & 91.8 & 126 & 4027.8 & 7140 & 1 & 1 & 0 & 0 \\
+		M3 & Other        & QRMSE & 80.8 & 120 & 2952.2 & 6441 & 3.4 & 6 & 0 & 0 \\
+		M4 & Demographic & QRMSE & 241.8 & 735 & 54101.2 & 245350 & 4 & 7 & 57.6 & 288 \\
+		M4 & Finance & QRMSE & 246 & 738 & 54945.4 & 247456 & 6.2 & 10 & 61.6 & 308 \\
+		M4 & Industry & QRMSE & 258.4 & 737 & 56492 & 246753 & 4.6 & 7 & 60 & 298 \\
+		M4 & Macro & QRMSE & 280 & 866 & 74559.8 & 339900 & 5.6 & 10 & 106.6 & 532 \\
+		M4 & Micro & QRMSE & 232.8 & 737 & 53371.2 & 246753 & 2.8 & 7 & 58.4 & 292 \\
+		M4 & Other & QRMSE & 260.4 & 701 & 53106.2 & 222778 & 4.8 & 10 & 57.6 & 286 \\
+		M6 & Finance & QRMSE & 265 & 367 & 32627.1 & 61423 & 3.1 & 7 & 7.6 & 25 \\
 \bottomrule
 \end{tabular}
 %\end{adjustwidth}
+\end{table}
+
+
+
+\begin{table}[H]
+	\centering
+	\caption{Data series results, AIC cost}\label{tab:seriesAIC}%
+	\begin{tabular}{@{}cllrrrrrrrr}
+		\toprule
+		Benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm & max.nsegm & avg.t & max.t \\
+		\midrule
+		M3 & Demographic  & AIC & 122.6 & 138 & 7073.2 & 8646 & 9.4 & 10 & 0.2 & 1 \\
+		M3 & Finance      & AIC & 124.8 & 144 & 7267.6 & 9453 & 9.6 & 10 & 0 & 0 \\
+		M3 & Industry     & AIC & 139 & 144 & 8789.2 & 9453 & 10 & 10 & 0 & 0 \\
+		M3 & Macro        & AIC & 128 & 144 & 7532.2 & 9453 & 10 & 10 & 0 & 0 \\
+		M3 & Micro        & AIC & 91.8 & 126 & 4027.8 & 7140 & 6.6 & 10 & 0 & 0 \\
+		M3 & Other        & AIC & 80.8 & 120 & 2952.2 & 6441 & 7.4 & 9 & 0 & 0 \\
+		M4 & Demographic & AIC & 241.8 & 735 & 54101.2 & 245350 & 10 & 10 & 58.4 & 292 \\
+		M4 & Finance & AIC & 246 & 738 & 54945.4 & 247456 & 10 & 10 & 65.2 & 325 \\
+		M4 & Industry & AIC & 258.4 & 737 & 56492 & 246753 & 8.8 & 10 & 62.4 & 310 \\
+		M4 & Macro & AIC & 280 & 866 & 74559.8 & 339900 & 10 & 10 & 105.8 & 528 \\
+		M4 & Micro & AIC & 232.8 & 737 & 53371.2 & 246753 & 10 & 10 & 60.4 & 302 \\
+		M4 & Other & AIC & 260.4 & 701 & 53106.2 & 222778 & 10 & 10 & 57.8 & 285 \\
+		M6 & Finance & AIC & 265 & 367 & 32627.1 & 61423 & 9.3 & 10 & 7.7 & 26 \\
+		\bottomrule
+	\end{tabular}
+	%\end{adjustwidth}
 \end{table}
 
 
