@@ -480,10 +480,6 @@ Typical global constraints include:
 		L_w \le \sum_{t \in W} d_t \le U_w,
 	\end{equation}
 	where $W$  is the time interval. These constraints regulate the distribution of changepoints over the entire series.
-		
-		
-
-
 	
 \end{itemize}
 
@@ -668,16 +664,16 @@ The results are summarized in table \ref{tab:series}. The columns show the name 
 
 \begin{figure*}[ht]
     \centering
-    \subfloat[Average temperature]{%
-        \includegraphics[width=0.45\textwidth]{PTemp_C_AvgCostVar.eps}
+    \subfloat[AIC cost segmentation]{%
+        \includegraphics[width=0.45\textwidth]{N2745-costAIC}
         \label{fig:temperature}%
         }%
     \hfill%
-    \subfloat[Minimum battery current]{%
-        \includegraphics[width=0.45\linewidth]{IBatt_MinCostVar.eps}%
+    \subfloat[QRMSE cost segmentation]{%
+        \includegraphics[width=0.45\linewidth]{N2745-costQRMSE}%
         \label{fig:battery}%
         }%
-    \caption{Environmental dataseries}
+    \caption{Segmentations derived from different costs, M3 dataseries N2745"}
     \label{fig:environ}
 \end{figure*}
 
@@ -688,14 +684,14 @@ The results are summarized in table \ref{tab:series}. The columns show the name 
 		\begin{adjustwidth}{-\extralength}{0cm}
 			\centering
 			%} % If the paper is ``preprints'', please uncomment this parenthesis.
-		\subfloat[\centering]{\includegraphics[width=5.0cm]{IBatt_MinCostVar.eps}}
+		\subfloat[\centering]{\includegraphics[width=6.0cm]{N2602-costQRMSE.eps}}
 		%\hfill
-		\subfloat[\centering]{\includegraphics[width=5.0cm]{IBatt_MinCostVar.eps}}\\
-		\subfloat[\centering]{\includegraphics[width=5.0cm]{IBatt_MinCostVar.eps}}
+		\subfloat[\centering]{\includegraphics[width=6.0cm]{N1901-costQRMSE.eps}}\\
+		\subfloat[\centering]{\includegraphics[width=6.0cm]{N2219-costQRMSE.eps}}
 		%\hfill
-		\subfloat[\centering]{\includegraphics[width=5.0cm]{IBatt_MinCostVar.eps}}
+		\subfloat[\centering]{\includegraphics[width=6.0cm]{Q10414-costQRMSE.eps}}
 		\end{adjustwidth}
-	\caption{This is a wide figure. Schemes follow the same formatting. If there are multiple panels, they should be listed as: (\textbf{a}) Description of what is contained in the first panel. (\textbf{b}) Description of what is contained in the second panel. (\textbf{c}) Description of what is contained in the third panel. (\textbf{d}) Description of what is contained in the fourth panel. Figures should be placed in the main text near to the first time they are cited. A caption on a single line should be centered.\label{fig2}}
+	\caption{Different dataseries categories (\textbf{a}) Financial. (\textbf{b}) Industry. (\textbf{c}) Macroeconomics. (\textbf{d}) Microeconomics.\label{fig2}}
 \end{figure}
 
 
