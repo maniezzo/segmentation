@@ -116,11 +116,11 @@ Fischetti, M.; Lodi, A.; Salvagnin, D.
   Vo{\ss}, S., Eds.; Springer,  2009; Vol.~10, {\em Annals of Information
   Systems}, pp. 1--20.
 
-\bibitem[Maniezzo()]{M24}
+\bibitem[Maniezzo(2024)]{M24}
 Maniezzo, V.
 \newblock Extended Set Covering for Time Series Segmentation.
 \newblock In Proceedings of the 15th Metaheuristics International Conference,
-  MIC 2024; Saveaux, M., Ed. Springer, Vol. 14753, {\em Lecture Notes in
+  MIC 2024; Saveaux, M., Ed. Springer,  2024, Vol. 14753, {\em Lecture Notes in
   Computer Science}, pp. 193.--199.
 
 \bibitem[Maniezzo et~al.(2021)Maniezzo, Boschetti, and St{\"u}tzle]{the_book}
@@ -135,12 +135,28 @@ Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
 \newblock A Log-Linear Time Algorithm for Constrained Changepoint Detection.
 \newblock {\em arXiv preprint arXiv:1703.03352} {\bf 2017}.
 
+\bibitem[Yao(1988)]{Y88}
+Yao, Y.C.
+\newblock Estimating the number of change-points via Schwarz' criterion.
+\newblock {\em Statistics \& Probability Letters} {\bf 1988}, {\em
+  6},~181--189.
+
 \bibitem[Tibshirani et~al.(2005)Tibshirani, Saunders, Rosset, Zhu, and
   Knight]{tibshirani2005sparsity}
 Tibshirani, R.; Saunders, M.; Rosset, S.; Zhu, J.; Knight, K.
 \newblock Sparsity and smoothness via the fused lasso.
 \newblock {\em Journal of the Royal Statistical Society: Series B (Statistical
   Methodology)} {\bf 2005}.
+
+\bibitem[Bai and Perron(1998)]{BP98}
+Bai, J.; Perron, P.
+\newblock Estimating and Testing Linear Models with Multiple Structural
+  Changes.
+\newblock {\em Econometrica} {\bf 1998}, {\em 66},~47--78.
+
+\bibitem[Rossi et~al.(2006)Rossi, van Beek, and Walsh]{RBW06}
+Rossi, F.; van Beek, P.; Walsh, T., Eds.
+\newblock {\em Handbook of Constraint Programming}; Elsevier,  2006.
 
 \bibitem[sma()]{smartlagoon}
 The Smartlagoon Project.

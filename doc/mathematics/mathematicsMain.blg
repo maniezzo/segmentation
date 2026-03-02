@@ -6,46 +6,45 @@ The style file: Definitions/mdpi.bst
 Reallocating 'name_of_file' (item size: 1) to 20 items.
 Database file #1: mathematicsMain.bib
 Warning--empty journal in PRSS25
-Warning--empty year in M24
-You've used 25 entries,
+You've used 28 entries,
             2887 wiz_defined-function locations,
-            737 strings with 7959 characters,
-and the built_in function-call counts, 9805 in all, are:
-= -- 872
-> -- 518
-< -- 17
-+ -- 233
-- -- 138
-* -- 799
-:= -- 1479
-add.period$ -- 77
-call.type$ -- 25
-change.case$ -- 25
-chr.to.int$ -- 25
-cite$ -- 28
-duplicate$ -- 487
-empty$ -- 839
-format.name$ -- 185
-if$ -- 2102
+            759 strings with 8305 characters,
+and the built_in function-call counts, 10833 in all, are:
+= -- 961
+> -- 565
+< -- 19
++ -- 254
+- -- 150
+* -- 879
+:= -- 1637
+add.period$ -- 85
+call.type$ -- 28
+change.case$ -- 28
+chr.to.int$ -- 28
+cite$ -- 30
+duplicate$ -- 543
+empty$ -- 939
+format.name$ -- 204
+if$ -- 2327
 int.to.chr$ -- 1
-int.to.str$ -- 25
-missing$ -- 27
-newline$ -- 128
-num.names$ -- 76
-pop$ -- 254
+int.to.str$ -- 28
+missing$ -- 30
+newline$ -- 142
+num.names$ -- 86
+pop$ -- 279
 preamble$ -- 0
-purify$ -- 25
+purify$ -- 28
 quote$ -- 0
-skip$ -- 295
+skip$ -- 324
 stack$ -- 0
-substring$ -- 444
-swap$ -- 116
+substring$ -- 486
+swap$ -- 126
 text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 166
-warning$ -- 2
-while$ -- 83
+type$ -- 184
+warning$ -- 1
+while$ -- 91
 width$ -- 0
-write$ -- 308
-(There were 2 warnings)
+write$ -- 344
+(There was 1 warning)

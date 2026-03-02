@@ -146,8 +146,8 @@ In summary, existing optimal CPD models exhibit a clear trade-off between comput
 The proposed SC-CPD framework occupies a complementary position in this landscape. By combining a set-covering formulation with modern MILP techniques and problem-specific preprocessing, it delivers global optimality while substantially expanding the class of constraints that can be handled in a principled and scalable manner. This positions SC-CPD as a flexible and extensible optimization framework for changepoint detection in applications where global structure and domain-specific requirements play a central role.
 
 
-\section{An extended set covering model}  \label{sec:SCPmodel}
-The model adopts a set partitioning perspective: all subsequences satisfying predefined structural properties—termed feasible runs—are generated and scored according to a segment-specific quality metric. The segmentation problem is then formulated as the selection of a collection of runs that forms a partition of the time index set while optimizing a global objective function based on residual loss or model fit. The resulting mixed-integer linear program provides a flexible framework in which additional modeling requirements can be seamlessly encoded via linear constraints and handled by state-of-the-art MIP solvers \cite{FLS09}.
+\section{Partitioning and extended set covering models}  \label{sec:SCPmodel}
+The problem can be naturally modeled according with a set partitioning perspective: all subsequences satisfying predefined structural properties—termed feasible runs—are generated and scored according to a segment-specific quality metric, subject to an addivity cost assumption. The segmentation problem is then formulated as the selection of a collection of runs that forms a partition of the time index set while optimizing a global objective function based on residual loss or model fit. The resulting mixed-integer linear program provides a flexible framework in which additional modeling requirements can be seamlessly encoded via linear constraints and handled by state-of-the-art MIP solvers \cite{FLS09}.
 
 A Set Partitioning Problem (SPP) lies at the core of the formulation. The objective is to minimize an aggregate residual-based cost, while the constraints enforce that each time index of the series is covered exactly once by the selected segments. No restriction is imposed on the functional form of the segment model: it may consist of linear regression (yielding piecewise linear regression), but also of nonlinear or nonparametric specifications. Moreover, different runs may be associated with different model classes without altering the structure of the optimization problem.
 
@@ -197,191 +197,14 @@ Importantly, although QRMSE is additive across segments and can therefore be use
 	\label{fig:costfunctions}
 \end{figure}
 
-\subsection{Global series constraints}    \label{subsec:globconstraints}
+\subsection{Additional constraints}  \label{subsec:additional_constraints}
 
 The literature proposed many constraints that could be requested on the single segments of the model or on the whole modelled series.
-Typical constraints on single segments include
-
-\begin{itemize}
-	\item Minimum spacing between changepoints: Enforce a global minimum gap (e.g., at least L points between any two changepoints) to prevent over-fragmentation of the series.
-	\item Boundary exclusion: Disallow changepoints too close to the start or end (e.g., first/last K points), ensuring stable estimation at boundaries.
-	\item Seasonal/calendar alignment: Restrict changepoints to a predefined set of admissible positions (e.g., month-ends, business-cycle markers), imposing global positional structure.
-	\item Equal or bounded segment sizes: Require near-equal segment lengths or bound length variability (e.g., max/min segment length ratio), affecting the global partition shape.
-	\item Group sparsity on positions: Impose structured sparsity over candidate positions (e.g., block or clustered positions), selecting changepoints from predefined groups globally.
-	\item Template matching: Require changepoint positions to follow a given motif (e.g., known intervention schedule) with limited deviations across the whole timeline.
-\end{itemize}
-
 
 Many changepoint frameworks encode these ideas via global penalization rather than hard constraints—using penalties on the number of changepoints ({\it L0}), total variation ({\it L1}), or graph-structured transitions that enforce sign alternation or monotone regimes across the entire sequence. These approaches provide a way to control global behaviors, such as roughness or regime structure, and are usually implemented by dynamic programming or specialized algorithm limiting the possibility to flexibly expand the proposed model.
 
 These are the constraints that "operate over the whole segmentation" and are discussed in the global constraint catalogues and CP-based changepoint detection literature (Beldiceanu, Régin; O'Hearn; Gionis; Killick; etc.), as well as in bioinformatics segmentation and shape-constrained segmentation. The main global constraints identified in the segmentation literature (CP + changepoint detection + structural break models) are:
 
-\begin{itemize}
-	\item Segment-count constraints (you already use); In MIP: $\sum d_t \leq K$.
-	\item Constraints on the distribution of segment lengths (global AMONG/NVALUES) Global-length constraint	Constraint on the multiset of segment lengths, not per-segment one-by-one:
-	(a) Total length equality (trivial): $\sum length_i = T$
-		But more interesting:
-	(b) Length profile constraints
-	Examples seen in CP segmentation papers:
-	AMONG/LENGTH-NVALUES constraints on the set of lengths
-	e.g., number of distinct segment lengths leq L
-	SUM of lengths in certain categories, e.g.:
-	number of long segments $\leq \alpha$, number of short segments $\leq \beta$.
-	\item Constraints on the global pattern of changes (REGULAR, PEAK/VALLY count) Used in shape-constrained segmentation, speech segmentation, and bioinformatics.
-	A peak is an increase followed by a decrease in segment means (or vice versa).
-	Global constraint: $PEAK_COUNT \leq P$.
-	\item Global monotonicity or global shape constraints. Not per segment, but a global pattern constraint:
-	Entire segmentation must be monotone nondecreasing, or
-	Must follow a user-specified pattern (e.g., up → plateau → down). 
-	Define a finite automaton over segment types (increasing, decreasing, stationary).
-	Segments must form a string in that language.
-	Examples:
-	No "up–down–up–down" oscillations beyond a pattern.
-	Must alternate increase/decrease in a specific regular pattern.
-	Change types must follow periodic structure (e.g., stable → volatile → stable).
-	\item Global cost budgets / global total variation constraints. A constraint on the sum of segment costs, similar to a global knapsack or global linear constraint:
-	Sum of all segment penalties leq B
-	Sum of divergences leq B
-	Total variation leq B (global TV constraint)
-	\item Global constraint on number of distinct regimes. Constraint: Number of unique $regimes \leq R$.
-	Used in regime-switching, hidden-state segmentation, and multiple-change models.
-	\item Global maxima/minima on segment attributes (e.g., amplitude range). $Max jump \leq \Delta_max$,
-	$Min jump \leq \Delta_min$,
-	Or bound the range of all segment means:	$max(\mu_i) – min(\mu_i) \leq R$.
-	\item Global forbidden-pattern constraints. A global constraint that forbids entire patterns:
-	No more than $\alpha$ alternations of direction.
-	No pattern like “short–long–short” repeated.
-	Prevent certain segment-type sequences entirely.
-	This is essentially a global pattern-avoidance constraint
-	\item Global window-based count constraints. If each segment has some attribute $a_i$ (e.g., slope, variance, change point score), enforce:
-	$\sum a_i \leq A$,
-	or$ A_min \leq \sum a_i \leq A_max$.
-	Examples in segmentation:
-	Global constraint on total curvature.
-	Global constraint on total number of outliers explained by segmentation.
-	Constraint on total misfit.
-	\item Global constraints on total curvature or total slope
-	\item Minimum / maximum number of "episodes" of a type
-	For multi-type segmentation (e.g., up/down/flat segments):
-	At most K episodes of type “up”, regardless of length.
-	At least M episodes of type “stable”.
-	This is global: it refers to the entire labeling.
-	\item Global domain-specific constraints
-	Found in applied changepoint papers in ecology, neuroscience, econometrics:
-	At most one structural break per season / per macro-regime
-	(the “season” or “macro-regime” spans multiple segments; still a global constraint)
-	Segments must align with known block boundaries, but only globally
-	(global periodicity constraints)
-	At most one changepoint in the entire first half of the series
-	(windowed-global count constraints)
-\end{itemize}
-
-
-Constraints for changepoint sets (	MERGE WITH ABOVE)
-\begin{itemize}
-	\item Minimum/maximum number of changepoints: ensure at least / at most a certain number to avoid under-segmentation in known nonstationary contexts.
-	\item Total variation budget: Constrain the sum of absolute jump magnitudes across all changepoints to be below a threshold, controlling global roughness.
-	\item Net drift constraint: Enforce that the signed sum of jumps equals a specified value (e.g., zero), ensuring the process starts/ends at comparable levels. Endpoint level constraints: Constrain the final level to lie within a target range relative to the initial level (e.g., bounded net change), coupling start/end globally.
-	\item Maximum total jump magnitude: Cap the aggregate absolute change across all changepoints, distinct from the count of changepoints.
-	\item Monotonic episode limits: Allow only a bounded number of monotone episodes (e.g., at most M runs of nondecreasing levels), acting globally over segments.
-	\item Parity or count constraints: Enforce an even/odd number of changepoints, or fixed counts of specific jump types (e.g., exactly R upward jumps).
-	\item Total penalty budget: Instead of a fixed penalty per changepoint, constrain the sum of penalties (data-adaptive or position-weights), globally bounding the objective’s regularization.
-	\item Symmetry constraints: Enforce symmetry of changepoint locations around the series midpoint, or mirrored jump magnitudes, for symmetric processes.
-	\item Multi-scale consistency: Enforce that changepoints persist across coarse-to-fine aggregations (e.g., daily to weekly), selecting positions robust globally.
-	\item Robustness-to-outliers budget: Limit the number of changepoints attributable to isolated spikes by bounding the cumulative outlier-attributed evidence globally.
-\end{itemize}
-
-1) Global pattern constraints (e.g., up–down constraints across all segments)
-
-Reference
-
-Hocking, T. D., Rigaill, G., Fearnhead, P., \& Bourque, G. (2017). A Log-Linear Time Algorithm for Constrained Changepoint Detection. arXiv:1703.03352.
-— Constrained changepoint detection with affine constraints on adjacent segment means (e.g., up–down patterns). 
-arXiv
-
-How it maps
-This work imposes global constraints across the segmentation (not per segment) on the relative direction of adjacent changes and shows how to incorporate them in an optimal detection algorithm. It’s widely cited for global directional constraints on changepoint sequences.
-
-2) Global structural constraints / regular patterns under a global formulation (higher-level constrained segmentation)
-
-Reference
-
-Hocking, T. D., Rigaill, G., Fearnhead, P., \& Bourque, G. (2018). Generalized Functional Pruning Optimal Partitioning (GFPOP) for Constrained Changepoint Detection in Genomic Data. arXiv:1810.00117.
-— Generalizes the pattern constraints to alternate up–down and other affine constraints across the whole segmentation. 
-arXiv
-
-How it maps
-The GFPOP work formalizes global constraints across segments as state transitions in a constrained model, allowing regular patterns across the entire solution rather than isolated local rules.
-
-3) Penalized global cost / budget constraints on segmentation
-
-While not always referred to as a global constraint in a CP sense, the core idea of a total budget / global penalty on the segmentation as a whole (affecting number of changepoints / model selection) is formalized in classic changepoint frameworks:
-
-Reference (classical)
-
-Killick, R., Fearnhead, P., \& Eckley, I. A. (2012). Optimal Detection of Changepoints With a Linear Computational Cost. Journal of the American Statistical Association.
-— Introduces the PELT algorithm with a global penalty on number of changepoints. (You can also cite the Arxiv pdf preprint if needed.)
-(PMCID not available, but widely known in the literature.)
-
-Related reference
-
-Yao, Y. C. (1988). Estimating the Number of Change-Points via Schwarz’ Criterion. Statistics \& Probability Letters.
-— Framework for selecting number of changepoints via information criteria (global cost consideration).
-
-These works treat the number of segments / overall penalty as part of the global optimization rather than a per-segment constraint.
-
-4) Global structural break frameworks (econometrics)
-
-Although econometric “structural break” models are not always couched as CP/MIP constraints, they formalize global constraints on the solution such as at most m structural breaks, with simultaneous estimation of break locations:
-
-Reference (foundational)
-
-Bai, J., \& Perron, P. (1998). Estimating and Testing Linear Models With Multiple Structural Changes. Econometrica, 66(1), 47–78.
-— Provides methods for global estimation of multiple structural breaks with explicit control on the number of breaks. 
-Boston University
-
-Follow-up survey
-
-Casini, A., \& Perron, P. (2018). Structural Breaks in Time Series. Oxford Research Encyclopedia of Economics and Finance.
-— A comprehensive review including multiple break estimation and tests. 
-Boston University
-
-These capture global constraints on the entire segmentation such as the number and joint locations of breaks.
-
-Constraint Programming Global Constraint References
-
-These are general global constraints (REGULAR, NVALUES, AMONG, etc.) that could be adapted to enforce whole-solution properties in a segmentation model:
-
-Reference (core text)
-
-Rossi, F., van Beek, P., \& Walsh, T. (Eds.). (2006). Handbook of Constraint Programming. Elsevier, ISBN: 978-0-444-52726-4.
-— Surveys global constraints (e.g., REGULAR for sequence patterns, global count constraints) across variables. 
-cs.uwaterloo.ca
-
-From the handbook you can specifically cite chapters on:
-
-REGULAR constraint — constrains a sequence of decision variables to be accepted by a finite automaton (global pattern constraint).
-
-NVALUES / AMONG / COUNT constraints — constrain global counts / distinct values of sets of variables.
-
-(The Handbook entry lists these as global constraint types; you can cite the appropriate chapter when applying them to segmentation.)
-
-Summary of Types and Representative References
-Constraint type	Representative reference	Notes
-Global up–down pattern / affine constraints	Hocking et al. (2017) arXiv:1703.03352	Changepoint detection with global constraints on adjacent segments. 
-arXiv
-
-General global segmented pattern / regular structure	Hocking et al. (2018) arXiv:1810.00117	GFPOP extends global pattern constraints over all segments. 
-arXiv
-
-Global cost / penalty budget	Killick et al. (2012), Yao (1988)	PELT penalized optimization, information criteria.
-Global selection of breaks	Bai \& Perron (1998) Econometrica	Structural break global model constraints. 
-Boston University
-
-Global CP constraints (REGULAR, COUNT, etc.)	Rossi et al. (2006) Handbook of Constraint Programming	Catalog of global constraints that can enforce global structure. 
-cs.uwaterloo.ca
-
-\subsection{Additional constraints}  \label{subsec:additional_constraints}
 
 In many real-world applications, the analyst is not only interested in minimizing a fitting error, but also in enforcing interpretable and domain-driven properties on the resulting segmentation.
 The literature proposed many constraints that could be requested on the single segments of the model or on the whole modelled series.
@@ -393,15 +216,15 @@ Segment-level constraints restrict the admissible properties of each segment ind
 Let a segment be defined by its start and end indices $(s,e)$, with length $\ell_{s,e} = e - s + 1$, slope $\beta_{s,e}$ (in the case of linear regression), and fitting cost $c_{s,e}$. 
 Typical segment-level constraints include:
 \begin{itemize}
-	
 	\item Minimum and maximum segment length.
-	Bounds on the length of each segment prevent over-fragmentation and excessively long segments. In optimal partitioning approaches,  minimum segment size constraints can be naturally incorporated. For instance, the PELT algorithm proposed in \cite{KFE12} allows restricting the set of admissible segmentations by enforcing a lower bound on segment length. This constraint is expressed as
+	Bounds on the length of each segment (minimum spacing between changepoints) prevent over-fragmentation and excessively long segments In optimal partitioning approaches,  minimum segment size constraints can be naturally incorporated. For instance, the PELT algorithm proposed in \cite{KFE12} allows restricting the set of admissible segmentations by enforcing a lower bound on segment length. This constraint is expressed as
 	\begin{equation}
 		\ell_{\min} \leq e - s + 1 \leq \ell_{\max}.
 	\end{equation}
 	Minimum segment length constraints are commonly imposed in exact and approximate changepoint detection methods through parameters such as \texttt{min-size}.
 	
-	\item Minimum spacing between changepoints.
+	Minimum spacing between changepoints. UGUALE A PRIMA
+	
 	Enforce a minimum gap of at least $L$ points between consecutive changepoints. Some methods such as PELT \cite{KFE12} accomodate this type of restriction by limiting admissible segment endpoints according to a predefined minimum segment size. This constraint can be written as
 	    \begin{equation}
 		e - s + 1 \geq L ,
@@ -426,7 +249,16 @@ Typical segment-level constraints include:
 	    \begin{equation}
 		s,e \in \mathcal{A}.
 	\end{equation}
-	These restrictions are useful both for computational efficiency and for incorporating prior structural information into the segmentation model.
+	These restrictions are useful both for computational efficiency and for incorporating prior structural information into the segmentation model. 	
+	
+	Template matching (UGUALE A PRIMA?): Require changepoint positions to follow a given motif (e.g., known intervention schedule) with limited deviations across the whole timeline.
+	
+	
+	\item Boundary exclusion: Disallow changepoints too close to the start or end (e.g., first/last K points), ensuring stable estimation at boundaries.
+	
+	\item Equal or bounded segment sizes: Require near-equal segment lengths or bound length variability (e.g., max/min segment length ratio), affecting the global partition shape. (GLOBALE SE NON SO PRIMA LA LUNGHEZZA; LOCALE SE LA SO)
+	
+	
 \end{itemize}
 
 \subsubsection{Global series constraints} \label{subsubsec:global_series_constraints}
@@ -450,7 +282,8 @@ Typical global constraints include:
 	\begin{equation}
 		\sum_{j} c_j x_j \le B,
 	\end{equation}
-	where $c_j$ denotes the cost of segment $j$. This formulation corresponds to the constrained counterpart of penalized segmentation model \cite{KFE12}, obtained via Lagrangian duality.
+	where $c_j$ denotes the cost of segment $j$. This formulation corresponds to the constrained counterpart of penalized segmentation model \cite{KFE12}, obtained via Lagrangian duality. Analogously, \cite{Y88} proposes a framework for selecting number of changepoints via information criteria.
+	
 	
 	\item Global total variation.
 	A bound on the aggregate magnitude of all changes across the series:
@@ -467,12 +300,60 @@ Typical global constraints include:
 	or follow a predefined shape such as up-down or down-up. These constraints impose a structural pattern on the whole segmentation.
 	Monotonicity-constrained segmentation and related shape-restricted models are studied in \cite{hocking2017constrained}.
 	
+	Global monotonicity or global shape constraints. Not per segment, but a global pattern constraint:
+	Entire segmentation must be monotone nondecreasing, or
+	Must follow a user-specified pattern (e.g., up → plateau → down). 
+	Define a finite automaton over segment types (increasing, decreasing, stationary).
+	Segments must form a string in that language.
+	Examples:
+	No "up–down–up–down" oscillations beyond a pattern.
+	Must alternate increase/decrease in a specific regular pattern.
+	Change types must follow periodic structure (e.g., stable → volatile → stable).
+	
+	ALSO Monotonic episode limits: Allow only a bounded number of monotone episodes (e.g., at most M runs of nondecreasing levels), acting globally over segments.
+	
+	ALSO Symmetry constraints: Enforce symmetry of changepoint locations around the series midpoint, or mirrored jump magnitudes, for symmetric processes. ($x_t = x_{n-t}$)	
+	
+	
 	\item Global pattern constraints on change directions.
 	Constraints on the sequence of increase/decrease signs across all changepoints, such as limiting the number of alternations or enforcing a regular pattern:
 	\begin{equation}
 		\text{ALT\_COUNT} \le A_{\max}.
 	\end{equation}
 	Pattern constraints on the directions of successive changes, including enforced up-down alternation (PeakSeg model) are explicitly formulated via dynamic programming in \cite{hocking2017constrained}.
+	
+	Constraints on the global pattern of changes (REGULAR, PEAK/VALLY count) Used in shape-constrained segmentation, speech segmentation, and bioinformatics.
+   A peak is an increase followed by a decrease in segment means (or vice versa).
+   Global constraint: $PEAK_COUNT \leq P$.
+	
+	Global pattern constraints (e.g., up–down constraints across all segments) 	
+	
+	Reference
+	
+	Hocking, T. D., Rigaill, G., Fearnhead, P., \& Bourque, G. (2017). A Log-Linear Time Algorithm for Constrained Changepoint Detection. arXiv:1703.03352.
+	— Constrained changepoint detection with affine constraints on adjacent segment means (e.g., up–down patterns). 
+	arXiv
+	
+	How it maps
+	This work imposes global constraints across the segmentation (not per segment) on the relative direction of adjacent changes and shows how to incorporate them in an optimal detection algorithm. It’s widely cited for global directional constraints on changepoint sequences.
+	
+	ALSO Global structural constraints / regular patterns under a global formulation (higher-level constrained segmentation)
+	
+	Reference
+	
+	Hocking, T. D., Rigaill, G., Fearnhead, P., \& Bourque, G. (2018). Generalized Functional Pruning Optimal Partitioning (GFPOP) for Constrained Changepoint Detection in Genomic Data. arXiv:1810.00117.
+	— Generalizes the pattern constraints to alternate up–down and other affine constraints across the whole segmentation. 
+	arXiv
+	
+	How it maps
+	The GFPOP work formalizes global constraints across segments as state transitions in a constrained model, allowing regular patterns across the entire solution rather than isolated local rules.
+	
+	ALSO IN THE NEGATIVE Global forbidden-pattern constraints. A global constraint that forbids entire patterns:
+	No more than $\alpha$ alternations of direction.
+	No pattern like “short–long–short” repeated.
+	Prevent certain segment-type sequences entirely.
+	This is essentially a global pattern-avoidance constraint
+	
 	
 	\item Window-based global count constraints.
 	Bounds on the number of changepoints within large predefined windows:
@@ -481,7 +362,31 @@ Typical global constraints include:
 	\end{equation}
 	where $W$  is the time interval. These constraints regulate the distribution of changepoints over the entire series.
 	
+	
+	\item Global structural break frameworks (econometrics)
+	
+	Although econometric “structural break” models are not always couched as CP/MIP constraints, they formalize global constraints on the solution such as at most m structural breaks, with simultaneous estimation of break locations:
+	
+	Reference (foundational) \cite{BP98} Provides methods for global estimation of multiple structural breaks with explicit control on the number of breaks. 
+	
+	Follow-up survey
+	
+	Casini, A., \& Perron, P. (2018). Structural Breaks in Time Series. Oxford Research Encyclopedia of Economics and Finance.
+	— A comprehensive review including multiple break estimation and tests. 
+	Boston University
+	
+	These capture global constraints on the entire segmentation such as the number and joint locations of breaks.
+	
 \end{itemize}
+
+QUESTO NON C'ENTRA MOLTO Global constraint on number of distinct regimes. Constraint: Number of unique $regimes \leq R$.
+Used in regime-switching, hidden-state segmentation, and multiple-change models.
+
+QUESTO NON VA CON OLS Net drift constraint: Enforce that the signed sum of jumps equals a specified value (e.g., zero), ensuring the process starts/ends at comparable levels. Endpoint level constraints: Constrain the final level to lie within a target range relative to the initial level (e.g., bounded net change), coupling start/end globally.
+
+	
+
+Finally, we point out that the explicit modelling of such constraints can, in most cases, be effectively achieved also using constraint programming techniques \cite{RBW06}. Constraint programming is deeply rooted in mathematical programming itself, and in recent years the two areas have arguably moved closer to one another. In particular, for global CPD constraints, one can exploit classical constraint programming constructs such as {\it regular}, which enforces that a sequence of decision variables is accepted by a finite automaton, or global constraints such as {\it nvalues} or {\it count}, which bound, respectively, the number of distinct values or the occurrences of specific values across a set of variables. Nevertheless, mixed‑integer programming remains a more general and flexible modelling framework, capable of accommodating a broader range of constraints than current constraint‑programming systems.
 
 \section{Computational experience} 			\label{sec:computation}
 
