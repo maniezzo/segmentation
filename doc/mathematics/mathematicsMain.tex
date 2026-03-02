@@ -199,25 +199,21 @@ Importantly, although QRMSE is additive across segments and can therefore be use
 
 \subsection{Additional constraints}  \label{subsec:additional_constraints}
 
-The literature proposed many constraints that could be requested on the single segments of the model or on the whole modelled series.
-
+In many real-world applications, the analyst is not only interested in minimizing a fitting error, but also in enforcing interpretable and domain-driven properties on the resulting segmentation.
 Many changepoint frameworks encode these ideas via global penalization rather than hard constraints—using penalties on the number of changepoints ({\it L0}), total variation ({\it L1}), or graph-structured transitions that enforce sign alternation or monotone regimes across the entire sequence. These approaches provide a way to control global behaviors, such as roughness or regime structure, and are usually implemented by dynamic programming or specialized algorithm limiting the possibility to flexibly expand the proposed model.
 
-These are the constraints that "operate over the whole segmentation" and are discussed in the global constraint catalogues and CP-based changepoint detection literature (Beldiceanu, Régin; O'Hearn; Gionis; Killick; etc.), as well as in bioinformatics segmentation and shape-constrained segmentation. The main global constraints identified in the segmentation literature (CP + changepoint detection + structural break models) are:
+These are the constraints that "operate over the whole segmentation" and are discussed in the global constraint catalogues and changepoint detection literature (Beldiceanu, Régin; O'Hearn; Gionis; Killick; etc.), as well as in application papers spanning different areas, including bioinformatics, econometerics, signal processing among others. 
 
+For the sake of our discussion, it is important to distinguish between two classes of constraints: those that affect the feasibility of individual segments independently of the remainder of the sequence, and those that impose conditions on the sequence as a whole. Constraints in the first class can be naturally incorporated into the segment generation process and are readily accommodated within dynamic programming frameworks. In contrast, constraints in the second class require the introduction of additional state variables to track global properties, thereby increasing the computational burden of dynamic programming approaches.
 
-In many real-world applications, the analyst is not only interested in minimizing a fitting error, but also in enforcing interpretable and domain-driven properties on the resulting segmentation.
-The literature proposed many constraints that could be requested on the single segments of the model or on the whole modelled series.
-
-\subsubsection{Segment-level constraints} \label{subsubsec:segment_level_constraint}
+\subsubsection{Local segment constraints} \label{subsubsec:segment_level_constraint}
 
 Segment-level constraints restrict the admissible properties of each segment independently of the rest of the segmentation. 
 
 Let a segment be defined by its start and end indices $(s,e)$, with length $\ell_{s,e} = e - s + 1$, slope $\beta_{s,e}$ (in the case of linear regression), and fitting cost $c_{s,e}$. 
 Typical segment-level constraints include:
 \begin{itemize}
-	\item Minimum and maximum segment length.
-	Bounds on the length of each segment (minimum spacing between changepoints) prevent over-fragmentation and excessively long segments In optimal partitioning approaches,  minimum segment size constraints can be naturally incorporated. For instance, the PELT algorithm proposed in \cite{KFE12} allows restricting the set of admissible segmentations by enforcing a lower bound on segment length. This constraint is expressed as
+	\item {\it Minimum and maximum segment length}.	Bounds on the length of each segment (minimum spacing between changepoints) prevent over-fragmentation and excessively long segments In optimal partitioning approaches,  minimum segment size constraints can be naturally incorporated. For instance, the PELT algorithm proposed in \cite{KFE12} allows restricting the set of admissible segmentations by enforcing a lower bound on segment length. This constraint is expressed as
 	\begin{equation}
 		\ell_{\min} \leq e - s + 1 \leq \ell_{\max}.
 	\end{equation}
@@ -230,21 +226,21 @@ Typical segment-level constraints include:
 		e - s + 1 \geq L ,
 	\end{equation}
 	
-	\item Slope constraints.
+	\item {\it Slope constraints}.
 	When segments are modeled via linear regression, constraints can be imposed on segment-specific parameters, such as the slope $\beta_{s,e}$. In particular, constrained changepoint detection under affine inequality restrictions between segment parameters has been studied in \cite{hocking2017constrained}. Typical examples include bounded slopes, 
 	\begin{equation}
 		|\beta_{s,e}| \leq \beta_{\max},
 	\end{equation}
 	or directional constraints enforcing locally non-decreasing or non-increasing behavior. 
 	
-	\item Boundary exclusion.
+	\item {\it Boundary exclusion}.
 	Changepoints can be disallowed in the first and last $K$ observations of the series to ensure stable parameter estimation. This can be enforced by restricting admissible start and end indices:
 	    \begin{equation}
 		s \geq K + 1 \quad \text{and} \quad e \leq N - K ,
 	\end{equation}
 	where $N$ denotes the length of the series.
 	
-	\item Admissible breakpoint positions.
+	\item {\it Admissible breakpoint positions}.
 	Changepoints may be restricted to a predefined set $\mathcal{A} \subseteq \{1,\dots,N\}$  of admissible positions, such as calendar or seasonal markers. For example, in the Ruptures framework \cite{TOV20} , the jump parameter enforces that changepoints can only be selected on a subsampled grid of indices, effectively reducing the admissible set of breakpoint locations. In this case, segment boundaries must satisfy:
 	    \begin{equation}
 		s,e \in \mathcal{A}.
@@ -253,11 +249,7 @@ Typical segment-level constraints include:
 	
 	Template matching (UGUALE A PRIMA?): Require changepoint positions to follow a given motif (e.g., known intervention schedule) with limited deviations across the whole timeline.
 	
-	
-	\item Boundary exclusion: Disallow changepoints too close to the start or end (e.g., first/last K points), ensuring stable estimation at boundaries.
-	
-	\item Equal or bounded segment sizes: Require near-equal segment lengths or bound length variability (e.g., max/min segment length ratio), affecting the global partition shape. (GLOBALE SE NON SO PRIMA LA LUNGHEZZA; LOCALE SE LA SO)
-	
+	\item {\it Equal or bounded segment sizes}: Require near-equal segment lengths or bound length variability (e.g., max/min segment length ratio), affecting the global partition shape. (GLOBALE SE NON SO PRIMA LA LUNGHEZZA; LOCALE SE LA SO)
 	
 \end{itemize}
 
