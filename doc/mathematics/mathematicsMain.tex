@@ -157,10 +157,12 @@ The resulting Time Series Set Partitioning (TSSP) model is defined as follows. L
 
 \begin{alignat}{4}
 	(TSSP) \hspace{0.5cm} z_{TSSC} = \min &\; \sum_{j=1}^{nruns} c_j x_{j}  \label{eq:SCPobj} \\
-	s.t. &\; \sum_{j=1}^{nruns}a_{ij}x_{j} \geq 1, & \hspace{1.5cm} i=1,\dots,npoints  \label{eq:SCPcov} \\
+	s.t. &\; \sum_{j=1}^{nruns}a_{ij}x_{j} = 1, & \hspace{1.5cm} i=1,\dots,npoints  \label{eq:SCPcov} \\
 	&\; \sum_{j=1}^{nruns} x_{j} = maxruns \label{eq:SPPext}\\
 	&\; x_j \in \{0,1\}, &\; j=1,\dots,nruns  \label{eq:SCPvar}
 \end{alignat}
+
+Additional variables can be included in the model associating them with the $X$ decision variables, for example it is possible to associate the starting time $s_i$, the end time $e_i$ with each variable $x_i \in X$. While redundant in this formulation, they might become important to express the constraints listed in subsection \ref{subsec:additional_constraints}.
 
 Unfortunately, in real-world applications the number of feasible runs can be very large, making the resulting SPP computationally demanding and, in some cases, intractable within acceptable time limits. From a polyhedral perspective, the set partitioning formulation is typically tighter but also harder to explore computationally, as the equality constraints induce a more restrictive feasible region and a combinatorially demanding branching structure. To mitigate this issue, we relax the equality constraints \ref{eq:SPPext} into inequalities, thereby transforming the formulation into a Set Covering Problem (SCP). The covering polyhedron is generally easier to handle algorithmically and can be solved in significantly larger dimensions, albeit with a weaker linear programming relaxation. 
 
@@ -170,7 +172,6 @@ State-of-the-art MIP solvers are highly effective on SCP formulations; however, 
 The resulting Lagrangian model is solved via a subgradient optimization scheme. The corresponding Lagrangian subproblem is computationally simple: at each iteration, it amounts to selecting at most the $maxruns$ variables with the most negative reduced costs. A simple fixing heuristic is embedded within the procedure: the incumbent solution of the subproblem, which may be infeasible with respect to the relaxed covering constraints, is iteratively augmented by adding selected variables until feasibility is restored. This relaxation makes it possible to easily include constraints such as the maximum number of segments allowed. However, in most cases, additional constraints must be added to the subproblem or relaxed themselves, which makes the approach impractical.
 
 In any case, after solving a set covering relaxation, postprocessing is required to transform any SCP solution into a feasible SPP segmentation. This can be accomplished in linear time by scanning each region of overlapping runs and identifying the splitting point that minimizes the total cost obtained by assigning the preceding observations to the preceding segment and the subsequent observations to the following segment.
-
 
 \subsection{Cost function}		\label{subsec:costfunc}
 
@@ -219,13 +220,8 @@ Typical segment-level constraints include:
 	\end{equation}
 	Minimum segment length constraints are commonly imposed in exact and approximate changepoint detection methods through parameters such as \texttt{min-size}.
 	
-	Minimum spacing between changepoints. UGUALE A PRIMA
-	
-	Enforce a minimum gap of at least $L$ points between consecutive changepoints. Some methods such as PELT \cite{KFE12} accomodate this type of restriction by limiting admissible segment endpoints according to a predefined minimum segment size. This constraint can be written as
-	    \begin{equation}
-		e - s + 1 \geq L ,
-	\end{equation}
-	
+	Some methods such as PELT \cite{KFE12} enforce a minimum gap of at least $L$ points between consecutive changepoints also by limiting admissible segment endpoints according to a predefined minimum segment size. 
+		
 	\item {\it Slope constraints}.
 	When segments are modeled via linear regression, constraints can be imposed on segment-specific parameters, such as the slope $\beta_{s,e}$. In particular, constrained changepoint detection under affine inequality restrictions between segment parameters has been studied in \cite{hocking2017constrained}. Typical examples include bounded slopes, 
 	\begin{equation}
@@ -247,136 +243,65 @@ Typical segment-level constraints include:
 	\end{equation}
 	These restrictions are useful both for computational efficiency and for incorporating prior structural information into the segmentation model. 	
 	
-	Template matching (UGUALE A PRIMA?): Require changepoint positions to follow a given motif (e.g., known intervention schedule) with limited deviations across the whole timeline.
-	
-	\item {\it Equal or bounded segment sizes}: Require near-equal segment lengths or bound length variability (e.g., max/min segment length ratio), affecting the global partition shape. (GLOBALE SE NON SO PRIMA LA LUNGHEZZA; LOCALE SE LA SO)
+	\item {\it Equal or bounded segment sizes}: Require near-equal segment lengths or bound length variability (e.g., max/min segment length ratio), affecting the global partition shape. This constraint acts locally when the acceptable lengths are known as inputs, but become global constraints when they have to be identified during optimization.
 	
 \end{itemize}
 
 \subsubsection{Global series constraints} \label{subsubsec:global_series_constraints}
 
 In constrast to segment-level constraints, global series constraints impose conditions that couple multiple segments and operate on the segmentation as a whole. 
-Mixed-Integer Programming formulations naturally support this class of constraints through linear inequalities linking multiple segment-selection variables.
+Mixed-Integer Programming formulations naturally support this class of constraints through possibly linear inequalities linking multiple segment-selection variables.
 
 Let $d_t \in \{0,1\}$ be the changepoint indicator at position $t$, and let $K$ be the total number of segments. 
 
-Typical global constraints include:
+Global constraints that were mentioned in the literature include:
 \begin{itemize}
-	\item Global bound on the number of segments.
+	\item {\it Global bound on the number of segments}.
 	A global bound on the number of selected segments controls the overall model complexity. This constraint can be written as 
 	\begin{equation}
-		\sum_t d_t \le K_{\max}.
+		\sum_t d_t \le n_{\max}.
 	\end{equation}
 	Constrained dynamic programming algorithms under this setting are discussed in \cite{hocking2017constrained}.
 	
-	\item Global budget on segmentation cost. 
+	\item {\it Global budget on segmentation cost}. 
 	The total cost of the segmentation can be bounded:
 	\begin{equation}
 		\sum_{j} c_j x_j \le B,
 	\end{equation}
-	where $c_j$ denotes the cost of segment $j$. This formulation corresponds to the constrained counterpart of penalized segmentation model \cite{KFE12}, obtained via Lagrangian duality. Analogously, \cite{Y88} proposes a framework for selecting number of changepoints via information criteria.
+	where $c_j$ denotes the cost of segment $j$. This constraint can be seen as the constrained version of penalized segmentation model, which is then relaxed in a Lagrangian fashion to obtain the penalized model \cite{KFE12}. 
+	A framework for selecting number of changepoints via information criteria is also proposed in \cite{Y88}.
 	
-	
-	\item Global total variation.
-	A bound on the aggregate magnitude of all changes across the series:
+	\item {\it Global total variation}.
+	A similar global constraint places a bound on the aggregate magnitude of all changes across the series:
 	\begin{equation}
 		\sum_{t} |\mu_{t^+} - \mu_{t^-}| \le C_{\max},
 	\end{equation}
-	where $\mu_{t^-}$ and $\mu_{t^+}$ denote the segment parameters before and after a changepoint. This constraint controls the overall amount of structural variation in the segmentation and limits the cumulative magnitude of successive jumps between adjacent segment parameters. It is closely related to total variation regularization and to the fused lasso formulation of \cite{tibshirani2005sparsity}, where an $\ell_1$ penalty is applied to successive parameter differences. 
-	
-	\item Global monotonicity or shape constraint.
-	The entire sequence of segment parameters must satisfy a prescribed global ordering,
+	where $\mu_{t^-}$ and $\mu_{t^+}$ denote the segment parameters before and after a changepoint. This constraint controls the overall amount of structural variation in the segmentation and limits the cumulative magnitude of successive jumps between adjacent segment parameters. It is closely related to total variation regularization and to the lasso formulation of \cite{tibshirani2005sparsity}, where a penalty is applied to successive parameter differences. 
+
+	\item {\it Global shape constraints (monotonicity, convexity, symmetry).}
+	These constraints impose structural properties on the segmentation as a whole, rather than on individual segments.
+	For instance, global monotonicity or convexity can be enforced by requiring the sequence of segment parameters to satisfy a prescribed ordering, such as
 	\begin{equation}
 		\mu_1 \le \mu_2 \le \dots \le \mu_K,
 	\end{equation}
-	or follow a predefined shape such as up-down or down-up. These constraints impose a structural pattern on the whole segmentation.
-	Monotonicity-constrained segmentation and related shape-restricted models are studied in \cite{hocking2017constrained}.
+	thereby ensuring a nondecreasing evolution of segment means. More generally, convexity or concavity can be imposed by constraining first or second differences of the segment parameters to follow a specified sign pattern.
 	
-	Global monotonicity or global shape constraints. Not per segment, but a global pattern constraint:
-	Entire segmentation must be monotone nondecreasing, or
-	Must follow a user-specified pattern (e.g., up → plateau → down). 
-	Define a finite automaton over segment types (increasing, decreasing, stationary).
-	Segments must form a string in that language.
-	Examples:
-	No "up–down–up–down" oscillations beyond a pattern.
-	Must alternate increase/decrease in a specific regular pattern.
-	Change types must follow periodic structure (e.g., stable → volatile → stable).
+	A related formulation limits the number of monotone episodes across the segmentation. For example, one may allow at most $n_r$ runs of consecutive nondecreasing (or nonincreasing) segments, thereby restricting the global alternation of trends.
 	
-	ALSO Monotonic episode limits: Allow only a bounded number of monotone episodes (e.g., at most M runs of nondecreasing levels), acting globally over segments.
+	Symmetry constraints also fall within this class. These may require changepoint locations to be symmetric with respect to the midpoint of the series, or impose mirrored jump magnitudes, as appropriate for symmetric processes (e.g., $x_t = x_{n-t}$).
 	
-	ALSO Symmetry constraints: Enforce symmetry of changepoint locations around the series midpoint, or mirrored jump magnitudes, for symmetric processes. ($x_t = x_{n-t}$)	
+	\item {\it Global pattern constraints on change directions.}
+	These constraints require the sequence of segment transitions to follow a prescribed qualitative pattern. For example, the model may be forced to follow a structure such as increase–plateau–decrease, to alternate increases and decreases in a regular manner, or to follow a periodic regime sequence (e.g., stable–volatile–stable). Similarly, one may regulate the occurrence of peaks, where a peak is defined as an increase in segment means immediately followed by a decrease.
 	
-	
-	\item Global pattern constraints on change directions.
-	Constraints on the sequence of increase/decrease signs across all changepoints, such as limiting the number of alternations or enforcing a regular pattern:
-	\begin{equation}
-		\text{ALT\_COUNT} \le A_{\max}.
-	\end{equation}
-	Pattern constraints on the directions of successive changes, including enforced up-down alternation (PeakSeg model) are explicitly formulated via dynamic programming in \cite{hocking2017constrained}.
-	
-	Constraints on the global pattern of changes (REGULAR, PEAK/VALLY count) Used in shape-constrained segmentation, speech segmentation, and bioinformatics.
-   A peak is an increase followed by a decrease in segment means (or vice versa).
-   Global constraint: $PEAK_COUNT \leq P$.
-	
-	Global pattern constraints (e.g., up–down constraints across all segments) 	
-	
-	Reference
-	
-	Hocking, T. D., Rigaill, G., Fearnhead, P., \& Bourque, G. (2017). A Log-Linear Time Algorithm for Constrained Changepoint Detection. arXiv:1703.03352.
-	— Constrained changepoint detection with affine constraints on adjacent segment means (e.g., up–down patterns). 
-	arXiv
-	
-	How it maps
-	This work imposes global constraints across the segmentation (not per segment) on the relative direction of adjacent changes and shows how to incorporate them in an optimal detection algorithm. It’s widely cited for global directional constraints on changepoint sequences.
-	
-	ALSO Global structural constraints / regular patterns under a global formulation (higher-level constrained segmentation)
-	
-	Reference
-	
-	Hocking, T. D., Rigaill, G., Fearnhead, P., \& Bourque, G. (2018). Generalized Functional Pruning Optimal Partitioning (GFPOP) for Constrained Changepoint Detection in Genomic Data. arXiv:1810.00117.
-	— Generalizes the pattern constraints to alternate up–down and other affine constraints across the whole segmentation. 
-	arXiv
-	
-	How it maps
-	The GFPOP work formalizes global constraints across segments as state transitions in a constrained model, allowing regular patterns across the entire solution rather than isolated local rules.
-	
-	ALSO IN THE NEGATIVE Global forbidden-pattern constraints. A global constraint that forbids entire patterns:
-	No more than $\alpha$ alternations of direction.
-	No pattern like “short–long–short” repeated.
-	Prevent certain segment-type sequences entirely.
-	This is essentially a global pattern-avoidance constraint
-	
-	
-	\item Window-based global count constraints.
-	Bounds on the number of changepoints within large predefined windows:
-	\begin{equation}
-		L_w \le \sum_{t \in W} d_t \le U_w,
-	\end{equation}
-	where $W$  is the time interval. These constraints regulate the distribution of changepoints over the entire series.
-	
-	
-	\item Global structural break frameworks (econometrics)
-	
-	Although econometric “structural break” models are not always couched as CP/MIP constraints, they formalize global constraints on the solution such as at most m structural breaks, with simultaneous estimation of break locations:
-	
-	Reference (foundational) \cite{BP98} Provides methods for global estimation of multiple structural breaks with explicit control on the number of breaks. 
-	
-	Follow-up survey
-	
-	Casini, A., \& Perron, P. (2018). Structural Breaks in Time Series. Oxford Research Encyclopedia of Economics and Finance.
-	— A comprehensive review including multiple break estimation and tests. 
-	Boston University
-	
-	These capture global constraints on the entire segmentation such as the number and joint locations of breaks.
-	
+	Such constraints may either enforce a specific pattern or restrict its complexity (e.g., by bounding the number of direction alternations) \cite{HRFB22}. They can also be formulated negatively as forbidden-pattern constraints, excluding certain global configurations. Examples include limiting the total number of alternations to at most $n_a$, or forbidding recurring structures such as repeated “short–long–short” segment sequences. These formulations amount to global pattern-avoidance constraints on the segmentation.
+
+	\item {\it Global structural break frameworks} (econometrics).	
+	Econometric “structural break” models can be seen as global constraints, as they formalize constraints on the solution such as maximum number of structural breaks, with simultaneous estimation of break locations \cite{BP98, CP19}. 
 \end{itemize}
 
-QUESTO NON C'ENTRA MOLTO Global constraint on number of distinct regimes. Constraint: Number of unique $regimes \leq R$.
-Used in regime-switching, hidden-state segmentation, and multiple-change models.
+The above lists are not intended to be exhaustive of all possible requirements that may be imposed on time series segmentation problems; rather, they are restricted to constraints that can be incorporated within an extension of our current modeling framework. For example, a global constraint on the number of distinct regimes—commonly used in regime-switching models and implemented in systems such as SETAR \cite{TL90}—would require an explicit regime identification mechanism, which is not presently supported by our framework.
 
-QUESTO NON VA CON OLS Net drift constraint: Enforce that the signed sum of jumps equals a specified value (e.g., zero), ensuring the process starts/ends at comparable levels. Endpoint level constraints: Constrain the final level to lie within a target range relative to the initial level (e.g., bounded net change), coupling start/end globally.
-
-	
+Similarly, certain global structural constraints, such as net drift constraints that enforce the signed sum of jumps to equal a specified value (e.g., zero), thereby ensuring that the process begins and ends at comparable levels, are not directly accommodated. Ensuring feasibility under such requirements would necessitate a joint search over segmentations and model parameters. In particular, restricting the search to a set of a priori fitted segments would be insufficient; instead, parameter optimization would need to be performed within the segmentation procedure itself.
 
 Finally, we point out that the explicit modelling of such constraints can, in most cases, be effectively achieved also using constraint programming techniques \cite{RBW06}. Constraint programming is deeply rooted in mathematical programming itself, and in recent years the two areas have arguably moved closer to one another. In particular, for global CPD constraints, one can exploit classical constraint programming constructs such as {\it regular}, which enforces that a sequence of decision variables is accepted by a finite automaton, or global constraints such as {\it nvalues} or {\it count}, which bound, respectively, the number of distinct values or the occurrences of specific values across a set of variables. Nevertheless, mixed‑integer programming remains a more general and flexible modelling framework, capable of accommodating a broader range of constraints than current constraint‑programming systems.
 
@@ -498,11 +423,15 @@ Unlike Dynp and Pelt, WBS does not guarantee global optimality with respect to a
 
 \subsection{Benchmarking and Comparative Performance} \label{subsec:benchmarking}
 
-The computational results reported here, still to be considered as preliminary, are mainly obtained on environmental monitoring data series, which initially prompted this research. The series were produced in the context of the SMARTLAGOON project, an EU H2020 project, born with the primary objective of developing a tool to allow real-time monitoring, analysis, to predict socio-environmental evolution of the vulnerable area {\it Mar Menor}, which is the largest saltwater coastal lagoon in Europe. \cite{smartlagoon}. Within the framework of the project, smart buoys were deployed in the lagoon and their sensors generated series on 12 attributes.
+The computational results are presented on a selection of time series drawn from the M3, M4, and M6 forecasting competitions. These datasets originate from the well-known Makridakis (M) competitions \cite{MH79}, which constitute one of the most influential large-scale benchmarking initiatives in forecasting research. Because of their size, diversity, and public availability, the M-competition datasets have become standard testbeds for evaluating methodological advances in time series analysis and forecasting. The M5 dataset was not included due to the substantially greater length of its daily series and its large hierarchical structure, which would require computational and modeling adaptations beyond the focus of this work.
 
-The sensed variables used here are: the steam pressure (Vapor-Pressure-Avg), the average wind speed (WS-ms-Avg), water temperature measured by a thermistor at the depth of 0.5m (ThermTemp1-Avg), water temperature measured by oximeter at different depths (1m - Wtemp-C1-Avg, 3m - Wtemp-C2-Avg), water temperature measured by conductimeter at the depth of 1m (SDI-Temp-1m), minimum current in the battery (IBatt-Min), average and maximum temperature obtained by a datalogger panel temp thermocouple (PTemp-C-Avg, PTemp-C-Max) and average charging voltage (V-in-chg-Avg). The overall dataset was recorded from August 2022 to April 2023.
-We complemented these datasets with two others from different domains: economics (bitcoin-US dollar exchange rate, BTC-USD) and healthcare (COVID infections in Italy, Covid-Italia-22) to get a first indication of the generality of the approach across domains.
+The M3 competition, conducted in 2000, comprised 3,003 real-world time series of varying frequencies (yearly, quarterly, monthly, and others) drawn from domains such as economics, finance, industry, and demography. The heterogeneity of the M3 dataset—both in terms of series length and underlying dynamics—makes it particularly suitable for assessing the robustness of segmentation and structural change detection procedures.
 
+The M4 competition, concluded in 2018, significantly expanded the scale of the benchmark to 100,000 series, again covering multiple sampling frequencies (yearly, quarterly, monthly, weekly, daily, and hourly). The M4 dataset includes both macroeconomic and microeconomic indicators, financial series, demographic data, and other business-related measurements. 
+
+More recently, the M6 competition (2022) focused on financial time series and incorporated ex-ante forecasting in a real-time setting and emphasized portfolio construction and risk-aware evaluation. The dataset primarily consists of financial asset returns and related variables, thereby introducing features such as higher volatility, regime shifts, and structural breaks that are particularly relevant for changepoint detection methodologies.
+
+Together, the M3, M4, and M6 benchmarks offer a diverse and demanding experimental framework. By evaluating our approach on selected series from these competitions, we aim to assess its effectiveness across different domains, sample sizes, and structural regimes representative of real-world forecasting applications. The tests were run on 5 randomly selected series for each category in M3 and M4, and on 10 series of M6 drawn from the different asset categories in the benchmark set.
 
 \begin{table}[H]
 \centering

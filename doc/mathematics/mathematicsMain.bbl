@@ -148,20 +148,37 @@ Tibshirani, R.; Saunders, M.; Rosset, S.; Zhu, J.; Knight, K.
 \newblock {\em Journal of the Royal Statistical Society: Series B (Statistical
   Methodology)} {\bf 2005}.
 
+\bibitem[Hocking et~al.(2022)Hocking, Rigaill, Fearnhead, and Bourque]{HRFB22}
+Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
+\newblock Generalized Functional Pruning Optimal Partitioning (GFPOP) for
+  Constrained Changepoint Detection in Genomic Data.
+\newblock {\em Journal of Statistical Software} {\bf 2022}, {\em 101},~1–31.
+
 \bibitem[Bai and Perron(1998)]{BP98}
 Bai, J.; Perron, P.
 \newblock Estimating and Testing Linear Models with Multiple Structural
   Changes.
 \newblock {\em Econometrica} {\bf 1998}, {\em 66},~47--78.
 
+\bibitem[Casini and Perron(2019)]{CP19}
+Casini, A.; Perron, P.
+\newblock Structural Breaks in Time Series,  2019.
+
+\bibitem[Tong and Lim(1980)]{TL90}
+Tong, H.; Lim, K.S.
+\newblock Threshold autoregression, limit cycles, and cyclical data.
+\newblock {\em Journal of the Royal Statistical Society: Series B
+  (Methodological)} {\bf 1980}, {\em 42},~245–292.
+
 \bibitem[Rossi et~al.(2006)Rossi, van Beek, and Walsh]{RBW06}
 Rossi, F.; van Beek, P.; Walsh, T., Eds.
 \newblock {\em Handbook of Constraint Programming}; Elsevier,  2006.
 
-\bibitem[sma()]{smartlagoon}
-The Smartlagoon Project.
-\newblock \url{https://www.smartlagoon.eu/}.
-\newblock Accessed December 2023.
+\bibitem[Makridakis and Hibon(1979)]{MH79}
+Makridakis, S.; Hibon, M.
+\newblock Accuracy of forecasting: An empirical investigation.
+\newblock {\em Journal of the Royal Statistical Society, Series A} {\bf 1979},
+  {\em 142},~97--145.
 
 \bibitem[Keogh et~al.(2001)Keogh, Chu, Hart, and Pazzani]{KCHP01}
 Keogh, E.J.; Chu, S.; Hart, D.M.; Pazzani, M.J.
