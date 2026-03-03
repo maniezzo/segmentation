@@ -205,70 +205,61 @@ Many changepoint frameworks encode these ideas via global penalization rather th
 
 These are the constraints that "operate over the whole segmentation" and are discussed in the global constraint catalogues and changepoint detection literature (Beldiceanu, Régin; O'Hearn; Gionis; Killick; etc.), as well as in application papers spanning different areas, including bioinformatics, econometerics, signal processing among others. 
 
+Let $\mathcal{I} = {1, \ldots, nruns}$ be the index set of feasible segments, where each segment is associated with its start and end indices $(s_i,e_i)$, $i \in I$, with length $\ell_i = e_i - s_i + 1$, slope $\beta_i$ (in the case of linear regression), fitting cost $c_i$ and endpoint values $(v^1_i,v^2_i)$. 
+
 For the sake of our discussion, it is important to distinguish between two classes of constraints: those that affect the feasibility of individual segments independently of the remainder of the sequence, and those that impose conditions on the sequence as a whole. Constraints in the first class can be naturally incorporated into the segment generation process and are readily accommodated within dynamic programming frameworks. In contrast, constraints in the second class require the introduction of additional state variables to track global properties, thereby increasing the computational burden of dynamic programming approaches.
 
 \subsubsection{Local segment constraints} \label{subsubsec:segment_level_constraint}
 
-Segment-level constraints restrict the admissible properties of each segment independently of the rest of the segmentation. 
-
-Let a segment be defined by its start and end indices $(s,e)$, with length $\ell_{s,e} = e - s + 1$, slope $\beta_{s,e}$ (in the case of linear regression), and fitting cost $c_{s,e}$. 
+Segment-level constraints restrict the admissible properties of each segment independently of the rest of the segmentation. Thee constraints can be implemented in the data generation phase, do not require additions to formulations TSSP or TSSC and are easily included in DP approaches. 
 Typical segment-level constraints include:
 \begin{itemize}
-	\item {\it Minimum and maximum segment length}.	Bounds on the length of each segment (minimum spacing between changepoints) prevent over-fragmentation and excessively long segments In optimal partitioning approaches,  minimum segment size constraints can be naturally incorporated. For instance, the PELT algorithm proposed in \cite{KFE12} allows restricting the set of admissible segmentations by enforcing a lower bound on segment length. This constraint is expressed as
+	\item {\it Minimum and maximum segment length}.	Bounds on the length of each segment (minimum spacing between changepoints) prevent over-fragmentation and excessively long segments In optimal partitioning approaches,  minimum segment size constraints can be naturally incorporated. For instance, the PELT algorithm \cite{KFE12} allows restricting the set of admissible segmentations by enforcing a lower bound on segment length and also by limiting admissible segment endpoints according to a predefined minimum segment size. This constraint is expressed as
 	\begin{equation}
-		\ell_{\min} \leq e - s + 1 \leq \ell_{\max}.
+		\ell_{\min} \leq e_i - s_i + 1 \leq \ell_{\max} \qquad i \in \mathcal{I}
 	\end{equation}
-	Minimum segment length constraints are commonly imposed in exact and approximate changepoint detection methods through parameters such as \texttt{min-size}.
 	
-	Some methods such as PELT \cite{KFE12} enforce a minimum gap of at least $L$ points between consecutive changepoints also by limiting admissible segment endpoints according to a predefined minimum segment size. 
-		
 	\item {\it Slope constraints}.
-	When segments are modeled via linear regression, constraints can be imposed on segment-specific parameters, such as the slope $\beta_{s,e}$. In particular, constrained changepoint detection under affine inequality restrictions between segment parameters has been studied in \cite{hocking2017constrained}. Typical examples include bounded slopes, 
+	When segments are modeled via linear regression, constraints can be imposed on segment-specific parameters, such as the slope $\beta_i$. More in general, constrained changepoint detection under affine inequality restrictions between segment parameters has been studied \cite{hocking2017constrained}. Typical examples include bounded slopes, or directional constraints enforcing locally non-decreasing or non-increasing behavior.
 	\begin{equation}
-		|\beta_{s,e}| \leq \beta_{\max},
+		|\beta_i| \leq \beta_{\max} \qquad i \in \mathcal{I}
 	\end{equation}
-	or directional constraints enforcing locally non-decreasing or non-increasing behavior. 
-	
+	 
 	\item {\it Boundary exclusion}.
 	Changepoints can be disallowed in the first and last $K$ observations of the series to ensure stable parameter estimation. This can be enforced by restricting admissible start and end indices:
-	    \begin{equation}
-		s \geq K + 1 \quad \text{and} \quad e \leq N - K ,
+	\begin{equation}
+		s_i \geq K + 1 \quad \text{and} \quad e_i \leq n - K  \qquad i \in \mathcal{I}
 	\end{equation}
-	where $N$ denotes the length of the series.
+	where $n$ denotes the length of the series.
 	
 	\item {\it Admissible breakpoint positions}.
-	Changepoints may be restricted to a predefined set $\mathcal{A} \subseteq \{1,\dots,N\}$  of admissible positions, such as calendar or seasonal markers. For example, in the Ruptures framework \cite{TOV20} , the jump parameter enforces that changepoints can only be selected on a subsampled grid of indices, effectively reducing the admissible set of breakpoint locations. In this case, segment boundaries must satisfy:
-	    \begin{equation}
-		s,e \in \mathcal{A}.
+	Changepoints may be restricted to a predefined set $\mathcal{A} \subseteq \mathcal{I}$ of admissible positions, such as calendar or seasonal markers. For example, in the Ruptures framework \cite{TOV20}, the jump parameter enforces that changepoints can only be selected on a subsampled grid of indices, effectively reducing the admissible set of breakpoint locations. In this case, segment boundaries must satisfy:
+	\begin{equation}
+		s_i,e_i \in \mathcal{A}.
 	\end{equation}
 	These restrictions are useful both for computational efficiency and for incorporating prior structural information into the segmentation model. 	
-	
-	\item {\it Equal or bounded segment sizes}: Require near-equal segment lengths or bound length variability (e.g., max/min segment length ratio), affecting the global partition shape. This constraint acts locally when the acceptable lengths are known as inputs, but become global constraints when they have to be identified during optimization.
-	
 \end{itemize}
 
 \subsubsection{Global series constraints} \label{subsubsec:global_series_constraints}
 
 In constrast to segment-level constraints, global series constraints impose conditions that couple multiple segments and operate on the segmentation as a whole. 
-Mixed-Integer Programming formulations naturally support this class of constraints through possibly linear inequalities linking multiple segment-selection variables.
-
-Let $d_t \in \{0,1\}$ be the changepoint indicator at position $t$, and let $K$ be the total number of segments. 
+Mixed-Integer Programming formulations can support several types of constraints belonging to this class through possibly linear inequalities linking multiple segment-selection variables.
 
 Global constraints that were mentioned in the literature include:
 \begin{itemize}
 	\item {\it Global bound on the number of segments}.
 	A global bound on the number of selected segments controls the overall model complexity. This constraint can be written as 
 	\begin{equation}
-		\sum_t d_t \le n_{\max}.
+		\sum_i x_i \le n_{\max}.
 	\end{equation}
 	Constrained dynamic programming algorithms under this setting are discussed in \cite{hocking2017constrained}.
 	
 	\item {\it Global budget on segmentation cost}. 
 	The total cost of the segmentation can be bounded:
 	\begin{equation}
-		\sum_{j} c_j x_j \le B,
+		\sum_{i} c_i x_i \le B,
 	\end{equation}
-	where $c_j$ denotes the cost of segment $j$. This constraint can be seen as the constrained version of penalized segmentation model, which is then relaxed in a Lagrangian fashion to obtain the penalized model \cite{KFE12}. 
+	where $c_i$ denotes the cost of segment $j$. This constraint can be seen as the constrained version of penalized segmentation model, which can be then relaxed in a Lagrangian fashion to obtain the penalized model itself \cite{KFE12}. 
 	A framework for selecting number of changepoints via information criteria is also proposed in \cite{Y88}.
 	
 	\item {\it Global total variation}.
@@ -297,6 +288,12 @@ Global constraints that were mentioned in the literature include:
 
 	\item {\it Global structural break frameworks} (econometrics).	
 	Econometric “structural break” models can be seen as global constraints, as they formalize constraints on the solution such as maximum number of structural breaks, with simultaneous estimation of break locations \cite{BP98, CP19}. 
+		
+	\item {\it Equal or bounded segment sizes}: Require near-equal segment lengths or bound length variability (e.g., max/min segment length ratio), affecting the global partition shape. If $\delta_{len}$ is the maximum allowed difference among segment lengths ($\delta_{len}=0$ in case of equal segment lengths), the constraint is 
+	\begin{equation}
+		|(e_i - s_i) - (e_j - s_j)| \leq \delta_{len} \qquad i,j\in \mathcal{I}.
+	\end{equation}
+	The acceptable length difference $\delta_{len}$ can given as input, or it can be optimized itself.
 \end{itemize}
 
 The above lists are not intended to be exhaustive of all possible requirements that may be imposed on time series segmentation problems; rather, they are restricted to constraints that can be incorporated within an extension of our current modeling framework. For example, a global constraint on the number of distinct regimes—commonly used in regime-switching models and implemented in systems such as SETAR \cite{TL90}—would require an explicit regime identification mechanism, which is not presently supported by our framework.
