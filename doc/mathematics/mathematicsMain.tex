@@ -245,7 +245,8 @@ Typical segment-level constraints include:
 In constrast to segment-level constraints, global series constraints impose conditions that couple multiple segments and operate on the segmentation as a whole. 
 Mixed-Integer Programming formulations can support several types of constraints belonging to this class through possibly linear inequalities linking multiple segment-selection variables.
 
-Global constraints that were mentioned in the literature include:
+A list of global constraints reported in the literature is presented below. We note that several of these constraint classes generate a number of constraints that grows superlinearly with the number of feasible segments (often quadratically in practice). Explicitly including all such constraints in the model is therefore impractical. Instead, we anticipate incorporating them via a cutting-plane strategy: constraints are added on demand as violated cuts because their separation can be performed efficiently for the constraint types considered.
+
 \begin{itemize}
 	\item {\it Global bound on the number of segments}.
 	A global bound on the number of selected segments controls the overall model complexity. This constraint can be written as 
@@ -265,21 +266,29 @@ Global constraints that were mentioned in the literature include:
 	\item {\it Global total variation}.
 	A similar global constraint places a bound on the aggregate magnitude of all changes across the series:
 	\begin{equation}
-		\sum_{t} |\mu_{t^+} - \mu_{t^-}| \le C_{\max},
+		\begin{split}
+			v_{min} \leq min(v^1_i x_i,v^2_i x_i) \qquad i \in \mathcal{I} \\ 
+			v_{max} \leq max(v^1_i x_i,v^2_i x_i) \qquad i \in \mathcal{I} \\ 
+			v_{max} - v_{min} \leq \delta_{max}
+		\end{split}
 	\end{equation}
-	where $\mu_{t^-}$ and $\mu_{t^+}$ denote the segment parameters before and after a changepoint. This constraint controls the overall amount of structural variation in the segmentation and limits the cumulative magnitude of successive jumps between adjacent segment parameters. It is closely related to total variation regularization and to the lasso formulation of \cite{tibshirani2005sparsity}, where a penalty is applied to successive parameter differences. 
+	This constraint controls the overall amount of structural variation in the segmentation by limiting the cumulative magnitude of successive jumps between chosen segments. It is closely related to total variation regularization and to the lasso formulation of \cite{tibshirani2005sparsity}, where a penalty is applied to successive parameter differences. 
 
 	\item {\it Global shape constraints (monotonicity, convexity, symmetry).}
 	These constraints impose structural properties on the segmentation as a whole, rather than on individual segments.
-	For instance, global monotonicity or convexity can be enforced by requiring the sequence of segment parameters to satisfy a prescribed ordering, such as
+	For example, global monotonicity or convexity can be enforced by requiring the sequence of segment parameters to satisfy a prescribed ordering, such as ensuring a nondecreasing evolution of segment means. The formulation here is more complex as it is necessary to identify successive segments in the model. To this end, let $\mathcal{A} = \{(i,j) \in \mathcal{I} \times \mathcal{I} : s_j = e_i+1 \}$ be the set of indices of successive, adjacent segments and let $\xi_{ij}, (i,j) \in \mathcal{A}$, be binary decision variables equal to 1 iff the two adjacent segments of indices $i$ and $j$ are in the solution. Then a monotonic nondecrease of means can be expressed as 
 	\begin{equation}
-		\mu_1 \le \mu_2 \le \dots \le \mu_K,
+		\begin{split}
+			\sum_{j:(i,j)\in \mathcal{A}} \xi_{ij} = x_i; 
+			\sum_{i:(i,j)\in \mathcal{A}} \xi_{ij} = x_j \qquad i \in \mathcal{I} \\
+			\mu_i - \mu_j \leq M(1-\xi_{ij}) \qquad (i,j) \in \mathcal{A}
+		\end{split}
 	\end{equation}
-	thereby ensuring a nondecreasing evolution of segment means. More generally, convexity or concavity can be imposed by constraining first or second differences of the segment parameters to follow a specified sign pattern.
+	where the $\mu_i$ are the mean values of the segments indexed by $i \in \mathcal{I}$. More generally, convexity or concavity can be imposed by constraining first or second differences of the segment parameters to follow a specified sign pattern.
 	
 	A related formulation limits the number of monotone episodes across the segmentation. For example, one may allow at most $n_r$ runs of consecutive nondecreasing (or nonincreasing) segments, thereby restricting the global alternation of trends.
 	
-	Symmetry constraints also fall within this class. These may require changepoint locations to be symmetric with respect to the midpoint of the series, or impose mirrored jump magnitudes, as appropriate for symmetric processes (e.g., $x_t = x_{n-t}$).
+	Symmetry constraints also fall within this class. These may require changepoint locations to be symmetric with respect to the midpoint of the series, or impose mirrored jump magnitudes, as appropriate for symmetric processes.
 	
 	\item {\it Global pattern constraints on change directions.}
 	These constraints require the sequence of segment transitions to follow a prescribed qualitative pattern. For example, the model may be forced to follow a structure such as increase–plateau–decrease, to alternate increases and decreases in a regular manner, or to follow a periodic regime sequence (e.g., stable–volatile–stable). Similarly, one may regulate the occurrence of peaks, where a peak is defined as an increase in segment means immediately followed by a decrease.
