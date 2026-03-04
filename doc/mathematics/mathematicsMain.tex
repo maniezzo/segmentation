@@ -317,18 +317,16 @@ We implemented models TSSP and TSSC in C++ and ran them on a Windows 11 Intel i7
 
 \subsection{Dynamic programming approaches} \label{subsec:DPcodes}
 
-This section reviews three established baselines for offline Change Point Detection (CDP): exact dynamic programming with a fixed number of change points (called Dynp in ruptures), the Pelt algorithm for penalized optimal partitioning and the Wild Binary Segmentation (WBS).
+This section reviews three established baselines for offline Change Point Detection (CPD): exact dynamic programming with a fixed number of change points (called Dynp in ruptures), the Pelt algorithm for penalized optimal partitioning and the Wild Binary Segmentation (WBS).
 The first two methods are globally optimal for their respective objective function under a segment-additive structure while the WBS method is a randomized recursive strategy that does not solve a single global optimization problem.
 
 \subsubsection{Additive segmentation framework}
 
 Let $y_{1:n} = (y_1,\dots,y_n)$ be a univariate time series. A segmentation with $k$ change points is defined by indices
-\[
-0 = \tau_0 < \tau_1 < \dots < \tau_k < \tau_{k+1} = n,
-\]
-which induce $k+1$ contiguous segments.  
+$0 = \tau_0 < \tau_1 < \dots < \tau_k < \tau_{k+1} = n$.
+Consequently, the $k$ changepoints split the data into $k + $1 segments, with the i-th segment containing $y_{(\tau_{i-1}+1):\tau_i}$.
 
-A broad class of CDP methods assumes that the signal can be modeled piecewise, and that the quality of a segmentation can be expressed through an additive objective of the form
+A broad class of CPD methods assumes that the signal can be modeled piecewise, and that the quality of a segmentation can be expressed through an additive objective of the form
 \begin{equation}
 	\label{eq:additive_general}
 	\min_{\tau_1,\dots,\tau_k}
@@ -351,7 +349,7 @@ Two optimization settings arise from \eqref{eq:additive_general}:
 	where $\beta>0$ is a penalty parameter. 
 \end{enumerate}
 
-In particular, the Dynp algorithm solves the constrained problem exactly, whereas the Pelt algorithm solves the penalized problem exactly through pruning.
+In particular, the Dynp algorithm solves the constrained problem exactly, whereas the PELT algorithm solves the penalized problem exactly through pruning.
 
 \subsubsection{Dynp: exact dynamic programming with fixed $k$}
 
@@ -386,8 +384,8 @@ Any optimal segmentation of $y_{1:t}$ with $k$ change points must consist of an 
 The computational complexity is quadratic in $n$ for each $k$, leading to an overall complexity of order $\mathcal{O}(k n^2)$ (up to the cost of evaluating $\mathcal{C}$). 
 The Ruptures implementation includes practical mechanisms to reduce computational burden: a minimum segment length constraint unstable very short segments and a jump parameter restricts candidate change point positions.
 
-\subsubsection{Pelt: penalized optimal partitioning with pruning}
-The Pelt algorithm (Killick, Fearnhead and Eckley, 2012) solves the penalized problem \eqref{eq:penalized_general} exactly. 
+\subsubsection{PELT: penalized optimal partitioning with pruning}
+The PELT algorithm (Killick, Fearnhead and Eckley, 2012) solves the penalized problem \eqref{eq:penalized_general} exactly. 
 
 Let
 \[
@@ -396,7 +394,7 @@ G(t)
 denote the minimum penalized cost of segmenting $y_{1:t}$. The dynamic programming recursion is
 
 \begin{equation}
-	\label{eq:pelt_recursion_consistent}
+	\label{eq:PELT_recursion_consistent}
 	G(t)
 	=
 	\min_{s < t}
@@ -412,20 +410,22 @@ denote the minimum penalized cost of segmenting $y_{1:t}$. The dynamic programmi
 with initialization $G(0) = -\beta$.
 
 The number of change points $k$ is not fixed but determined by the optimization through the penalty term.
-The key contribution of Pelt is a pruning rule that maintains a candidate set of potential last change points and discards those that can be proven suboptimal for all future $t' > t$.
+The key contribution of PELT is a pruning rule that maintains a candidate set of potential last change points and discards those that can be proven suboptimal for all future $t' > t$. It requires the segment cost to satisfy a weak subadditivity condition, 
+$\mathcal{C}(s+1,t) \geq \mathcal{C}(s+1,u) + \mathcal{C}(u+1,t)$, $s < u < t$, a condition that holds for several common costs, such as minus the log-likelihood or AIC but that does not hold for other ones, for example for RMSE.
+
 It can be shown that the expected number of retained candidates remains bounded as $n$ increases. Consequently, the expected computational complexity becomes linear in $n$. 
-As in Dynp, the Ruptures implementation of Pelt includes minimum segment length and candidate grid restrictions.
+As in Dynp, the Ruptures implementation of PELT includes minimum segment length and candidate grid restrictions.
 
 \subsubsection{Wild Binary Segmentation (WBS)}
 Wild Binary Segmentation (Fryzlewicz, 2014) is conceptually different from the previous two methods. It does not directly optimize \eqref{eq:additive_general} or \eqref{eq:penalized_general}. Instead, it extends classical binary segmentation through randomized interval localization. 
-Classical binary segmentation detects a single change point over the full interval $(0,n]$, splits the signal at that location, and recurses on the left and right subintervals. However, when multiple change points are close to each othere, the global constrant over the full interval may blur their individual effects. 
+Classical binary segmentation detects a single change point over the full interval $(0,n]$, splits the signal at that location, and recurses on the left and right subintervals. However, when multiple change points are close to each other, the global constrant over the full interval may blur their individual effects. 
 WBS addresses this limitation by sampling $M$ random intervals \[
 [s_m,e_m] \subseteq \{1,\dots,n\},
 \quad m=1,\dots,M.
 \]
 On each interval, a single change point contrast statistic is computed and the location maximizing the absolute constrast within that interval is identified. Among all intervals, the candidate achieving the largest constrast is selected as the estimated change point, provided the contrast exceeds a predefined threshold. 
 The procedure then recurses on the subintervals induced by the detected change point, using only random intervals fully contained in each subproblem. 
-Unlike Dynp and Pelt, WBS does not guarantee global optimality with respect to an additive objective. Its performance depends on the number of sampled intervals $M$, the constrast definition and the stopping rule (threshold-based). Nevertheless, it is often computationally efficient when change points are numerous. 
+Unlike Dynp and PELT, WBS does not guarantee global optimality with respect to an additive objective. Its performance depends on the number of sampled intervals $M$, the constrast definition and the stopping rule (threshold-based). Nevertheless, it is often computationally efficient when change points are numerous. 
 
 \subsection{Benchmarking and Comparative Performance} \label{subsec:benchmarking}
 
