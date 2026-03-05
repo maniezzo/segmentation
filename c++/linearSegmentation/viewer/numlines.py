@@ -1,7 +1,7 @@
 import os
 
 # calcola il numero di linee dei file che hanno _runs nel nome
-directory = "c:\\git\\segmentation\\data\mathtests\\"
+directory = "c:\\git\\segmentation\\data\M6\\"
 
 for filename in os.listdir(directory):
     if "_runs" in filename:

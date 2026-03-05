@@ -437,63 +437,51 @@ The M4 competition, concluded in 2018, significantly expanded the scale of the b
 
 More recently, the M6 competition (2022) focused on financial time series and incorporated ex-ante forecasting in a real-time setting and emphasized portfolio construction and risk-aware evaluation. The dataset primarily consists of financial asset returns and related variables, thereby introducing features such as higher volatility, regime shifts, and structural breaks that are particularly relevant for changepoint detection methodologies.
 
-Together, the M3, M4, and M6 benchmarks offer a diverse and demanding experimental framework. By evaluating our approach on selected series from these competitions, we aim to assess its effectiveness across different domains, sample sizes, and structural regimes representative of real-world forecasting applications. The tests were run on 5 randomly selected series for each category in M3 and M4, and on 10 series of M6 drawn from the different asset categories in the benchmark set.
+Together, the M3, M4, and M6 benchmarks offer a diverse and demanding experimental framework. By evaluating our approach on selected series from these competitions, we aim to assess its effectiveness across different domains, sample sizes, and structural regimes representative of real-world forecasting applications. The tests were run on 5 randomly selected series for each category in M3 and M4, and on 10 series of M6 drawn from the different asset types (stock and ETF) and different categories (Health Care, Energy, Real Estate, IT, Consumer Discretionary, Equities, Commodities, Volatility) in the benchmark set.
 
-\begin{table}[H]
-\centering
-\caption{Data series results, QRMSE cost}\label{tab:seriesQRMSE}%
-\begin{tabular}{@{}cllrrrrrrrr}
-\toprule
-Benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm & max.nsegm & avg.t & max.t \\
-\midrule
-		M3 & Demographic  & QRMSE & 122.6 & 138 & 7073.2 & 8646 & 3.8 & 7 & 0.6 & 1 \\
-		M3 & Finance      & QRMSE & 124.8 & 144 & 7267.6 & 9453 & 3.6 & 9 & 0 & 0 \\
-		M3 & Industry     & QRMSE & 139 & 144 & 8789.2 & 9453 & 1 & 1 & 0 & 0 \\
-		M3 & Macro        & QRMSE & 128 & 144 & 7532.2 & 9453 & 2 & 5 & 0 & 0 \\
-		M3 & Micro        & QRMSE & 91.8 & 126 & 4027.8 & 7140 & 1 & 1 & 0 & 0 \\
-		M3 & Other        & QRMSE & 80.8 & 120 & 2952.2 & 6441 & 3.4 & 6 & 0 & 0 \\
-		M4 & Demographic & QRMSE & 241.8 & 735 & 54101.2 & 245350 & 4 & 7 & 57.6 & 288 \\
-		M4 & Finance & QRMSE & 246 & 738 & 54945.4 & 247456 & 6.2 & 10 & 61.6 & 308 \\
-		M4 & Industry & QRMSE & 258.4 & 737 & 56492 & 246753 & 4.6 & 7 & 60 & 298 \\
-		M4 & Macro & QRMSE & 280 & 866 & 74559.8 & 339900 & 5.6 & 10 & 106.6 & 532 \\
-		M4 & Micro & QRMSE & 232.8 & 737 & 53371.2 & 246753 & 2.8 & 7 & 58.4 & 292 \\
-		M4 & Other & QRMSE & 260.4 & 701 & 53106.2 & 222778 & 4.8 & 10 & 57.6 & 286 \\
-		M6 & Finance & QRMSE & 265 & 367 & 32627.1 & 61423 & 3.1 & 7 & 7.6 & 25 \\
-\bottomrule
-\end{tabular}
-%\end{adjustwidth}
-\end{table}
+\subsubsection{Cost functions}
 
 
+\begin{figure*}[ht]
+	\centering
+	\subfloat[AIC cost segmentation]{%
+		\includegraphics[width=0.45\textwidth]{N2745-costAIC}
+		\label{fig:temperature}%
+	}%
+	\hfill%
+	\subfloat[QRMSE cost segmentation]{%
+		\includegraphics[width=0.45\linewidth]{N2745-costQRMSE}%
+		\label{fig:battery}%
+	}%
+	\caption{Segmentations derived from different costs, M3 dataseries N2745"}
+	\label{fig:environ}
+\end{figure*}
+
+
+% Example of a figure that spans the whole page width and with subfigures. The same concept works for tables, too.
+\begin{figure}[ht]
+	%\isPreprints{}{% This command is only used for ``preprints''.
+		\begin{adjustwidth}{-\extralength}{0cm}
+			\raggedleft 
+			%} % If the paper is ``preprints'', please uncomment this parenthesis.
+		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{N2602-costQRMSE.eps}}
+		%\hfill
+		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{N1901-costQRMSE.eps}}\\
+		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{N2219-costQRMSE.eps}}
+		%\hfill
+		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{Q10414-costQRMSE.eps}}
+	\end{adjustwidth}
+	\caption{Different dataseries categories (\textbf{a}) Financial. (\textbf{b}) Industry. (\textbf{c}) Macroeconomics. (\textbf{d}) Microeconomics.\label{fig2}}
+\end{figure}
+
+
+\subsubsection{Unconstrained segmentation}
+
+bla bla
 
 \begin{table}[H]
 	\centering
-	\caption{Data series results, AIC cost}\label{tab:seriesAIC}%
-	\begin{tabular}{@{}cllrrrrrrrr}
-		\toprule
-		Benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm & max.nsegm & avg.t & max.t \\
-		\midrule
-		M3 & Demographic  & AIC & 122.6 & 138 & 7073.2 & 8646 & 9.4 & 10 & 0.2 & 1 \\
-		M3 & Finance      & AIC & 124.8 & 144 & 7267.6 & 9453 & 9.6 & 10 & 0 & 0 \\
-		M3 & Industry     & AIC & 139 & 144 & 8789.2 & 9453 & 10 & 10 & 0 & 0 \\
-		M3 & Macro        & AIC & 128 & 144 & 7532.2 & 9453 & 10 & 10 & 0 & 0 \\
-		M3 & Micro        & AIC & 91.8 & 126 & 4027.8 & 7140 & 6.6 & 10 & 0 & 0 \\
-		M3 & Other        & AIC & 80.8 & 120 & 2952.2 & 6441 & 7.4 & 9 & 0 & 0 \\
-		M4 & Demographic & AIC & 241.8 & 735 & 54101.2 & 245350 & 10 & 10 & 58.4 & 292 \\
-		M4 & Finance & AIC & 246 & 738 & 54945.4 & 247456 & 10 & 10 & 65.2 & 325 \\
-		M4 & Industry & AIC & 258.4 & 737 & 56492 & 246753 & 8.8 & 10 & 62.4 & 310 \\
-		M4 & Macro & AIC & 280 & 866 & 74559.8 & 339900 & 10 & 10 & 105.8 & 528 \\
-		M4 & Micro & AIC & 232.8 & 737 & 53371.2 & 246753 & 10 & 10 & 60.4 & 302 \\
-		M4 & Other & AIC & 260.4 & 701 & 53106.2 & 222778 & 10 & 10 & 57.8 & 285 \\
-		M6 & Finance & AIC & 265 & 367 & 32627.1 & 61423 & 9.3 & 10 & 7.7 & 26 \\
-		\bottomrule
-	\end{tabular}
-	%\end{adjustwidth}
-\end{table}
-
-\begin{table}[H]
-	\centering
-	\caption{PELT: Data series results, QRMSE cost}\label{tab:seriesQRMSE}%
+	\caption{PELT: Data series results, QRMSE cost}\label{tab:PseriesQRMSE}%
 	\begin{tabular}{lllrrrrrrr}
 		\toprule
 		benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm & max.nsegm & avg.t \\
@@ -518,7 +506,7 @@ Benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm 
 
 \begin{table}[H]
 	\centering
-	\caption{PELT: Data series results, AIC cost}\label{tab:seriesAIC}%
+	\caption{PELT: Data series results, AIC cost}\label{tab:PseriesAIC}%
 	\begin{tabular}{lllrrrrrrr}
 		\toprule
 		benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm & max.nsegm & avg.t \\
@@ -542,39 +530,63 @@ Benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm 
 \end{table}
 
 
-The results are summarized in table \ref{tab:series}. The columns show the name of the series ({\it Dataseries}), the number of data points ({\it npoints}), the number of generated runs ({\it nruns}), the number of chosen segments ({\it nsegm}), the CPU time in seconds to generate all runs ({\it truns}), the CPU time in seconds to generate all runs ({\it truns}), the CPU time to solve the extended SCP model ({\it tsolve}), and a {\it quasi RMSE} quality measure of the solutions obtained by the algorithm described in section \ref{sec:SCPmodel}, {\it QMSE}, and, for comparison, the same measure for the solutions obtained by the codes of \cite{KCHP01}, {\it QMSE1}, and of \cite{KCHP02}, {\it QMSE2}. A comparison with the results from {\it Ruptures} \cite{TOV20} is being finalized and will be presented at the conference. Data with asterisks require special comments, which are incompatible with the page limit of this note, but will be presented at the conference and in the full version of the paper, {\it na}'s mean that no feasible solution was produced.
 
-\begin{figure*}[ht]
-    \centering
-    \subfloat[AIC cost segmentation]{%
-        \includegraphics[width=0.45\textwidth]{N2745-costAIC}
-        \label{fig:temperature}%
-        }%
-    \hfill%
-    \subfloat[QRMSE cost segmentation]{%
-        \includegraphics[width=0.45\linewidth]{N2745-costQRMSE}%
-        \label{fig:battery}%
-        }%
-    \caption{Segmentations derived from different costs, M3 dataseries N2745"}
-    \label{fig:environ}
-\end{figure*}
+\subsubsection{Constrained segmentation}
+
+The results are summarized in tables \ref{tab:seriesQRMSE} and \ref{tab:seriesAIC}. The columns show compatible data in both tables, that is the benchmark set of origin of the series ({\it bench}), the category of the series ({\it category}), the average and maximum number of data points in the group series ({\it avg.n} and {\it max.n}), the corresponding average and maximum number of generated runs ({\it avg.nrun} and {\it max.nrun}), the average and maximum number of chosen segments ({\it avg.nseg} and {max.nsegm}), and the average and maximum CPU time in seconds to solve the extended SCP model, inclusive of the time needed to generate the runs ({\it avg.t} and {\it max.t}).
+
+\begin{table}[H]
+\centering
+\caption{Data series results, QRMSE cost}\label{tab:seriesQRMSE}%
+\begin{tabular}{@{}cl|lr|rr|rr|rr}
+\toprule
+bench & category & avg.n & max.n & avg.nrun & max.nrun & avg.nseg & max.nseg & avg.t & max.t \\
+\midrule
+		M3 & Demographic  & 122.6 & 138 & 7073.2  & 8646 & 3.8 & 7 & 0.6 & 1 \\
+		M3 & Finance      & 124.8 & 144 & 7267.6  & 9453 & 3.6 & 9 & 0.1 & 0.1 \\
+		M3 & Industry     & 139   & 144 & 8789.2  & 9453 & 1 & 1 & 0.1 & 0.1 \\
+		M3 & Macro        & 128   & 144 & 7532.2  & 9453 & 2 & 5 & 0.1 & 0.1 \\
+		M3 & Micro        & 91.8  & 126 & 4027.8  & 7140 & 1 & 1 & 0.1 & 0.1 \\
+		M3 & Other        & 80.8  & 120 & 2952.2  & 6441 & 3.4 & 6 & 0.1 & 0.1 \\
+		M4 & Demographic  & 241.8 & 735 & 54101.2 & 245350 & 4 & 7 & 57.6 & 288 \\
+		M4 & Finance      & 246   & 738 & 54945.4 & 247456 & 6.2 & 10 & 61.6 & 308 \\
+		M4 & Industry     & 258.4 & 737 & 56492   & 246753 & 4.6 & 7 & 60 & 298 \\
+		M4 & Macro   	   & 280   & 866 & 74559.8 & 339900 & 5.6 & 10 & 106.6 & 532 \\
+		M4 & Micro   		& 232.8 & 737 & 53371.2 & 246753 & 2.8 & 7 & 58.4 & 292 \\
+		M4 & Other   		& 260.4 & 701 & 53106.2 & 222778 & 4.8 & 10 & 57.6 & 286 \\
+		M6 & Finance 		& 257.8 & 265 & 30394.2 & 32131 & 4.2 & 7 & 7.0 & 25 \\
+\bottomrule
+\end{tabular}
+%\end{adjustwidth}
+\end{table}
 
 
-% Example of a figure that spans the whole page width and with subfigures. The same concept works for tables, too.
-\begin{figure}[ht]
-	%\isPreprints{}{% This command is only used for ``preprints''.
-		\begin{adjustwidth}{-\extralength}{0cm}
-			\centering
-			%} % If the paper is ``preprints'', please uncomment this parenthesis.
-		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{N2602-costQRMSE.eps}}
-		%\hfill
-		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{N1901-costQRMSE.eps}}\\
-		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{N2219-costQRMSE.eps}}
-		%\hfill
-		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{Q10414-costQRMSE.eps}}
-		\end{adjustwidth}
-	\caption{Different dataseries categories (\textbf{a}) Financial. (\textbf{b}) Industry. (\textbf{c}) Macroeconomics. (\textbf{d}) Microeconomics.\label{fig2}}
-\end{figure}
+
+\begin{table}[H]
+	\centering
+	\caption{Data series results, AIC cost}\label{tab:seriesAIC}%
+\begin{tabular}{@{}cl|lr|rr|rr|rr}
+	\toprule
+		bench & category & avg.n & max.n & avg.nrun & max.nrun & avg.nseg & max.nseg & avg.t & max.t \\
+		\midrule
+		M3 & Demographic & 122.6 & 138 & 7073.2 & 8646 & 9.4 & 10 & 0.2 & 1 \\
+		M3 & Finance     & 124.8 & 144 & 7267.6 & 9453 & 9.6 & 10 & 0.1 & 0.1 \\
+		M3 & Industry    & 139 	 & 144 & 8789.2 & 9453 & 10 & 10  & 0.1 & 0.1 \\
+		M3 & Macro       & 128   & 144 & 7532.2 & 9453 & 10 & 10  & 0.1 & 0.1 \\
+		M3 & Micro       & 91.8  & 126 & 4027.8 & 7140 & 6.6 & 10 & 0.1 & 0.1 \\
+		M3 & Other       & 80.8  & 120 & 2952.2 & 6441 & 7.4 & 9  & 0.1 & 0.1 \\
+		M4 & Demographic & 241.8 & 735 & 54101.2 & 245350 & 10  & 10 & 58.4 & 292 \\
+		M4 & Finance 	  & 246   & 738 & 54945.4 & 247456 & 10  & 10 & 65.2 & 325 \\
+		M4 & Industry 	  & 258.4 & 737 & 56492   & 246753 & 8.8 & 10 & 62.4 & 310 \\
+		M4 & Macro 		  & 280   & 866 & 74559.8 & 339900 & 10  & 10 & 105.8 & 528 \\
+		M4 & Micro 		  & 232.8 & 737 & 53371.2 & 246753 & 10  & 10 & 60.4 & 302 \\
+		M4 & Other 		  & 260.4 & 701 & 53106.2 & 222778 & 10  & 10 & 57.8 & 285 \\
+		M6 & Finance 	  & 257.8 & 265 & 30394.2 & 32131 & 10.0 & 10 & 5.9 & 7 \\
+		\bottomrule
+	\end{tabular}
+	%\end{adjustwidth}
+\end{table}
+
 
 
 Not surprisingly, the set partitioning model could always produce the better solution, as it was the only algorithm that explicitly used the proposed cost function for optimization. More interesting is the limited computational time needed to solve instances with up to a few hundred variables, while the "curse of dimensionality" becomes apparent when solving instances with more than 1000 variables. The healthcare instance, here only a validation case, proves that the approach is also effective for nonlinear segmentation, but the search for optimal fitting parameters requires a very high CPU time. The figures \ref{fig:environ} show the solution for two environmental data series, while the figures \ref{fig:nonenv} show the two non environmental data series.
@@ -593,6 +605,8 @@ Not surprisingly, the set partitioning model could always produce the better sol
 %    \caption{Economics and healthcare dataseries}
 %    \label{fig:nonenv}
 %\end{figure*}
+
+\subsubsection{Nonlinear models}
 
 We emphasize that the validity of the proposed framework is not restricted to piecewise linear regression: any parametric or nonparametric trend function can be adopted for computing the segment-specific error cost. Figure \ref{fig:covid} illustrates the segmentation obtained by applying the model to the time series of total infected patients in Italy during the first year and a half (500 data points) of the Covid-19 pandemic. The epidemic evolved through successive waves, each of which can be effectively approximated by a trend following a negative binomial pattern. Accordingly, the formulation of Section \ref{sec:SCPmodel} is applied by computing, for each feasible run, the fitting error associated with a negative binomial model. The subsequent optimization procedure remains unchanged.
 

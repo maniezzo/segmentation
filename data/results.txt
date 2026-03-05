@@ -1,0 +1,33 @@
+PELT, sataset IBatt_Min costo 0.003565249934016757 n_brkpoints 6 t.cpu 0.0
+PELT, sataset PTemp_C_Avg costo 56.44897659047956 n_brkpoints 2 t.cpu 0.0
+PELT, sataset PTemp_C_Max costo 125.18543876082512 n_brkpoints 2 t.cpu 0.0
+PELT, sataset SDI_Temp_1m costo 56.30029908062219 n_brkpoints 2 t.cpu 0.0
+PELT, sataset ThermTemp1_Avg costo 21.2044472622241 n_brkpoints 2 t.cpu 0.0
+PELT, sataset V_in_chg_Avg costo 16.33727204316147 n_brkpoints 1 t.cpu 0.0
+PELT, sataset Vapor_Pressure_Avg costo 1.503680849491167 n_brkpoints 1 t.cpu 0.0
+PELT, sataset Vapor_Pressure_Avg_2 costo 4.19373855271596 n_brkpoints 1 t.cpu 0.0
+PELT, sataset WS_ms_Avg costo 163.54822373116576 n_brkpoints 1 t.cpu 0.0
+PELT, sataset WTemp_C1_Avg costo 55.771484621500974 n_brkpoints 2 t.cpu 0.0
+PELT, sataset WTemp_C2_Avg costo 59.22915266926786 n_brkpoints 4 t.cpu 0.0
+
+Binseg, sataset IBatt_Min costo 0.0029871627055626814 n_brkpoints 4 t.cpu 0.0
+Binseg, sataset PTemp_C_Avg costo 53.82427487017445 n_brkpoints 2 t.cpu 0.0
+Binseg, sataset PTemp_C_Max costo 123.93448733525598 n_brkpoints 2 t.cpu 0.0
+Binseg, sataset SDI_Temp_1m costo 56.30029908062219 n_brkpoints 2 t.cpu 0.0
+Binseg, sataset ThermTemp1_Avg costo 21.2044472622241 n_brkpoints 2 t.cpu 0.0
+Binseg, sataset V_in_chg_Avg costo 16.33727204316147 n_brkpoints 1 t.cpu 
+Binseg, sataset Vapor_Pressure_Avg costo 1.503680849491167 n_brkpoints 1 t.cpu 0.0
+Binseg, sataset Vapor_Pressure_Avg_2 costo 4.19373855271596 n_brkpoints 1 t.cpu 0.0
+Binseg, sataset WS_ms_Avg costo 163.54822373116576 n_brkpoints 1 t.cpu 0.0
+Binseg, sataset WTemp_C1_Avg costo 55.771484621500974 n_brkpoints 2 t.cpu 0.0
+Binseg, sataset WTemp_C2_Avg costo 70.56920511251188 n_brkpoints 3 t.cpu 0.0
+
+MIP home\IBatt_Min n_runs 17391 t_runs 0 cost 0.00139771 n_brk 4 t_opt 0
+MIP home\PTemp_C_Avg n_runs 17391 t_runs 0 cost 39.16 n_brk 10 t_opt 0
+MIP home\PTemp_C_Max n_runs 17391 t_runs 0 cost 105.943 n_brk 7 t_opt 0
+MIP home\SDI_Temp_1m n_runs 588070 t_runs 13 cost 15.7179 n_brk 15 t_opt 498
+MIP home\ThermTemp1_Avg n_runs 17391 t_runs 0 cost 1.93712 n_brk 19 t_opt 0
+MIP home\V_in_chg_Avg n_runs 17391 t_runs 0 cost 8.86408 n_brk 2 t_opt 0
+MIP home\Vapor_Pressure_Avg n_runs 17391 t_runs 0 cost 0.607151 n_brk 13 t_opt 0
+MIP home\Vapor_Pressure_Avg_2 n_runs 588070 t_runs 10 cost 2.88774 n_brk 3 t_opt 362
+
