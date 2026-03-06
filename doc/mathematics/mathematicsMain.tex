@@ -543,7 +543,7 @@ bla bla
 
 \subsubsection{Constrained segmentation}
 
-In this section we move to globally constrained series, therefore the only suitable models are TSPP and its heuristic relaxation TSCP. In the examples, models were constrained to propose a number of segments upper bounded by 10 (not "equal to 10" as Dynp could manage), besides a shortest segment length of 8. However, any of the constraints listed in section \ref{subsec:additional_constraints} could have been included.
+In this section, we consider globally constrained series; therefore, the only suitable models for application are the TSPP and its heuristic relaxation, the TSCP. In the examples, the models were constrained to propose a maximum of 10 segments (rather than an exact number of 10, as managed by Dynp), as well as a minimum segment length of 8. However, any of the additional constraints listed in \ref{subsec:additional_constraints} could have been included.
 
 The results are summarized in tables \ref{tab:seriesQRMSE} and \ref{tab:seriesAIC}. The columns show compatible data in both tables, that is the benchmark set of origin of the series ({\it bench}), the category of the series ({\it category}), the average and maximum number of data points in the group series ({\it avg.n} and {\it max.n}), the corresponding average and maximum number of generated runs ({\it avg.nrun} and {\it max.nrun}), the average and maximum number of chosen segments ({\it avg.nseg} and {max.nsegm}), and the average and maximum CPU time in seconds to solve the extended SCP model, inclusive of the time needed to generate the runs ({\it avg.t} and {\it max.t}).
 
@@ -554,27 +554,29 @@ The results are summarized in tables \ref{tab:seriesQRMSE} and \ref{tab:seriesAI
 \toprule
 bench & category & avg.n & max.n & avg.nrun & max.nrun & avg.nseg & max.nseg & avg.t & max.t \\
 \midrule
-		M3 & Demographic  & 122.6 & 138 & 7073.2  & 8646 & 3.8 & 7 & 0.6 & 1 \\
-		M3 & Finance      & 124.8 & 144 & 7267.6  & 9453 & 3.6 & 9 & 0.1 & 0.1 \\
-		M3 & Industry     & 139   & 144 & 8789.2  & 9453 & 1 & 1 & 0.1 & 0.1 \\
-		M3 & Macro        & 128   & 144 & 7532.2  & 9453 & 2 & 5 & 0.1 & 0.1 \\
-		M3 & Micro        & 91.8  & 126 & 4027.8  & 7140 & 1 & 1 & 0.1 & 0.1 \\
-		M3 & Other        & 80.8  & 120 & 2952.2  & 6441 & 3.4 & 6 & 0.1 & 0.1 \\
-		M4 & Demographic  & 241.8 & 735 & 54101.2 & 245350 & 4 & 7 & 57.6 & 288 \\
+		M3 & Demographic  & 122.6 & 138 &  7073.2 &   8646 & 3.8 &  7 &  0.6 & 1 \\
+		M3 & Finance      & 124.8 & 144 &  7267.6 &   9453 & 3.6 &  9 &  0.1 & 0.1 \\
+		M3 & Industry     & 139   & 144 &  8789.2 &   9453 & 1   &  1 &  0.1 & 0.1 \\
+		M3 & Macro        & 128   & 144 &  7532.2 &   9453 & 2   &  5 &  0.1 & 0.1 \\
+		M3 & Micro        & 91.8  & 126 &  4027.8 &   7140 & 1   &  1 &  0.1 & 0.1 \\
+		M3 & Other        & 80.8  & 120 &  2952.2 &   6441 & 3.4 &  6 &  0.1 & 0.1 \\
+		M4 & Demographic  & 241.8 & 735 & 54101.2 & 245350 & 4   &  7 & 57.6 & 288 \\
 		M4 & Finance      & 246   & 738 & 54945.4 & 247456 & 6.2 & 10 & 61.6 & 308 \\
-		M4 & Industry     & 258.4 & 737 & 56492   & 246753 & 4.6 & 7 & 60 & 298 \\
-		M4 & Macro   	   & 280   & 866 & 74559.8 & 339900 & 5.6 & 10 & 106.6 & 532 \\
-		M4 & Micro   		& 232.8 & 737 & 53371.2 & 246753 & 2.8 & 7 & 58.4 & 292 \\
+		M4 & Industry     & 258.4 & 737 & 56492   & 246753 & 4.6 &  7 & 60   & 298 \\
+		M4 & Macro   	   & 280   & 866 & 74559.8 & 339900 & 5.6 & 10 &106.6 & 532 \\
+		M4 & Micro   		& 232.8 & 737 & 53371.2 & 246753 & 2.8 &  7 & 58.4 & 292 \\
 		M4 & Other   		& 260.4 & 701 & 53106.2 & 222778 & 4.8 & 10 & 57.6 & 286 \\
-		M6 & Finance 		& 257.8 & 265 & 30394.2 & 32131 & 4.2 & 7 & 7.0 & 25 \\
+		M6 & Finance 		& 257.8 & 265 & 30394.2 &  32131 & 4.2 &  7 &  7.0 & 25 \\
 \bottomrule
 \end{tabular}
 %\end{adjustwidth}
 \end{table}
 
+Table \ref{tab:seriesQRMSE} reports aggregate results obtained with the TSPP model using QRMSE as the cost function. The results show that relatively short series—up to a few hundred observations—lead to integer programming instances of moderate size that can be solved very efficiently even on standard hardware.
 
+As the length of the series increases, the non-polynomial complexity of the exact integer programming search becomes more apparent. When the series approaches about 500 observations, solution times begin to require minutes of CPU time. This increase is primarily due to the rapid growth of the IP formulation, whose constraint matrix (the “tableau”) may reach dimensions close to 1000 rows and more than 300,000 columns.
 
-\begin{table}[H]
+\begin{table}[ht]
 	\centering
 	\caption{Data series results, AIC cost}\label{tab:seriesAIC}%
 \begin{tabular}{@{}cl|lr|rr|rr|rr}
@@ -599,28 +601,31 @@ bench & category & avg.n & max.n & avg.nrun & max.nrun & avg.nseg & max.nseg & a
 	%\end{adjustwidth}
 \end{table}
 
+Table \ref{tab:seriesAIC} reports the results obtained on the same set of series when AIC is used as the cost function. Since the cost function affects only the data preparation phase—namely the computation of the costs associated with the feasible segments—the size of the resulting IP instances remains unchanged, and the dimensions of the constraint matrices are therefore identical to those reported in Table \ref{tab:seriesQRMSE}.
 
+The CPU time required for the optimization, however, is influenced by the numerical values of the costs, although this effect is relatively limited. The most notable difference between Tables \ref{tab:seriesQRMSE} and \ref{tab:seriesAIC} concerns the number of segments in the optimal solutions. When AIC is used, the optimal segmentation frequently saturates the imposed upper bound on the number of segments, whereas QRMSE tends to produce solutions with a consistently smaller number of segments.
 
-\begin{table}[H]
+\begin{table}[ht]
 	\centering
 	\caption{Partitioning vs. covering comparison}\label{tab:SPP_SCP}%
-	\begin{tabular}{@{}lrrrrrr}
+	\begin{tabular}{@{}lrrrrrrr}
 		\toprule
-		name & rows & cols & nonzeros & truns & tSPP & tSCP \\
+		name & rows & cols & nonzeros & truns & GAP & tSPP & tSCP \\
 		\midrule
-		Q13050 & 736 & 245350 &  66244500 & 2 &  219 & 162 \\
-		Q22221 & 739 & 247456 &  67060576 & 4 &  294 & 119 \\
-		Q15697 & 738 & 246753 &  66787812 & 4 &  275 & 201 \\
-		Q5109  & 867 & 339900 & 108201500 & 6 &  467 & 211 \\
-		Q10414 & 738 & 246753 &  66787812 & 3 &  326 & 197 \\
-		Q23661 & 702 & 222778 &  57476724 & 6 &  242 & 143 \\
+Q13050 & 736 & 245350 &  66244500 & 2 & 0.06 & 219 & 162 \\
+Q22221 & 739 & 247456 &  67060576 & 4 & 0.81 & 294 & 119 \\
+Q15697 & 738 & 246753 &  66787812 & 4 & 0.16 & 275 & 201 \\
+Q5109  & 867 & 339900 & 108201500 & 6 & 0.60 & 467 & 211 \\
+Q10414 & 738 & 246753 &  66787812 & 3 & 0.33 & 326 & 197 \\
+Q23661 & 702 & 222778 &  57476724 & 6 & 0.99 & 242 & 143 \\
 		\bottomrule
 	\end{tabular}
 	%\end{adjustwidth}
 \end{table}
 
+A final remark concerns the relative effectiveness of the two models, TSPP and TSCP. This comparison is reported in Table \ref{tab:SPP_SCP}. The columns show: the instance name {\it name}, the number of rows {\it rows} and columns {\it cols} of the constraint matrix, and the number of nonzero coefficients {\it nonzeros}. The remaining columns report the CPU time, in seconds, required to generate all feasible segment runs {\it truns}, to solve the instance using model TSPP {\it tSPP}, and to solve it using model TSCP {\it tSCP}. The latter includes the time required by the fixing heuristic used to ensure feasibility of the final TSCP solution. Column {\it GAP} reports the percentage cost gap between the heuristic TSCP solution and the optimal TSPP solution.
 
-Not surprisingly, the set partitioning model could always produce the better solution, as it was the only algorithm that explicitly used the proposed cost function for optimization. More interesting is the limited computational time needed to solve instances with up to a few hundred variables, while the "curse of dimensionality" becomes apparent when solving instances with more than 1000 variables. The healthcare instance, here only a validation case, proves that the approach is also effective for nonlinear segmentation, but the search for optimal fitting parameters requires a very high CPU time. 
+The table summarizes results for the longest series included in our benchmark set. The figures highlight the limited computational burden associated with the preliminary generation of segment runs, as well as the effectiveness of modern MIP solvers, which are able to handle matrices of substantial size and densities exceeding 36\% within a few minutes of CPU time. As expected, the {\it TSPP} model requires longer solution times, whereas {\it TSCP} is on average about 40\% faster. The fixing heuristic runs in negligible time and produces solutions whose average optimality gap with respect to {\it TSPP} remains consistently below 1\%.
 
 %\begin{figure*}[ht]
 %    \centering
