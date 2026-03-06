@@ -543,6 +543,8 @@ bla bla
 
 \subsubsection{Constrained segmentation}
 
+In this section we move to globally constrained series, therefore the only suitable models are TSPP and its heuristic relaxation TSCP. In the examples, models were constrained to propose a number of segments upper bounded by 10 (not "equal to 10" as Dynp could manage), besides a shortest segment length of 8. However, any of the constraints listed in section \ref{subsec:additional_constraints} could have been included.
+
 The results are summarized in tables \ref{tab:seriesQRMSE} and \ref{tab:seriesAIC}. The columns show compatible data in both tables, that is the benchmark set of origin of the series ({\it bench}), the category of the series ({\it category}), the average and maximum number of data points in the group series ({\it avg.n} and {\it max.n}), the corresponding average and maximum number of generated runs ({\it avg.nrun} and {\it max.nrun}), the average and maximum number of chosen segments ({\it avg.nseg} and {max.nsegm}), and the average and maximum CPU time in seconds to solve the extended SCP model, inclusive of the time needed to generate the runs ({\it avg.t} and {\it max.t}).
 
 \begin{table}[H]
@@ -618,7 +620,7 @@ bench & category & avg.n & max.n & avg.nrun & max.nrun & avg.nseg & max.nseg & a
 \end{table}
 
 
-Not surprisingly, the set partitioning model could always produce the better solution, as it was the only algorithm that explicitly used the proposed cost function for optimization. More interesting is the limited computational time needed to solve instances with up to a few hundred variables, while the "curse of dimensionality" becomes apparent when solving instances with more than 1000 variables. The healthcare instance, here only a validation case, proves that the approach is also effective for nonlinear segmentation, but the search for optimal fitting parameters requires a very high CPU time. The figures \ref{fig:environ} show the solution for two environmental data series, while the figures \ref{fig:nonenv} show the two non environmental data series.
+Not surprisingly, the set partitioning model could always produce the better solution, as it was the only algorithm that explicitly used the proposed cost function for optimization. More interesting is the limited computational time needed to solve instances with up to a few hundred variables, while the "curse of dimensionality" becomes apparent when solving instances with more than 1000 variables. The healthcare instance, here only a validation case, proves that the approach is also effective for nonlinear segmentation, but the search for optimal fitting parameters requires a very high CPU time. 
 
 %\begin{figure*}[ht]
 %    \centering
