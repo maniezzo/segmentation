@@ -173,7 +173,7 @@ The resulting Lagrangian model is solved via a subgradient optimization scheme. 
 
 In any case, after solving a set covering relaxation, postprocessing is required to transform any SCP solution into a feasible SPP segmentation. This can be accomplished in linear time by scanning each region of overlapping runs and identifying the splitting point that minimizes the total cost obtained by assigning the preceding observations to the preceding segment and the subsequent observations to the following segment.
 
-\subsection{Cost function}		\label{subsec:costfunc}
+\subsection{Cost function}	\label{subsec:costfunc}
 
 Models TSSP and TSSC are suitable for offline (or anytime) analysis assuming additive costs. The model is independent on the specific function used to quantify the cost associated with each segment. The CPD literature proposes different cost functions, including negative log-likelihood (Horvath 1993; Chen and Gupta 2000), quadratic loss or cumulative sums (e.g., Inclan and Tiao 1994; Rigaill 2010), but any statistical measure of fit can be used for the task. Each measure favors different characteristics of the model and the results can be widely different.
 
@@ -441,29 +441,38 @@ Together, the M3, M4, and M6 benchmarks offer a diverse and demanding experiment
 
 \subsubsection{Cost functions}
 
+Section \ref{subsec:costfunc} introduced the considerations motivating the choice of the cost functions used in our experiments. In particular, we focused on two alternatives: AIC and QRMSE. The former is well established in the changepoint literature, while the latter was found in our experiments to produce segmentations that better align with visual expectations than the commonly used RMSE, of which it represents a minor variant.
+
+Figure \ref{fig:twocosts} illustrates the typical impact of these two criteria on the segmentation results for series N2745. In both cases, model TSPP was applied under the constraints that the minimum segment length be 8 observations and the maximum number of segments be 10.
+
+When AIC is used as the cost function (Figure \ref{fig:AICcost}), the resulting model exploits the full fragmentation allowed by the constraints, producing a segmentation with the maximum number of segments in order to achieve a close fit to the observed data points. In contrast, when QRMSE is used (Figure \ref{fig:QRMSEcost}), the resulting segmentation tends to favor longer segments, tolerating a higher variance of observations around the fitted segments and thereby producing a smoother representation of the series.
+
+These results demonstrate the impact of the choice of cost function on the balance between fidelity to local fluctuations and the reduction of the number of segments.
 
 \begin{figure*}[ht]
 	\centering
 	\subfloat[AIC cost segmentation]{%
 		\includegraphics[width=0.45\textwidth]{N2745-costAIC}
-		\label{fig:temperature}%
+		\label{fig:AICcost}%
 	}%
 	\hfill%
 	\subfloat[QRMSE cost segmentation]{%
 		\includegraphics[width=0.45\linewidth]{N2745-costQRMSE}%
-		\label{fig:battery}%
+		\label{fig:QRMSEcost}%
 	}%
 	\caption{Segmentations derived from different costs, M3 dataseries N2745"}
-	\label{fig:environ}
+	\label{fig:twocosts}
 \end{figure*}
 
+We emphasize that there is no universally “correct” cost function for segmentation. Different criteria emphasize different characteristics of the fitted model and may therefore align better or worse with the expectations placed on the resulting segments. Beyond these modeling preferences, the statistical properties of the series itself also play an important role in determining which cost function performs more satisfactorily.
 
-% Example of a figure that spans the whole page width and with subfigures. The same concept works for tables, too.
+Figure \ref{fig:categories} reports the optimal TSPP segmentation, obtained under the same constraints as in the previous experiment, for four series belonging to different economic categories. The results highlight the considerable heterogeneity present in these datasets. Even within a single category, series may exhibit markedly different structural properties, such as variability, seasonality, or frequency of structural changes.
+
+Because of this diversity, relying on a single cost function often entails a human-in-the-loop process in which the analyst repeatedly adjusts optimization control parameters to obtain satisfactory segmentations. In contrast, selecting a cost function whose properties are known to match the statistical characteristics of the series can already guide the optimization toward the expected segmentation, reducing or eliminating the need for manual intervention.
+
 \begin{figure}[ht]
-	%\isPreprints{}{% This command is only used for ``preprints''.
 		\begin{adjustwidth}{-\extralength}{0cm}
 			\raggedleft 
-			%} % If the paper is ``preprints'', please uncomment this parenthesis.
 		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{N2602-costQRMSE.eps}}
 		%\hfill
 		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{N1901-costQRMSE.eps}}\\
@@ -472,6 +481,7 @@ Together, the M3, M4, and M6 benchmarks offer a diverse and demanding experiment
 		\subfloat[\centering]{\includegraphics[width=0.45\textwidth]{Q10414-costQRMSE.eps}}
 	\end{adjustwidth}
 	\caption{Different dataseries categories (\textbf{a}) Financial. (\textbf{b}) Industry. (\textbf{c}) Macroeconomics. (\textbf{d}) Microeconomics.\label{fig2}}
+	\label{fig:categories}
 \end{figure}
 
 
@@ -587,6 +597,25 @@ bench & category & avg.n & max.n & avg.nrun & max.nrun & avg.nseg & max.nseg & a
 	%\end{adjustwidth}
 \end{table}
 
+
+
+\begin{table}[H]
+	\centering
+	\caption{Partitioning vs. covering comparison}\label{tab:SPP_SCP}%
+	\begin{tabular}{@{}lrrrrrr}
+		\toprule
+		name & rows & cols & nonzeros & truns & tSPP & tSCP \\
+		\midrule
+		Q13050 & 736 & 245350 &  66244500 & 2 &  219 & 162 \\
+		Q22221 & 739 & 247456 &  67060576 & 4 &  294 & 119 \\
+		Q15697 & 738 & 246753 &  66787812 & 4 &  275 & 201 \\
+		Q5109  & 867 & 339900 & 108201500 & 6 &  467 & 211 \\
+		Q10414 & 738 & 246753 &  66787812 & 3 &  326 & 197 \\
+		Q23661 & 702 & 222778 &  57476724 & 6 &  242 & 143 \\
+		\bottomrule
+	\end{tabular}
+	%\end{adjustwidth}
+\end{table}
 
 
 Not surprisingly, the set partitioning model could always produce the better solution, as it was the only algorithm that explicitly used the proposed cost function for optimization. More interesting is the limited computational time needed to solve instances with up to a few hundred variables, while the "curse of dimensionality" becomes apparent when solving instances with more than 1000 variables. The healthcare instance, here only a validation case, proves that the approach is also effective for nonlinear segmentation, but the search for optimal fitting parameters requires a very high CPU time. The figures \ref{fig:environ} show the solution for two environmental data series, while the figures \ref{fig:nonenv} show the two non environmental data series.
