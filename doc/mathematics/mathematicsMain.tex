@@ -489,57 +489,85 @@ Because of this diversity, relying on a single cost function often entails a hum
 
 bla bla
 
+
 \begin{table}[H]
 	\centering
-	\caption{PELT: Data series results, QRMSE cost}\label{tab:PseriesQRMSE}%
-	\begin{tabular}{lllrrrrrrr}
-		\toprule
-		benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm & max.nsegm & avg.t \\
-		\midrule
-		M3 & Demographic  & QRMSE & 122.6 & 138 & 226.0 & 262 & 1.2 & 5 & 0.0 \\
-		M3 & Finance      & QRMSE & 124.8 & 144 & 227.6 & 266 & 1.8 & 7 & 0.0 \\
-		M3 & Industry     & QRMSE & 139.0 & 144 & 256.0 & 266 & 0.0 & 0 & 0.0 \\
-		M3 & Macrp        & QRMSE & 128.0 & 144 & 234.0 & 266 & 0.6 & 2 & 0.0 \\
-		M3 & Micro        & QRMSE & 91.8 & 126 & 161.6 & 230 & 0.0 & 0 & 0.0 \\
-		M3 & Other        & QRMSE & 80.8 & 120 & 139.8 & 218 & 0.6 & 3 & 0.0 \\
-		M4 & Demographic & QRMSE & 241.8 & 735 & 463.2 & 1455 & 4.2 & 15 & 0.0 \\
-		M4 & Finance & QRMSE & 246.0 & 738 & 470.4 & 1454 & 2.0 & 6 & 0.0 \\
-		M4 & Industry & QRMSE & 258.4 & 737 & 495.0 & 1452 & 1.0 & 4 & 0.0 \\
-		M4 & Macro & QRMSE & 280.0 & 866 & 546.0 & 1718 & 6.4 & 26 & 0.0 \\
-		M4 & Micro & QRMSE & 232.8 & 737 & 443.6 & 1452 & 0.4 & 2 & 0.0 \\
-		M4 & Other & QRMSE & 260.4 & 701 & 500.8 & 1381 & 4.0 & 10 & 0.0 \\
-		M6 & Finance & QRMSE & 264.8 & 367 & 507.7 & 712 & 0.0 & 0 & 0.0 \\
-		\bottomrule
-	\end{tabular}
-	%\end{adjustwidth}
+	\caption{PELT: Data series results, AIC-QRMSE cost}\label{tab:seriesAICQRMSE}%
+\begin{tabular}{llcccccccc}
+	\toprule
+	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
+	Bench & Category & avg n.seg & max n.seg & avg.t & max.t & avg n.seg & max n.seg & avg.t & max.t \\
+	\midrule
+	M3 & Demographic  & 2.8 & 6.0 & 0.0 & 0.0 &   1.2 & 5.0 & 0.0 & 0.0 \\
+	M3 & Finance    & 2.6 & 8.0 & 0.0 & 0.0 &   1.8 & 7.0 & 0.0 & 0.0 \\
+	M3 & Industry      & 0.4 & 1.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+	M3 & Macro        & 1.8 & 4.0 & 0.0 & 0.0   & 0.6 & 2.0 & 0.0 & 0.0 \\
+	M3 & Micro         & 0.2 & 1.0 & 0.0 & 0.0   & 0.0 & 0.0 & 0.0 & 0.0 \\
+	M3 & Other          & 1.8 & 3.0 & 0.0 & 0.0   & 0.6 & 3.0 & 0.0 & 0.0 \\
+	M4 & Demographic   & 7.0 & 25.0 & 0.0 & 0.1   & 4.2 & 15.0 & 0.0 & 0.0 \\
+	M4 & Finance  & 6.0 & 16.0 & 0.0 & 0.1 &   2.0 & 6.0 & 0.0 & 0.0 \\
+	M4 & Industry  & 4.2 & 9.0 & 0.0 & 0.1 &   1.0 & 4.0 & 0.0 & 0.0 \\
+	M4 & Macro  & 9.8 & 34.0 & 0.0 & 0.1 & 6.4 & 26.0 & 0.0 & 0.0 \\
+	M4 & Micro  & 3.4 & 8.0 & 0.0 & 0.1   & 0.4 & 2.0 & 0.0 & 0.0 \\
+	M4 & Other   & 9.0 & 27.0 & 0.0 & 0.0  & 4.0 & 10.0 & 0.0 & 0.0 \\
+	M6 & Finance   & 5.6 & 7.0 & 0.0 & 0.0   & 0.0 & 0.0 & 0.0 & 0.0 \\
+	\bottomrule
+\end{tabular}
+%\end{adjustwidth}
+\end{table}
+
+
+\begin{table}[H]
+	\centering
+	\caption{DYNP: Data series results, AIC-QRMSE cost}\label{tab:seriesAICQRMSE}%
+\begin{tabular}{llcccccccc}
+	\toprule
+	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
+	Bench & Category & avg n.seg & max n.seg & avg.t & max.t & avg n.seg & max n.seg & avg.t & max.t \\
+	\midrule
+	M3 & Demographic    & 9.6 & 10.0 & 0.0 & 0.0   & 9.6 & 10.0 & 0.0 & 0.0 \\
+	M3 & Finance        & 9.8 & 10.0 & 0.0 & 0.1   & 9.8 & 10.0 & 0.0 & 0.0 \\
+	M3 & Industry      & 10.0 & 10.0 & 0.0 & 0.0   & 10.0 & 10.0 & 0.0 & 0.0 \\
+	M3 & Macro          & 10.0 & 10.0 & 0.0 & 0.1   & 10.0 & 10.0 & 0.0 & 0.0 \\
+	M3 & Micro          & 8.8 & 10.0 & 0.0 & 0.0   & 8.8 & 10.0 & 0.0 & 0.0 \\
+	M3 & Other          & 8.4 & 10.0 & 0.0 & 0.0   & 8.4 & 10.0 & 0.0 & 0.0 \\
+	M4 & Demographic   & 10.0 & 10.0 & 0.5 & 2.5   & 10.0 & 10.0 & 0.5 & 2.6 \\
+	M4 & Finance   & 10.0 & 10.0 & 0.5 & 2.5 & 10.0 & 10.0 & 0.5 & 2.6 \\
+	M4 & Industry   & 10.0 & 10.0 & 0.5 & 2.5   & 10.0 & 10.0 & 0.5 & 2.5 \\
+	M4 & Macro   & 10.0 & 10.0 & 0.8 & 3.7   & 10.0 & 10.0 & 0.8 & 3.9 \\
+	M4 & Micro   & 10.0 & 10.0 & 0.5 & 2.5   & 10.0 & 10.0 & 0.5 & 2.6 \\
+	M4 & Other   & 10.0 & 10.0 & 0.5 & 2.2   & 10.0 & 10.0 & 0.5 & 2.3 \\
+	M6 & Finance   & 10.0 & 10.0 & 0.2 & 0.2   & 10.0 & 10.0 & 0.2 & 0.2 \\
+	\bottomrule
+\end{tabular}
+%\end{adjustwidth}
 \end{table}
 
 \begin{table}[H]
 	\centering
-	\caption{PELT: Data series results, AIC cost}\label{tab:PseriesAIC}%
-	\begin{tabular}{lllrrrrrrr}
-		\toprule
-		benchmark & category & cost & avg.n & max.n & avg.nruns & max.nruns & avg.nsegm & max.nsegm & avg.t \\
-		\midrule
-		M3 & Demographic  & AIC & 122.6 & 138 & 3740.6 & 5152 & 2.0 & 4 & 0.0 \\
-		M3 & Finance      & AIC & 124.8 & 144 & 3917.8 & 6523 & 1.8 & 4 & 0.0 \\
-		M3 & Industry     & AIC & 139.0 & 144 & 3334.8 & 5592 & 0.2 & 1 & 0.0 \\
-		M3 & Macro        & AIC & 128.0 & 144 & 4333.0 & 7192 & 1.2 & 2 & 0.0 \\
-		M3 & Micro        & AIC & 91.8 & 126 & 1421.0 & 2999 & 0.2 & 1 & 0.0 \\
-		M3 & Other        & AIC & 80.8 & 120 & 1321.0 & 1545 & 0.8 & 2 & 0.0 \\
-		M4 & Demographic & AIC & 241.8 & 735 & 9673.4 & 33364 & 4.8 & 17 & 0.0 \\
-		M4 & Finance & AIC & 246.0 & 738 & 11889.8 & 46477 & 5.4 & 15 & 0.0 \\
-		M4 & Industry & AIC & 258.4 & 737 & 14743.8 & 57210 & 3.4 & 7 & 0.0 \\
-		M4 & Macro & AIC & 280.0 & 866 & 10578.6 & 35795 & 7.2 & 25 & 0.0 \\
-		M4 & Micro & AIC & 232.8 & 737 & 13525.0 & 54636 & 2.4 & 7 & 0.0 \\
-		M4 & Other & AIC & 260.4 & 701 & 10996.2 & 30864 & 4.6 & 13 & 0.0 \\
-		M6 & Finance & AIC & 264.8 & 367 & 13019.6 & 16118 & 4.0 & 6 & 0.0 \\
-		\bottomrule
-	\end{tabular}
-	%\end{adjustwidth}
+	\caption{WBS: Data series results, AIC-QRMSE cost}\label{tab:seriesAICQRMSE}%
+\begin{tabular}{llcccccccc}
+	\toprule
+	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
+	Bench & Category & avg n.seg & max n.seg & avg.t & max.t & avg n.seg & max n.seg & avg.t & max.t \\
+	\midrule
+	M3 & Demographic  & 8.0 & 11.0 & 0.2 & 0.3   & 1.4 & 3.0 & 0.1 & 0.2 \\
+	M3 & Finance   & 8.0 & 11.0 & 0.2 & 0.2 &   1.4 & 2.0 & 0.1 & 0.1 \\
+	M3 & Industry      & 5.6 & 12.0 & 0.3 & 0.5   & 1.0 & 1.0 & 0.1 & 0.1 \\
+	M3 & Macro          & 8.0 & 11.0 & 0.2 & 0.3   & 1.0 & 1.0 & 0.1 & 0.1 \\
+	M3 & Micro          & 2.8 & 6.0 & 0.1 & 0.3   & 1.0 & 1.0 & 0.0 & 0.1 \\
+	M3 & Other          & 4.4 & 6.0 & 0.1 & 0.1   & 1.2 & 2.0 & 0.0 & 0.1 \\
+	M4 & Demographic   & 17.6 & 55.0 & 0.8 & 3.0   & 3.2 & 5.0 & 0.3 & 0.7 \\
+	M4 & Finance &   18.6 & 56.0 & 0.7 & 2.8 &   2.8 & 7.0 & 0.2 & 0.7 \\
+	M4 & Industry   & 12.0 & 27.0 & 0.8 & 2.8   & 2.4 & 5.0 & 0.2 & 0.4 \\
+	M4 & Macro   & 21.2 & 69.0 & 0.9 & 3.3   & 2.8 & 6.0 & 0.4 & 1.5 \\
+	M4 & Micro   & 10.4 & 22.0 & 0.7 & 2.7   & 1.2 & 2.0 & 0.1 & 0.4 \\
+	M4 & Other   & 18.8 & 51.0 & 0.8 & 2.5   & 1.8 & 4.0 & 0.3 & 1.2 \\
+	M6 & Finance   & 17.6 & 21.0 & 0.7 & 0.8   & 1.0 & 1.0 & 0.1 & 0.1 \\
+	\bottomrule
+\end{tabular}
+%\end{adjustwidth}
 \end{table}
-
-
 
 \subsubsection{Constrained segmentation}
 
