@@ -487,12 +487,35 @@ Because of this diversity, relying on a single cost function often entails a hum
 
 \subsubsection{Unconstrained segmentation}
 
-bla bla
+In this section we report the results obtained using the three unconstrained changepoint detection algorithms described earlier, namely Pelt, Dynp and Wild Binary Segmentation (WBS). 
+The experiments were conducted on the M3, M4 and M6 benchmark datasets in order to provide baseline results for comparison with the proposed set-covering MILP framework. 
 
+To ensure a consistent experimental setting across all algorithms, the minimum segment length was fixed to 8 observations. 
+This choice prevents the detection of extremely short segments and aligns the unconstrained methods with the structural constraints that will later be considered.
+
+The parameters of the three algorithms were selected through preliminary calibration experiments carried out on a small number of representative series drawn from different dataset categories. For each method, several parameter configurations were tested and the final parameter values were chosen so as to obtain segmentations whose number of segments is broadly comparable with the segmentation structures considered in the experiments with the proposed set-covering MILP framework.
+
+For the Pelt algorithm, the penalty parameters were set to $\beta=40$ for the AIC function cost and $\beta=0.05$ for the QRMSE function cost, with \texttt{jump} $=1$ and \texttt{min\_size} $=8$.  
+
+For Dynp, the number of breakpoints was fixed to $9$, corresponding to a target segmentation of $10$ segments. This choice was motivated by the fact that the esperiments with the proposal framework consider segmentations with up to $10$ segments. The minimum segment length was again set to $8$ observations. For shorter series, the reqeusted number of breakpoints may not always be feasible under this constraint; in those cases, the number of breakpoints was automatically reduced to the largest asmissible value.
+
+For WBS, the number of randomly generated intervals was fixed to $M=400$, while the minimum segment length was set to $8$ observations. The threshold parameters were calibrated separately for the two cost functions and set to $\texttt{thr}_{\text{AIC}}=20$ and $\texttt{thr}_{\text{QRMSE}}=10$. 
+
+The results reported in Tables~\ref{tab:PELTseriesAICQRMSE}--\ref{tab:WBSeriesAICQRMSE} highlight several differences among the three approaches. In general, the number of detected segments varies substantially depending on both the algorithm and the cost function. 
+The AIC function cost tends to produce more fragmented segmentations, while the QRMSE function cost generally tends to smoother segmentations with fewer segments. 
+
+Among the three methods, Pelt often produces the smallest number of segments, reflecting the influence of the penalty term in the objective function. 
+Dynp, on the other hand, tends to generate segmentations closer to the desired cardinality of ten segments, since the number of breakpoints is fixed. Finally, WBS typically exhibits the largest variability in the number of detected segments, which can be attributed to the interval sampling procedure. 
+
+Both Pelt and Dynp are exact optimization methods and were implemented using the Ruptures library. 
+Among the two, Pelt is typically the fastest algorithm, since its pruning strategy allows it to discard many candidate changepoints during the search process.
+The Dynp algorithm generally requires slightly higher computational times because it relies on a dynamic programming procedure whose complexity grows with both the length of the series and the number of requested breakpoints. 
+In constrast, WBS is not an exact optimization method and it repeatedly evaluates changepoint statistics over a large number of randomly generated intervals ($M=400$ in our experiments), which increases the computational burden. 
+As a result, WBS typically requires longer CPU times compared with the other two methods.
 
 \begin{table}[H]
 	\centering
-	\caption{PELT: Data series results, AIC-QRMSE cost}\label{tab:seriesAICQRMSE}%
+	\caption{PELT: Data series results, AIC-QRMSE cost}\label{tab:PELTseriesAICQRMSE}%
 \begin{tabular}{llcccccccc}
 	\toprule
 	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
@@ -519,7 +542,7 @@ bla bla
 
 \begin{table}[H]
 	\centering
-	\caption{DYNP: Data series results, AIC-QRMSE cost}\label{tab:seriesAICQRMSE}%
+	\caption{DYNP: Data series results, AIC-QRMSE cost}\label{tab:DYNPseriesAICQRMSE}%
 \begin{tabular}{llcccccccc}
 	\toprule
 	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
@@ -545,7 +568,7 @@ bla bla
 
 \begin{table}[H]
 	\centering
-	\caption{WBS: Data series results, AIC-QRMSE cost}\label{tab:seriesAICQRMSE}%
+	\caption{WBS: Data series results, AIC-QRMSE cost}\label{tab:WBSeriesAICQRMSE}%
 \begin{tabular}{llcccccccc}
 	\toprule
 	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
