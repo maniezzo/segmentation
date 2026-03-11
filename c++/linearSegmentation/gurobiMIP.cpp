@@ -55,7 +55,7 @@ int populateGurobiByRow(GRBModel& model,
                sum += xVars[j];
          }
          string cname = "c" + to_string(i);
-         GRBConstr c = model.addConstr(sum == 1.0, cname);  // <<<<<<<<<<<<<<<<<<< PARTITIONING OPPURE COVERING == oppure <=
+         GRBConstr c = model.addConstr(sum == 1.0, cname);  // <<<<<<<<<<<<<<<<<<< PARTITIONING OPPURE COVERING == oppure >=
          constrs.push_back(c);
       }
       model.update();
