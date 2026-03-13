@@ -1,3 +1,0 @@
-benchmark,category,series_id,cost_name,changepoints,seg_index,low,high,seg_cost,total_cost,time_sec,jump,min_size,pen
-M3,INDUSTRY    ,N2072,AIC,[144],1,0,144,1573.148373133702,1573.148373133702,0.0027978750003967434,1,8,40.0
-M3,INDUSTRY    ,N2072,QRMSE,[144],1,0,144,805.0345341411988,805.0345341411988,0.0009583339997334406,1,8,40.0
