@@ -1,0 +1,14 @@
+benchmark,category,cost,avg.nsegm,max.nsegm,avg.t,max.t
+M3,DEMOGRAPHIC ,QRMSE,2.8,4,0.0,0.0
+M3,FINANCE     ,QRMSE,3.6,7,0.0,0.0
+M3,INDUSTRY    ,QRMSE,3.2,12,0.0,0.0
+M3,MACRO       ,QRMSE,2.2,3,0.0,0.0
+M3,MICRO       ,QRMSE,1.0,1,0.0,0.0
+M3,OTHER       ,QRMSE,1.8,4,0.0,0.0
+M4,Demographic,QRMSE,7.4,10,0.0,0.0
+M4,Finance,QRMSE,5.8,10,0.0,0.0
+M4,Industry,QRMSE,5.4,7,0.0,0.0
+M4,Macro,QRMSE,5.2,17,0.0,0.0
+M4,Micro,QRMSE,3.8,6,0.0,0.0
+M4,Other,QRMSE,3.4,9,0.0,0.0
+M6,Finance,QRMSE,1.0,1,0.0,0.0
