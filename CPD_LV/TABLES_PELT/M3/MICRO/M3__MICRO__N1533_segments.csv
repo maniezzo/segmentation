@@ -1,3 +1,0 @@
-benchmark,category,series_id,cost_name,changepoints,seg_index,low,high,seg_cost,total_cost,time_sec,jump,min_size,pen
-M3,MICRO       ,N1533,AIC,[69],1,0,69,856.0063735691494,856.0063735691494,0.0004121669990126975,1,8,40.0
-M3,MICRO       ,N1533,QRMSE,[69],1,0,69,57.79521440349704,57.79521440349704,0.00036174999877403025,1,8,0.05

@@ -1,3 +1,0 @@
-benchmark,category,series_id,cost_name,changepoints,seg_index,low,high,seg_cost,total_cost,time_sec,jump,min_size,pen
-M4,Industry,Q16176,AIC,[118],1,0,118,1634.5698089182388,1634.5698089182388,0.0017754159998730756,1,8,40.0
-M4,Industry,Q16176,QRMSE,[118],1,0,118,92.19001185032667,92.19001185032667,0.000646415999653982,1,8,0.05
