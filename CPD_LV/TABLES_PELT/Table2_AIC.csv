@@ -1,0 +1,14 @@
+benchmark,category,cost,avg.nsegm,max.nsegm,avg.t,max.t
+M3,DEMOGRAPHIC ,AIC,3.8,7,0.0,0.0
+M3,FINANCE     ,AIC,3.6,9,0.0,0.0
+M3,INDUSTRY    ,AIC,1.4,2,0.0,0.0
+M3,MACRO       ,AIC,2.8,5,0.0,0.0
+M3,MICRO       ,AIC,1.2,2,0.0,0.0
+M3,OTHER       ,AIC,2.8,4,0.0,0.0
+M4,Demographic,AIC,8.0,26,0.0,0.1
+M4,Finance,AIC,7.0,17,0.0,0.1
+M4,Industry,AIC,5.2,10,0.0,0.1
+M4,Macro,AIC,10.8,35,0.0,0.1
+M4,Micro,AIC,4.4,9,0.0,0.1
+M4,Other,AIC,10.0,28,0.0,0.0
+M6,Finance,AIC,6.6,8,0.0,0.0

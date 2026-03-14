@@ -495,14 +495,27 @@ This choice prevents the detection of extremely short segments and aligns the un
 
 The parameters of the three algorithms were selected through preliminary calibration experiments carried out on a small number of representative series drawn from different dataset categories. For each method, several parameter configurations were tested and the final parameter values were chosen so as to obtain segmentations whose number of segments is broadly comparable with the segmentation structures considered in the experiments with the proposed set-covering MILP framework.
 
-For the Pelt algorithm, the penalty parameters were set to $\beta=40$ for the AIC function cost and $\beta=0.05$ for the QRMSE function cost, with \texttt{jump} $=1$ and \texttt{min\_size} $=8$.  
+For the Pelt algorithm, the penalty parameters were set to $\beta=40$ for both the AIC function cost and the QRMSE function cost, with \texttt{jump} $=1$ and \texttt{min\_size} $=8$.  
 
 For Dynp, the number of breakpoints was fixed to $9$, corresponding to a target segmentation of $10$ segments. This choice was motivated by the fact that the esperiments with the proposal framework consider segmentations with up to $10$ segments. The minimum segment length was again set to $8$ observations. For shorter series, the reqeusted number of breakpoints may not always be feasible under this constraint; in those cases, the number of breakpoints was automatically reduced to the largest asmissible value.
 
 For WBS, the number of randomly generated intervals was fixed to $M=400$, while the minimum segment length was set to $8$ observations. The threshold parameters were calibrated separately for the two cost functions and set to $\texttt{thr}_{\text{AIC}}=20$ and $\texttt{thr}_{\text{QRMSE}}=10$. 
 
 The results reported in Tables~\ref{tab:PELTseriesAICQRMSE}--\ref{tab:WBSeriesAICQRMSE} highlight several differences among the three approaches. In general, the number of detected segments varies substantially depending on both the algorithm and the cost function. 
-The AIC function cost tends to produce more fragmented segmentations, while the QRMSE function cost generally tends to smoother segmentations with fewer segments. 
+
+In particular, the AIC criterion generally favors more fragmented segmentations while the QRMSE criterion tends to produce smoother segmentations with fewer changepoints.
+In our implementation, QRMSE is computed as a quarter-root RMSE, obtained from the residual sum of squares as
+
+\[
+QRMSE = \sqrt{\frac{SSE}{\sqrt{n}}}
+\]
+
+which effectively corresponds to scaling the residual sum of squares with an exponent proportional to $n^{1/4}$. 
+This formulation reduces the implicit penalty associated with long segments compared with classical RMSE or MSE-based criteria. 
+As a consequence, longer segments are penalized less strongly and the resulting segmentations tend to be smoother.
+
+The influence of this formulation is clearly visible in Table~1. When the PELT algorithm is used with the same penalty parameter $\beta = 40$ for both cost functions, the QRMSE criterion generally produces fewer segments than AIC across most dataset categories. 
+For example, in several M4 categories the average number of detected segments decreases noticeably under QRMSE, reflecting the reduced tendency of the criterion to split long segments.
 
 Among the three methods, Pelt often produces the smallest number of segments, reflecting the influence of the penalty term in the objective function. 
 Dynp, on the other hand, tends to generate segmentations closer to the desired cardinality of ten segments, since the number of breakpoints is fixed. Finally, WBS typically exhibits the largest variability in the number of detected segments, which can be attributed to the interval sampling procedure. 
@@ -516,26 +529,26 @@ As a result, WBS typically requires longer CPU times compared with the other two
 \begin{table}[H]
 	\centering
 	\caption{PELT: Data series results, AIC-QRMSE cost}\label{tab:PELTseriesAICQRMSE}%
-\begin{tabular}{ll|cccc|cccc}
+\begin{tabular}{@{}cl|lr|rr|rr|rr}
 	\toprule
-	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
+	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} \\
 	Bench & Category & avg n.seg & max n.seg & avg.t & max.t & avg n.seg & max n.seg & avg.t & max.t \\
 	\midrule
-	M3 & Demographic   & 3.8 & 7.0 & 0.0 & 0.0   & 10.2 & 13.0 & 0.0 & 0.0 \\
-	M3 & Finance      & 3.6 & 9.0 & 0.0 & 0.0 & 10.0 & 13.0 & 0.0 & 0.0 \\
-	M3 & Industry       & 1.4 & 2.0 & 0.0 & 0.0   & 13.0 & 17.0 & 0.0 & 0.0 \\
-	M3 & Macro          & 2.8 & 5.0 & 0.0 & 0.0   & 11.2 & 15.0 & 0.0 & 0.0 \\
-	M3 & Micro          & 1.2 & 2.0 & 0.0 & 0.0   & 3.2 & 7.0 & 0.0 & 0.0 \\
-	M3 & Other          & 2.8 & 4.0 & 0.0 & 0.0   & 5.2 & 7.0 & 0.0 & 0.0 \\
-	M4 & Demographic   & 8.0 & 26.0 & 0.0 & 0.1   & 23.6 & 72.0 & 0.0 & 0.0 \\
-	M4 & Finance   & 7.0 & 17.0 & 0.0 & 0.1 &   23.4 & 74.0 & 0.0 & 0.0 \\
-	M4 & Industry   & 5.2 & 10.0 & 0.0 & 0.1 &   17.0 & 43.0 & 0.0 & 0.0 \\
-	M4 & Macro   & 10.8 & 35.0 & 0.0 & 0.1 &   27.2 & 84.0 & 0.0 & 0.0 \\
-	M4 & Micro   & 4.4 & 9.0 & 0.0 & 0.1 &   13.6 & 28.0 & 0.0 & 0.0 \\
-	M4 & Other   & 10.0 & 28.0 & 0.0 & 0.0   & 23.6 & 65.0 & 0.0 & 0.0 \\
-	M6 & Finance   & 6.6 & 8.0 & 0.0 & 0.0   & 2.6 & 9.0 & 0.0 & 0.0 \\
+	M3 & Demographic    & 3.8 & 7.0 & 0.0 & 0.0 & 2.8 & 4.0 & 0.0 & 0.0 \\
+	M3 & Finance       & 3.6 & 9.0 & 0.0 & 0.0   & 3.6 & 7.0 & 0.0 & 0.0 \\
+	M3 & Industry      & 1.4 & 2.0 & 0.0 & 0.0   & 3.2 & 12.0 & 0.0 & 0.0 \\
+	M3 & Macro         & 2.8 & 5.0 & 0.0 & 0.0   & 2.2 & 3.0 & 0.0 & 0.0 \\
+	M3 & Micro          & 1.2 & 2.0 & 0.0 & 0.0   & 1.0 & 1.0 & 0.0 & 0.0 \\
+	M3 & Other          & 2.8 & 4.0 & 0.0 & 0.0   & 1.8 & 4.0 & 0.0 & 0.0 \\
+	M4 & Demographic   & 8.0 & 26.0 & 0.0 & 0.1  & 7.4 & 10.0 & 0.0 & 0.0 \\
+	M4 & Finance   & 7.0 & 17.0 & 0.0 & 0.1 &   5.8 & 10.0 & 0.0 & 0.0 \\
+	M4 & Industry   & 5.2 & 10.0 & 0.0 & 0.1   & 5.4 & 7.0 & 0.0 & 0.0 \\
+	M4 & Macro   & 10.8 & 35.0 & 0.0 & 0.1   & 5.2 & 17.0 & 0.0 & 0.0 \\
+	M4 & Micro   & 4.4 & 9.0 & 0.0 & 0.1 &   3.8 & 6.0 & 0.0 & 0.0 \\
+	M4 & Other   & 10.0 & 28.0 & 0.0 & 0.0   & 3.4 & 9.0 & 0.0 & 0.0 \\
+	M6 & Finance   & 6.6 & 8.0 & 0.0 & 0.0   & 1.0 & 1.0 & 0.0 & 0.0 \\
 	\bottomrule
-	\end{tabular}
+\end{tabular}
 %\end{adjustwidth}
 \end{table}
 
@@ -543,24 +556,24 @@ As a result, WBS typically requires longer CPU times compared with the other two
 \begin{table}[H]
 	\centering
 	\caption{DYNP: Data series results, AIC-QRMSE cost}\label{tab:DYNPseriesAICQRMSE}%
-\begin{tabular}{llcccccccc}
+\begin{tabular}{@{}cl|lr|rr|rr|rr}
 	\toprule
-	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
+	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE}  \\
 	Bench & Category & avg n.seg & max n.seg & avg.t & max.t & avg n.seg & max n.seg & avg.t & max.t \\
 	\midrule
 	M3 & Demographic    & 9.6 & 10.0 & 0.0 & 0.0   & 9.6 & 10.0 & 0.0 & 0.0 \\
-	M3 & Finance      &   9.8 & 10.0 & 0.0 & 0.1 &   9.8 & 10.0 & 0.0 & 0.0 \\
+	M3 & Finance      &   9.8 & 10.0 & 0.0 & 0.1  & 9.8 & 10.0 & 0.0 & 0.0 \\
 	M3 & Industry     &   10.0 & 10.0 & 0.0 & 0.0   & 10.0 & 10.0 & 0.0 & 0.0 \\
 	M3 & Macro        &   10.0 & 10.0 & 0.0 & 0.1   & 10.0 & 10.0 & 0.0 & 0.0 \\
 	M3 & Micro        &   8.8 & 10.0 & 0.0 & 0.0   & 8.8 & 10.0 & 0.0 & 0.0 \\
 	M3 & Other        &   8.4 & 10.0 & 0.0 & 0.0   & 8.4 & 10.0 & 0.0 & 0.0 \\
-	M4 & Demographic   & 10.0 & 10.0 & 0.5 & 2.5   & 10.0 & 10.0 & 0.5 & 2.6 \\
-	M4 & Finance &   10.0 & 10.0 & 0.5 & 2.6 &   10.0 & 10.0 & 0.5 & 2.6 \\
-	M4 & Industry &   10.0 & 10.0 & 0.5 & 2.6 &   10.0 & 10.0 & 0.6 & 2.7 \\
-	M4 & Macro &   10.0 & 10.0 & 0.8 & 3.7 &   10.0 & 10.0 & 0.8 & 4.0 \\
-	M4 & Micro &   10.0 & 10.0 & 0.5 & 2.6 &   10.0 & 10.0 & 0.5 & 2.7 \\
-	M4 & Other &   10.0 & 10.0 & 0.5 & 2.2 &   10.0 & 10.0 & 0.5 & 2.4 \\
-	M6 & Finance &   10.0 & 10.0 & 0.2 & 0.2   & 10.0 & 10.0 & 0.2 & 0.2 \\
+	M4 & Demographic   & 10.0 & 10.0 & 0.5 & 2.6   & 10.0 & 10.0 & 0.6 & 2.7 \\
+	M4 & Finance &   10.0 & 10.0 & 0.5 & 2.5 &   10.0 & 10.0 & 0.6 & 2.8 \\
+	M4 & Industry  & 10.0 & 10.0 & 0.5 & 2.6 &   10.0 & 10.0 & 0.6 & 2.7 \\
+	M4 & Macro   & 10.0 & 10.0 & 0.8 & 3.7 &   10.0 & 10.0 & 0.8 & 4.1 \\
+	M4 & Micro   & 10.0 & 10.0 & 0.5 & 2.5 &   10.0 & 10.0 & 0.6 & 2.8 \\
+	M4 & Other   & 10.0 & 10.0 & 0.5 & 2.3 &   10.0 & 10.0 & 0.5 & 2.5 \\
+	M6 & Finance   & 10.0 & 10.0 & 0.2 & 0.2   & 10.0 & 10.0 & 0.2 & 0.2 \\
 	\bottomrule
 \end{tabular}
 %\end{adjustwidth}
@@ -569,24 +582,24 @@ As a result, WBS typically requires longer CPU times compared with the other two
 \begin{table}[H]
 	\centering
 	\caption{WBS: Data series results, AIC-QRMSE cost}\label{tab:WBSeriesAICQRMSE}%
-\begin{tabular}{llcccccccc}
+\begin{tabular}{@{}cl|lr|rr|rr|rr}
 	\toprule
-	& & \multicolumn{4}{c}{AIC} & \multicolumn{4}{c}{QRMSE} \\
+	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} \\
 	Bench & Category & avg n.seg & max n.seg & avg.t & max.t & avg n.seg & max n.seg & avg.t & max.t \\
 	\midrule
-	M3 & Demographic    & 8.0 & 11.0 & 0.2 & 0.3   & 11.4 & 14.0 & 0.2 & 0.2 \\
-	M3 & Finance        & 8.0 & 11.0 & 0.2 & 0.2   & 9.8 & 12.0 & 0.2 & 0.2 \\
-	M3 & Industry       & 5.6 & 12.0 & 0.3 & 0.5   & 13.0 & 16.0 & 0.3 & 0.4 \\
-	M3 & Macro          & 8.0 & 11.0 & 0.2 & 0.3   & 11.6 & 14.0 & 0.2 & 0.3 \\
-	M3 & Micro          & 2.8 & 6.0 & 0.1 & 0.3   & 6.2 & 10.0 & 0.1 & 0.2 \\
-	M3 & Other          & 4.4 & 6.0 & 0.1 & 0.1   & 6.8 & 8.0 & 0.1 & 0.2 \\
-	M4 & Demographic   & 17.6 & 55.0 & 0.8 & 2.9  & 22.6 & 70.0 & 0.6 & 2.4 \\
-	M4 & Finance &   18.6 & 56.0 & 0.7 & 2.7 &   22.4 & 67.0 & 0.6 & 2.4 \\
-	M4 & Industry   & 12.0 & 27.0 & 0.8 & 2.8  & 18.2 & 52.0 & 0.6 & 2.4 \\
-	M4 & Macro   & 21.2 & 69.0 & 0.9 & 3.3   & 25.6 & 78.0 & 0.7 & 2.7 \\
-	M4 & Micro   & 10.4 & 22.0 & 0.7 & 2.7   & 14.4 & 31.0 & 0.5 & 2.1 \\
-	M4 & Other   & 18.8 & 51.0 & 0.8 & 2.5   & 23.0 & 61.0 & 0.6 & 2.0 \\
-	M6 & Finance   & 17.6 & 21.0 & 0.7 & 0.8   & 6.4 & 18.0 & 0.4 & 0.6 \\
+	M3 & Demographic    & 8.0 & 11.0 & 0.2 & 0.3   & 5.6 & 8.0 & 0.2 & 0.3 \\
+	M3 & Finance      &   8.0 & 11.0 & 0.2 & 0.2 &   7.0 & 12.0 & 0.2 & 0.3 \\
+	M3 & Industry     &   5.6 & 12.0 & 0.3 & 0.5 &   4.2 & 14.0 & 0.2 & 0.4 \\
+	M3 & Macro        &   8.0 & 11.0 & 0.2 & 0.3 &   4.8 & 6.0 & 0.2 & 0.3 \\
+	M3 & Micro      &   2.8 & 6.0 & 0.1 & 0.3 &   1.0 & 1.0 & 0.1 & 0.1 \\
+	M3 & Other       &   4.4 & 6.0 & 0.1 & 0.1 &   3.8 & 6.0 & 0.1 & 0.1 \\
+	M4 & Demographic   & 17.6 & 55.0 & 0.7 & 2.9   & 14.0 & 37.0 & 0.7 & 2.7 \\
+	M4 & Finance &   18.6 & 56.0 & 0.7 & 2.7 &   14.6 & 39.0 & 0.6 & 2.4 \\
+	M4 & Industry   & 12.0 & 27.0 & 0.8 & 2.8 &   7.4 & 11.0 & 0.6 & 2.1 \\
+	M4 & Macro   & 21.2 & 69.0 & 0.9 & 3.3 &   16.6 & 50.0 & 0.8 & 3.2 \\
+	M4 & Micro   & 10.4 & 22.0 & 0.7 & 2.6 &   7.4 & 9.0 & 0.6 & 2.1 \\
+	M4 & Other   & 18.8 & 51.0 & 0.8 & 2.5 &   13.0 & 31.0 & 0.7 & 2.2 \\
+	M6 & Finance   & 17.6 & 21.0 & 0.7 & 0.8   & 1.5 & 3.0 & 0.2 & 0.4 \\
 	\bottomrule
 \end{tabular}
 %\end{adjustwidth}

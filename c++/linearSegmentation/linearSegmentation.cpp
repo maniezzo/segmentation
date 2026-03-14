@@ -1160,10 +1160,10 @@ int main(int argc, char** argv)
    string dataFile = baseDir + dsName + ".csv";
    int minidc,maxidc,idrow;
 
-   idrow = 1;
+   idrow = 45;
 
    // ciclo su (eventualmente) tutte le serie in M3 e M4
-   while(idrow < 61)
+   while(idrow < 46)
    {
       if (f3_4) 
       {  n = readM3_4(dataFile, ids, y, idrow, seriesName);
@@ -1196,8 +1196,9 @@ int main(int argc, char** argv)
             default: cout<<"ERROR 1"<<endl;
          }
 
+         bool fExists = false;
          string runsFileName = baseDir+seriesName+costFunc+"_runs.csv";
-         if (entryExists("risultati.csv", seriesName, costFunc))
+         if (fExists && entryExists("risultati.csv", seriesName, costFunc))
          {  cout<<seriesName<<" "<<costFunc<<" Istanza gia' risolta"<<endl;
             continue;
          }
@@ -1269,7 +1270,7 @@ int main(int argc, char** argv)
 
          //postProcess(lstOLS, x, minlag);
          tend = clock();
-         tCpuOpt = (tend-tstart)/CLOCKS_PER_SEC;
+         tCpuOpt = (tend-tstart)/(1.0*CLOCKS_PER_SEC);
 
          cont = 0;
          dsFile<<"id,low,hi,m,q,"<<costFunc<<endl;

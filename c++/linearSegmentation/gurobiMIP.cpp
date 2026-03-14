@@ -65,7 +65,7 @@ int populateGurobiByRow(GRBModel& model,
       for (int j = 0; j < n; ++j)
          sum += xVars[j];
       string cname = "ntot";
-      GRBConstr c = model.addConstr(sum <= ntot, cname);  // <<<<<<<<<<<<<<<<<<< PARTITIONING OPPURE COVERING == oppure <=
+      GRBConstr c = model.addConstr(sum == ntot, cname);  // <<<<<<<<<<<<<<<<<<< PARTITIONING OPPURE COVERING == oppure <=
       constrs.push_back(c);
       model.update();
 
