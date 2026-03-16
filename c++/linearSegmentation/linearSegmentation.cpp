@@ -542,7 +542,7 @@ vector<tuple<int, int, double, double, double>> computeRuns(int minlag, vector<d
          }
          lstOLS.push_back(tup);
          cont++;
-         if (low % 250 == 0)
+         if (cont % 10000 == 0)
             cout << "Compute runs, cost for low=" << low << " up " << up << " num cols=" << cont << endl;
       }
    return lstOLS;
@@ -1090,8 +1090,10 @@ int readConfig()
    solver  = JSV["solver"].ToString()[0];
    maxIter = JSV["maxIter"].ToInt();
    maxTime = JSV["maxTime"].ToInt();
-   idcost  = JSV["idcost"].ToInt();
-   ntot    = JSV["ntot"].ToInt();// max num segments
+   firstRow = JSV["firstRow"].ToInt();
+   lastRow  = JSV["lastRow"].ToInt();
+   idcost   = JSV["idcost"].ToInt();
+   nMaxSegm = JSV["nMaxSegm"].ToInt();// max num segments
    minlength = JSV["minlength"].ToInt();// min segment length
 
    cout << baseDir << endl;
@@ -1137,7 +1139,7 @@ int main(int argc, char** argv)
    bool   fCPLEX      = false;
    bool   f3_4        = false;
    int    solstat, n_brk=-1;
-   double objval=-1, tCpuOpt, cost = 0;
+   double objval=-1, tMIPopt=-1, tCpuOpt, cost = 0;
 
    int     i, j, n, idcost, cont;
    clock_t tstart, tend, truns, tMIP;
@@ -1145,6 +1147,25 @@ int main(int argc, char** argv)
 
    std::cout << std::fixed; // prevent scientific notation output
    idcost = readConfig();   // cost function:  R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC
+
+   if (argc == 6) 
+      try 
+      {  
+         dsName = argv[1];      
+         idcost = stoi(argv[2]);   
+         firstRow = stoi(argv[3]);   
+         lastRow  = stoi(argv[4]);   
+         nMaxSegm = stoi(argv[5]);   
+         cout << "Parameters: dataset:" << dsName << " idcost: " << idcost <<
+              " firrstrow: "<< firstRow << " lastRow: " << lastRow << " maxnsegm:" << nMaxSegm << endl;
+      } 
+      catch (const std::exception& e) 
+      {  std::cerr << "Error: Invalid input parameters." << std::endl;
+         return 1;   
+      }
+   else
+      cout << "No feasible calling argument" << endl;
+
    f3_4   = dsName.find("M3_4")!=std::string::npos;
 
    switch (solver)
@@ -1160,10 +1181,10 @@ int main(int argc, char** argv)
    string dataFile = baseDir + dsName + ".csv";
    int minidc,maxidc,idrow;
 
-   idrow = 45;
+   idrow = firstRow;
 
    // ciclo su (eventualmente) tutte le serie in M3 e M4
-   while(idrow < 46)
+   while(idrow < lastRow)
    {
       if (f3_4) 
       {  n = readM3_4(dataFile, ids, y, idrow, seriesName);
@@ -1204,15 +1225,14 @@ int main(int argc, char** argv)
          }
 
          vector<tuple<int, int, double, double, double>> lstOLS;
-         int minlag = max(minlength, n/20); // minimal segment length, updated
+         int minlag = minlength; // max(minlength, n/20); // minimal segment length, updated
 
          tstart = clock();
 
          // se segmenti già calcolati li legge, altrimenti li calcola
          ifstream f(baseDir+seriesName+costFunc+"_runs.csv");
          if (f.good())
-         {
-            string line;
+         {  string line;
             getline(f, line); // headers
             while (getline(f, line))
             {
@@ -1238,31 +1258,32 @@ int main(int argc, char** argv)
 
          n = lstOLS.size();
          truns = clock();
-         double tCpuRuns = (truns-tstart)/CLOCKS_PER_SEC;
+         double tCpuRuns = (truns-tstart)/(1.0*CLOCKS_PER_SEC);
          cout<<"CPU time for runs: "<<tCpuRuns<<endl;
 
          ofstream dsFile(baseDir+seriesName+"_"+costFunc+"_segments.csv");
          ofstream resFile("risultati.csv", std::ios::app); // Open in append mode, risultati totali
          compressTableau(lstOLS);      // calcola tableau per righe e per colonne, compresse (lista indici)
-         tstart = clock();
+
+         tstart = clock();  // riparte
 
          if (fLagrangian)
          {
             double alpha = 0.05;
             cost = lagrangian(INT_MAX, lstOLS, minlag, alpha);
             tMIP = clock();
-            tCpuOpt = (tMIP-truns)/CLOCKS_PER_SEC;
-            cout<<"CPU time for Lagr: "<<tCpuOpt<<endl;
+            tMIPopt = (tMIP-truns)/CLOCKS_PER_SEC;
+            cout<<"CPU time for Lagr: "<<tMIPopt<<endl;
             goto TERMINATE;
          }
          else if (fGurobi)
-         {  x = goGurobi(y, lstOLS, ntot);
+         {  x = goGurobi(y, lstOLS, nMaxSegm);
          }
          else if (fHexaly)
-         {  x = goHexaly(y, lstOLS, ntot);
+         {  x = goHexaly(y, lstOLS, nMaxSegm);
          }
          else if (fCPLEX)
-            x = goCPLEX(y, lstOLS, ntot);
+            x = goCPLEX(y, lstOLS, nMaxSegm);
          else
          {  cout<<"Manca il solver"<<endl;
             goto TERMINATE;
@@ -1271,10 +1292,13 @@ int main(int argc, char** argv)
          //postProcess(lstOLS, x, minlag);
          tend = clock();
          tCpuOpt = (tend-tstart)/(1.0*CLOCKS_PER_SEC);
+         tMIPopt = (tend-tstart)/(1.0*CLOCKS_PER_SEC);
 
          cont = 0;
          dsFile<<"id,low,hi,m,q,"<<costFunc<<endl;
-         resFile<<seriesName<<","<<costFunc<<","<<(f3_4 ? idrow : -1)<<","<<tCpuOpt<<",";
+         resFile<<fixed<<seriesName<<","<<costFunc<<","
+            <<" n_runs,"<<n<<",t_runs "<<setprecision(2)<<tCpuRuns<<",tMIP,"<<tMIPopt
+            <<",idrow,"<<(f3_4 ? idrow : -1)<<",t.cpu,"<<tCpuOpt<<",segm,";
          for (j = 0; j<x.size(); j++)
             if (x[j]>0.01)
             {
@@ -1289,19 +1313,21 @@ int main(int argc, char** argv)
                   <<get<2>(lstOLS[j])<<","
                   <<get<3>(lstOLS[j])<<","
                   <<get<4>(lstOLS[j])<<endl;
-               resFile<<get<0>(lstOLS[j])<<","<<get<1>(lstOLS[j])<<",";
+               //resFile<<get<0>(lstOLS[j])<<","<<get<1>(lstOLS[j])<<",";
                cont++;
                cost += get<4>(lstOLS[j]);
+
+               n_brk = cont-1;
             }
+         resFile<<",cost,"<<std::setprecision(3)<<cost<<",n_brk,"<<n_brk;
          resFile<<endl;
          dsFile.close();
          resFile.close();
-         n_brk = cont-1;
          cout<<"Final number of segments: "<<cont<<" cost "<<cost<<endl;
 
          cout<<(fLagrangian ? "Lagrangian " : "MIP ")<<seriesName<<
-            " n_runs "<<n<<" t_runs "<<tCpuRuns<<
-            " SCP objval "<<objval<<" final cost "<<std::setprecision(6)<<cost<<" n_brk "<<n_brk<<" t_opt "<<tCpuOpt<<endl;
+            " n_runs "<<n<<" t_runs "<<setprecision(2)<<tCpuRuns<<
+            " SCP objval "<<objval<<" final cost "<<std::setprecision(6)<<cost<<" n_brk "<<n_brk<<" t_opt "<<setprecision(2)<<tCpuOpt<<endl;
       }
       if(!f3_4) break;  // solo una serie
       idrow++;

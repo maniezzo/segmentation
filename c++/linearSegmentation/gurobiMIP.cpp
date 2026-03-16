@@ -82,7 +82,7 @@ int populateGurobiByRow(GRBModel& model,
 }
 
 // Main function
-vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS, int ntot) 
+vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS, int nMaxSegm) 
 {
    clock_t tstart, truns, tMIP;
    vector<double> xnil;
@@ -101,7 +101,7 @@ vector<double> goGurobi(vector<double> y, vector<tuple<int, int, double, double,
       vector<GRBVar> xVars;
       vector<GRBConstr> constrs;
 
-      int status = populateGurobiByRow(model, y, lstOLS, xVars, constrs, ntot);
+      int status = populateGurobiByRow(model, y, lstOLS, xVars, constrs, nMaxSegm);
       if (status) 
       {  cout << "Failed to populate model." << endl;
          goto TERMINATE;

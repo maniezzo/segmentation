@@ -1,7 +1,8 @@
 #include "cplexMIP.h"
 
 // Cplex, to populate by row, we first create the columns, and then add the rows.
-int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int, int, double, double, double>> lstOLS, int ntot)
+int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, 
+                  vector<tuple<int, int, double, double, double>> lstOLS, int nMaxSegm)
 {  int status,numrows,numcols,numnz,i,j,n,m;
    vector<double> obj;
    vector<double> lb;
@@ -73,8 +74,8 @@ int populatebyrow(CPXENVptr env, CPXLPptr lp, vector<double> y, vector<tuple<int
       rmatval.push_back(1.0); 
       numnz++;
    }
-   sense.push_back('L');
-   rhs.push_back(ntot);
+   sense.push_back('E'); // L or E
+   rhs.push_back(nMaxSegm);
    cout << "Constr ntot"<< endl;
 
    // vector<string> to char**
