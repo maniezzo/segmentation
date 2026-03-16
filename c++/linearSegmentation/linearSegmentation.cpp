@@ -1193,8 +1193,8 @@ int main(int argc, char** argv)
       }
       else 
       {  n = readData(dataFile, ids, y);
-         minidc = 0;
-         maxidc = 10;
+         minidc = idcost;
+         maxidc = idcost+1;
          seriesName = dsName;
       }
       cout << "read " << n << " data series values" << endl;

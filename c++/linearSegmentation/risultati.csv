@@ -118,3 +118,10 @@ mathtests/Q23410,costQRMSE, n_runs,14535,t_runs 0.09,tMIP,1.11,idrow,57,t.cpu,1.
 mathtests/Q23524,costQRMSE, n_runs,6670,t_runs 0.04,tMIP,0.39,idrow,58,t.cpu,0.39,segm,,cost,288771.168,n_brk,9
 mathtests/Q23487,costQRMSE, n_runs,6670,t_runs 0.07,tMIP,0.37,idrow,59,t.cpu,0.37,segm,,cost,288947.300,n_brk,9
 mathtests/Q23661,costQRMSE, n_runs,241165,t_runs 1.81,tMIP,49.81,idrow,60,t.cpu,49.81,segm,,cost,290600.250,n_brk,9
+M6\ABBV,costR2, n_runs,30381,t_runs 0.26,tMIP,3.19,idrow,-1,t.cpu,3.19,segm,,cost,0.255,n_brk,9
+M6\ABBV,costMSE, n_runs,30381,t_runs 0.23,tMIP,2.71,idrow,-1,t.cpu,2.71,segm,,cost,23.548,n_brk,9
+M6\ABBV,costChi2, n_runs,30381,t_runs 0.22,tMIP,2.77,idrow,-1,t.cpu,2.77,segm,,cost,27.819,n_brk,9
+M6\ABBV,costSER, n_runs,30381,t_runs 0.22,tMIP,3.67,idrow,-1,t.cpu,3.67,segm,,cost,30.541,n_brk,9
+M6\ABBV,costVar, n_runs,30381,t_runs 0.21,tMIP,3.26,idrow,-1,t.cpu,3.26,segm,,cost,54.917,n_brk,9
+M6\ABBV,costAIC, n_runs,30381,t_runs 0.19,tMIP,2.72,idrow,-1,t.cpu,2.72,segm,,cost,239.496,n_brk,9
+M6\VXX,costAIC, n_runs,33411,t_runs 0.25,tMIP,3.10,idrow,-1,t.cpu,3.10,segm,,cost,-312.168,n_brk,9

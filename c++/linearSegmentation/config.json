@@ -1,6 +1,6 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "mathtests\\M3_4_sample",
+	"dsName"  : "M6\\VXX",
 	"maxIter" : 500,
 	"maxTime" : 300,
     "idcost"  : 8,    "commentCost"  : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC",
