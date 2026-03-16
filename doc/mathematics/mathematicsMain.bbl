@@ -174,17 +174,20 @@ Tong, H.; Lim, K.S.
 Rossi, F.; van Beek, P.; Walsh, T., Eds.
 \newblock {\em Handbook of Constraint Programming}; Elsevier,  2006.
 
+\bibitem[rup()]{rupweb}
+Ruptures Documentation.
+\newblock \url{https://centre-borelli.github.io/ruptures-docs/}.
+\newblock Accessed 2025-12-01.
+
+\bibitem[Fryzlewicz(2014)]{F14}
+Fryzlewicz, P.
+\newblock Wild binary segmentation for multiple change-point detection.
+\newblock {\em Annals of Statististics} {\bf 2014}, {\em 42},~2243 -- 2281.
+
 \bibitem[Makridakis and Hibon(1979)]{MH79}
 Makridakis, S.; Hibon, M.
 \newblock Accuracy of forecasting: An empirical investigation.
 \newblock {\em Journal of the Royal Statistical Society, Series A} {\bf 1979},
   {\em 142},~97--145.
-
-\bibitem[Keogh et~al.(2001)Keogh, Chu, Hart, and Pazzani]{KCHP01}
-Keogh, E.J.; Chu, S.; Hart, D.M.; Pazzani, M.J.
-\newblock An Online Algorithm for Segmenting Time Series.
-\newblock In Proceedings of the Proceedings of the 2001 IEEE International
-  Conference on Data Mining, San Jose, CA, USA,  2001; pp. 289--296.
-\newblock {\url{https://doi.org/10.1109/ICDM.2001.989541}}.
 
 \end{thebibliography}

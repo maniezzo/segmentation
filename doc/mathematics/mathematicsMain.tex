@@ -354,7 +354,7 @@ In particular, the Dynp algorithm solves the constrained problem exactly, wherea
 \subsubsection{Dynp: exact dynamic programming with fixed $k$}
 
 When the number of change points $k$ is fixed, the global minimizer of \eqref{eq:additive_general} can be computed via dynamic programming. 
-This approach corresponds to the classical Segment Neighbourhood algorithm introduced by Auger and Lawrence (1989), and is implemented in Ruptures under the name Dynp.
+This approach corresponds to the classical Segment Neighbourhood algorithm introduced by \cite{AL89}, and is implemented in the Ruptures library under the name {\it Dynp} \cite{rupweb}.
 
 Define
 \[
@@ -385,7 +385,7 @@ The computational complexity is quadratic in $n$ for each $k$, leading to an ove
 The Ruptures implementation includes practical mechanisms to reduce computational burden: a minimum segment length constraint unstable very short segments and a jump parameter restricts candidate change point positions.
 
 \subsubsection{PELT: penalized optimal partitioning with pruning}
-The PELT algorithm (Killick, Fearnhead and Eckley, 2012) solves the penalized problem \eqref{eq:penalized_general} exactly. 
+The PELT algorithm \cite{KFE12} solves the penalized problem \eqref{eq:penalized_general} exactly. 
 
 Let
 \[
@@ -417,7 +417,7 @@ It can be shown that the expected number of retained candidates remains bounded 
 As in Dynp, the Ruptures implementation of PELT includes minimum segment length and candidate grid restrictions.
 
 \subsubsection{Wild Binary Segmentation (WBS)}
-Wild Binary Segmentation (Fryzlewicz, 2014) is conceptually different from the previous two methods. It does not directly optimize \eqref{eq:additive_general} or \eqref{eq:penalized_general}. Instead, it extends classical binary segmentation through randomized interval localization. 
+Wild Binary Segmentation \cite{F14} is conceptually different from the previous two methods. It does not directly optimize \eqref{eq:additive_general} or \eqref{eq:penalized_general}. Instead, it extends classical binary segmentation through randomized interval localization. 
 Classical binary segmentation detects a single change point over the full interval $(0,n]$, splits the signal at that location, and recurses on the left and right subintervals. However, when multiple change points are close to each other, the global constrant over the full interval may blur their individual effects. 
 WBS addresses this limitation by sampling $M$ random intervals \[
 [s_m,e_m] \subseteq \{1,\dots,n\},
@@ -507,27 +507,34 @@ The parameters of the three algorithms were selected through preliminary calibra
 
 For the Pelt algorithm, the penalty parameters were set to $\beta=40$ for both the AIC function cost and the QRMSE function cost, with \texttt{jump} $=1$ and \texttt{min\_size} $=8$.  
 
-For Dynp, the number of breakpoints was fixed to $9$, corresponding to a target segmentation of $10$ segments. This choice was motivated by the fact that the esperiments with the proposal framework consider segmentations with up to $10$ segments. The minimum segment length was again set to $8$ observations. For shorter series, the reqeusted number of breakpoints may not always be feasible under this constraint; in those cases, the number of breakpoints was automatically reduced to the largest asmissible value.
+For Dynp, the number of breakpoints was fixed to $9$, corresponding to a target segmentation of $10$ segments. This choice was motivated by the fact that the experiments with the proposal framework consider segmentations with up to $10$ segments. The minimum segment length was again set to $8$ observations. For shorter series, the requested number of breakpoints may not always be feasible under this constraint; in those cases, the number of breakpoints was automatically reduced to the largest admissible value.
 
 For WBS, the number of randomly generated intervals was fixed to $M=400$, while the minimum segment length was set to $8$ observations. The threshold parameters were calibrated separately for the two cost functions and set to $\texttt{thr}_{\text{AIC}}=20$ and $\texttt{thr}_{\text{QRMSE}}=10$. 
 
-The results reported in Tables~\ref{tab:PELTseriesAICQRMSE}--\ref{tab:WBSeriesAICQRMSE} highlight several differences among the three approaches. The columns show the benchmark of origin of the series, {\it Bench}, the category of the set of series reported in the row, {\it Category}, then separately for AIC and for QRMSE the median and maximum number of segments in the proposed solutions, {\it med.n}, {\it max.n}, and the median and maximum CPU time for solving, {\it med.t}, {\it max.t}. In tables \ref{tab:PELTseriesAICQRMSE} and \ref{tab:DYNPseriesAICQRMSE} we also added for reference the median and maximum CPU time used by MIP (inclusive of the setup time) for producing the solutions forcing the same number of segments as in Dynp, {\it med.t},{\it max.t}, while in table \ref{tab:WBSeriesAICQRMSE} we report the percentual cost gap between the solutions proposed by WBS and MIP, {\it med.gap} and {\it max.gap}.
+The results reported in Tables~\ref{tab:PELTseriesAICQRMSE}--\ref{tab:WBSeriesAICQRMSE} highlight several differences among the three approaches. The columns show the benchmark of origin of the series, {\it Bench}, the category of the set of series reported in the row, {\it Category}, then separately for AIC and for QRMSE the median and maximum number of segments in the proposed solutions, {\it med.n}, {\it max.n}, and the median and maximum CPU time for solving, {\it med.t}, {\it max.t}. In tables \ref{tab:PELTseriesAICQRMSE} and \ref{tab:DYNPseriesAICQRMSE} we also added for reference the median and maximum CPU time used by MIP (inclusive of the setup time) for producing the solutions forcing the same number of segments as in Dynp, {\it med.t},{\it max.t}, while in table \ref{tab:WBSeriesAICQRMSE} we report the percentage cost gap between the solutions proposed by WBS and MIP, {\it med.gap} and {\it max.gap}.
 
-A first observation is that the number of detected segments varies substantially depending on both the algorithm and the cost function.  The AIC criterion generally favors more fragmented segmentations while the QRMSE criterion tends to produce smoother segmentations with fewer changepoints. 
+The first observation is that the number of segments detected varies substantially depending on the algorithm and cost function used.  The AIC criterion generally favours more fragmented segmentations, whereas the QRMSE criterion tends to produce smoother segmentations with fewer change points. 
 
-The influence of this formulation is clearly visible in Table \ref{tab:PELTseriesAICQRMSE}. When the PELT algorithm is used with the same penalty parameter $\beta = 40$ for both cost functions, the QRMSE criterion generally produces fewer segments than AIC across most dataset categories. 
-For example, in several M4 categories the average number of detected segments decreases noticeably under QRMSE, reflecting the reduced tendency of the criterion to split long segments.
+The influence of this formulation is clearly evident in Table \ref{tab:PELTseriesAICQRMSE}. When the PELT algorithm is used with the same penalty parameter, $\beta = 40$, for both cost functions, the QRMSE criterion generally produces fewer segments than the AIC criterion across most dataset categories. 
+For instance, the average number of detected segments decreases notably in several M4 categories under QRMSE, reflecting the criterion's reduced tendency to split long segments.
 
-Among the three methods, Pelt often produces the smallest number of segments, reflecting the influence of the penalty term in the objective function. 
-Dynp, on the other hand, tends to generate segmentations closer to the desired cardinality of ten segments, since the number of breakpoints is fixed. Finally, WBS typically exhibits the largest variability in the number of detected segments, which can be attributed to the interval sampling procedure. 
+Of the three methods, Pelt often produces the fewest segments, reflecting the influence of the penalty term in the objective function. 
+Dynp, on the other hand, aims to generate segmentations closer to the desired number of ten segments since the number of breakpoints is fixed. Finally, WBS typically exhibits the greatest variability in the number of detected segments, due to the interval sampling procedure. 
 
-Both Pelt and Dynp are exact optimization methods and were implemented using the Ruptures library. 
-Among the two, Pelt is typically the fastest algorithm, since its pruning strategy allows it to discard many candidate changepoints during the search process.
-The Dynp algorithm generally requires slightly higher computational times because it relies on a dynamic programming procedure whose complexity grows with both the length of the series and the number of requested breakpoints. 
-In constrast, WBS is not an exact optimization method and it repeatedly evaluates changepoint statistics over a large number of randomly generated intervals ($M=400$ in our experiments), which increases the computational burden. 
-As a result, WBS typically requires longer CPU times compared with the other two methods.
+Of the two algorithms, Pelt is usually the fastest, since its pruning strategy enables it to discard many candidate changepoints during the search process.
+The Dynp algorithm generally takes slightly longer to run because it relies on a dynamic programming procedure whose complexity increases with the length of the series and the number of requested breakpoints. 
+In contrast, WBS is not an exact optimization method; it repeatedly evaluates change-point statistics over a large number of randomly generated intervals ($M = 400$ in our experiments), which increases the computational burden. 
+Consequently, despite its heuristic approach, WBS typically requires longer CPU times compared with the other two methods.
 
-\begin{table}[H]
+We also ran the TSPP model while constraining it to generate exactly the same number of segments as Dynp, in order to allow a fair performance comparison in a setting compatible with the other algorithms. In this case, both TSPP and Dynp yield optimal solutions; therefore, only the computational times are reported for TSPP.
+
+The higher asymptotic complexity and longer setup time of TSPP are evident in Tables \ref{tab:PELTseriesAICQRMSE} and \ref{tab:DYNPseriesAICQRMSE}. In particular, the degradation in TSPP performance becomes apparent for longer time series.
+
+Nevertheless, computational times remain below three minutes even for instances leading to constraint matrices with nearly 1000 rows and more than 300,000 columns (see Table \ref{tab:SPP_SCP}). This demonstrates the practical viability of relying on state-of-the-art solvers even for time series whose length would normally motivate data aggregation (e.g., subsampling or smoothing) for visualization purposes.
+
+Finally, Table \ref{tab:DYNPseriesAICQRMSE} also compares the relative effectiveness of TSPP and WSB. The median percentage error of WSB is generally small, with medians below 3\% and equal to 0\% for the M6 series. However, in some cases the heuristic solutions fail to converge to an acceptable quality.
+
+\begin{table}[ht]
 	\centering
 	\caption{PELT: Data series results, AIC-QRMSE cost}\label{tab:PELTseriesAICQRMSE}%
 \begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
@@ -554,7 +561,7 @@ As a result, WBS typically requires longer CPU times compared with the other two
 \end{table}
 
 
-\begin{table}[H]
+\begin{table}[ht]
 	\centering
 	\caption{DYNP: Data series results, AIC-QRMSE cost}\label{tab:DYNPseriesAICQRMSE}%
 \begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
@@ -580,7 +587,7 @@ As a result, WBS typically requires longer CPU times compared with the other two
 %\end{adjustwidth}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[ht]
 	\centering
 	\caption{WBS: Data series results, AIC-QRMSE cost}\label{tab:WBSeriesAICQRMSE}%
 \begin{tabular}{@{}cl|rr|rr|rr|rr|rr}
@@ -619,19 +626,19 @@ The results are summarized in tables \ref{tab:seriesQRMSE} and \ref{tab:seriesAI
 \toprule
 bench & category & avg.n & max.n & avg.nrun & max.nrun & avg.nseg & max.nseg & avg.t & max.t \\
 \midrule
-		M3 & Demographic  & 122.6 & 138 &  7073.2 &   8646 & 3.8 &  7 &  0.6 & 1 \\
-		M3 & Finance      & 124.8 & 144 &  7267.6 &   9453 & 3.6 &  9 &  0.1 & 0.1 \\
-		M3 & Industry     & 139   & 144 &  8789.2 &   9453 & 1   &  1 &  0.1 & 0.1 \\
-		M3 & Macro        & 128   & 144 &  7532.2 &   9453 & 2   &  5 &  0.1 & 0.1 \\
-		M3 & Micro        & 91.8  & 126 &  4027.8 &   7140 & 1   &  1 &  0.1 & 0.1 \\
-		M3 & Other        & 80.8  & 120 &  2952.2 &   6441 & 3.4 &  6 &  0.1 & 0.1 \\
-		M4 & Demographic  & 241.8 & 735 & 54101.2 & 245350 & 4   &  7 & 57.6 & 288 \\
-		M4 & Finance      & 246   & 738 & 54945.4 & 247456 & 6.2 & 10 & 61.6 & 308 \\
-		M4 & Industry     & 258.4 & 737 & 56492   & 246753 & 4.6 &  7 & 60   & 298 \\
-		M4 & Macro   	   & 280   & 866 & 74559.8 & 339900 & 5.6 & 10 &106.6 & 532 \\
-		M4 & Micro   		& 232.8 & 737 & 53371.2 & 246753 & 2.8 &  7 & 58.4 & 292 \\
-		M4 & Other   		& 260.4 & 701 & 53106.2 & 222778 & 4.8 & 10 & 57.6 & 286 \\
-		M6 & Finance 		& 257.8 & 265 & 30394.2 &  32131 & 4.2 &  7 &  7.0 & 25 \\
+		M3 & Demographic & 122.6 & 138 &  7073.2 &   8646 & 3.8 &  7 &  0.6 & 1 \\
+		M3 & Finance     & 124.8 & 144 &  7267.6 &   9453 & 3.6 &  9 &  0.1 & 0.1 \\
+		M3 & Industry    & 139   & 144 &  8789.2 &   9453 & 1   &  1 &  0.1 & 0.1 \\
+		M3 & Macro       & 128   & 144 &  7532.2 &   9453 & 2   &  5 &  0.1 & 0.1 \\
+		M3 & Micro       & 91.8  & 126 &  4027.8 &   7140 & 1   &  1 &  0.1 & 0.1 \\
+		M3 & Other       & 80.8  & 120 &  2952.2 &   6441 & 3.4 &  6 &  0.1 & 0.1 \\
+		M4 & Demographic & 241.8 & 735 & 54101.2 & 245350 & 4   &  7 & 57.6 & 288 \\
+		M4 & Finance     & 246   & 738 & 54945.4 & 247456 & 6.2 & 10 & 61.6 & 308 \\
+		M4 & Industry    & 258.4 & 737 & 56492   & 246753 & 4.6 &  7 & 60   & 298 \\
+		M4 & Macro   	 & 280   & 866 & 74559.8 & 339900 & 5.6 & 10 &106.6 & 532 \\
+		M4 & Micro   	 & 232.8 & 737 & 53371.2 & 246753 & 2.8 &  7 & 58.4 & 292 \\
+		M4 & Other   	 & 260.4 & 701 & 53106.2 & 222778 & 4.8 & 10 & 57.6 & 286 \\
+		M6 & Finance 	 & 257.8 & 265 & 30394.2 &  32131 & 4.2 &  7 &  7.0 & 25 \\
 \bottomrule
 \end{tabular}
 %\end{adjustwidth}
@@ -655,12 +662,12 @@ As the length of the series increases, the non-polynomial complexity of the exac
 		M3 & Micro       & 91.8  & 126 & 4027.8 & 7140 & 6.6 & 10 & 0.1 & 0.1 \\
 		M3 & Other       & 80.8  & 120 & 2952.2 & 6441 & 7.4 & 9  & 0.1 & 0.1 \\
 		M4 & Demographic & 241.8 & 735 & 54101.2 & 245350 & 10  & 10 & 58.4 & 292 \\
-		M4 & Finance 	  & 246   & 738 & 54945.4 & 247456 & 10  & 10 & 65.2 & 325 \\
-		M4 & Industry 	  & 258.4 & 737 & 56492   & 246753 & 8.8 & 10 & 62.4 & 310 \\
-		M4 & Macro 		  & 280   & 866 & 74559.8 & 339900 & 10  & 10 & 105.8 & 528 \\
-		M4 & Micro 		  & 232.8 & 737 & 53371.2 & 246753 & 10  & 10 & 60.4 & 302 \\
-		M4 & Other 		  & 260.4 & 701 & 53106.2 & 222778 & 10  & 10 & 57.8 & 285 \\
-		M6 & Finance 	  & 257.8 & 265 & 30394.2 & 32131 & 10.0 & 10 & 5.9 & 7 \\
+		M4 & Finance 	 & 246   & 738 & 54945.4 & 247456 & 10  & 10 & 65.2 & 325 \\
+		M4 & Industry 	 & 258.4 & 737 & 56492   & 246753 & 8.8 & 10 & 62.4 & 310 \\
+		M4 & Macro 		 & 280   & 866 & 74559.8 & 339900 & 10  & 10 & 105.8 & 528 \\
+		M4 & Micro 		 & 232.8 & 737 & 53371.2 & 246753 & 10  & 10 & 60.4 & 302 \\
+		M4 & Other 		 & 260.4 & 701 & 53106.2 & 222778 & 10  & 10 & 57.8 & 285 \\
+		M6 & Finance 	 & 257.8 & 265 & 30394.2 & 32131 & 10.0 & 10 & 5.9 & 7 \\
 		\bottomrule
 	\end{tabular}
 	%\end{adjustwidth}
