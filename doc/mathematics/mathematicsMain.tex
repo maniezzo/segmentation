@@ -441,7 +441,17 @@ Together, the M3, M4, and M6 benchmarks offer a diverse and demanding experiment
 
 \subsubsection{Cost functions}
 
-Section \ref{subsec:costfunc} introduced the considerations motivating the choice of the cost functions used in our experiments. In particular, we focused on two alternatives: AIC and QRMSE. The former is well established in the changepoint literature, while the latter was found in our experiments to produce segmentations that better align with visual expectations than the commonly used RMSE, of which it represents a minor variant.
+Section \ref{subsec:costfunc} introduced the considerations motivating the choice of the cost functions used in our experiments. In particular, we focused on two alternatives: AIC and QRMSE. The former is well established in the changepoint literature, while the latter, {\it Quarter-root RMSE}, an in-between MSE and RMSE which effectively corresponds to scaling the residual sum of squares with an exponent proportional to $n^{1/4}$, was found in our experiments to produce segmentations that better align with visual expectations than the commonly used RMSE, of which it represents a minor variant. 
+
+Specifically, QRMSE is obtained from the residual sum of squares as
+
+$$
+QRMSE = \sqrt{\frac{SSE}{\sqrt{n}}}
+$$
+
+\noindent This formulation reduces the implicit penalty associated with long segments compared with classical RMSE or MSE-based criteria. 
+As a consequence, longer segments are penalized less strongly and the resulting segmentations tend to be smoother.
+
 
 Figure \ref{fig:twocosts} illustrates the typical impact of these two criteria on the segmentation results for series N2745. In both cases, model TSPP was applied under the constraints that the minimum segment length be 8 observations and the maximum number of segments be 10.
 
@@ -460,7 +470,7 @@ These results demonstrate the impact of the choice of cost function on the balan
 		\includegraphics[width=0.45\linewidth]{N2745-costQRMSE}%
 		\label{fig:QRMSEcost}%
 	}%
-	\caption{Segmentations derived from different costs, M3 dataseries N2745"}
+	\caption{Segmentations derived from different cost functions, M3 dataseries N2745, maximum 10 segments}
 	\label{fig:twocosts}
 \end{figure*}
 
@@ -488,7 +498,7 @@ Because of this diversity, relying on a single cost function often entails a hum
 \subsubsection{Unconstrained segmentation}
 
 In this section we report the results obtained using the three unconstrained changepoint detection algorithms described earlier, namely Pelt, Dynp and Wild Binary Segmentation (WBS). 
-The experiments were conducted on the M3, M4 and M6 benchmark datasets in order to provide baseline results for comparison with the proposed set-covering MILP framework. 
+The experiments were conducted on the M3, M4 and M6 benchmark datasets in order to provide baseline results for comparison with the proposed set-covering MILP framework. Both Pelt and Dynp, which are exact optimization methods, were tun using the implementation provided by the Ruptures library \cite{rupweb}.
 
 To ensure a consistent experimental setting across all algorithms, the minimum segment length was fixed to 8 observations. 
 This choice prevents the detection of extremely short segments and aligns the unconstrained methods with the structural constraints that will later be considered.
@@ -501,20 +511,11 @@ For Dynp, the number of breakpoints was fixed to $9$, corresponding to a target 
 
 For WBS, the number of randomly generated intervals was fixed to $M=400$, while the minimum segment length was set to $8$ observations. The threshold parameters were calibrated separately for the two cost functions and set to $\texttt{thr}_{\text{AIC}}=20$ and $\texttt{thr}_{\text{QRMSE}}=10$. 
 
-The results reported in Tables~\ref{tab:PELTseriesAICQRMSE}--\ref{tab:WBSeriesAICQRMSE} highlight several differences among the three approaches. In general, the number of detected segments varies substantially depending on both the algorithm and the cost function. 
+The results reported in Tables~\ref{tab:PELTseriesAICQRMSE}--\ref{tab:WBSeriesAICQRMSE} highlight several differences among the three approaches. The columns show the benchmark of origin of the series, {\it Bench}, the category of the set of series reported in the row, {\it Category}, then separately for AIC and for QRMSE the median and maximum number of segments in the proposed solutions, {\it med.n}, {\it max.n}, and the median and maximum CPU time for solving, {\it med.t}, {\it max.t}. In tables \ref{tab:PELTseriesAICQRMSE} and \ref{tab:DYNPseriesAICQRMSE} we also added for reference the median and maximum CPU time used by MIP (inclusive of the setup time) for producing the solutions forcing the same number of segments as in Dynp, {\it med.t},{\it max.t}, while in table \ref{tab:WBSeriesAICQRMSE} we report the percentual cost gap between the solutions proposed by WBS and MIP, {\it med.gap} and {\it max.gap}.
 
-In particular, the AIC criterion generally favors more fragmented segmentations while the QRMSE criterion tends to produce smoother segmentations with fewer changepoints.
-In our implementation, QRMSE is computed as a quarter-root RMSE, obtained from the residual sum of squares as
+A first observation is that the number of detected segments varies substantially depending on both the algorithm and the cost function.  The AIC criterion generally favors more fragmented segmentations while the QRMSE criterion tends to produce smoother segmentations with fewer changepoints. 
 
-\[
-QRMSE = \sqrt{\frac{SSE}{\sqrt{n}}}
-\]
-
-which effectively corresponds to scaling the residual sum of squares with an exponent proportional to $n^{1/4}$. 
-This formulation reduces the implicit penalty associated with long segments compared with classical RMSE or MSE-based criteria. 
-As a consequence, longer segments are penalized less strongly and the resulting segmentations tend to be smoother.
-
-The influence of this formulation is clearly visible in Table~1. When the PELT algorithm is used with the same penalty parameter $\beta = 40$ for both cost functions, the QRMSE criterion generally produces fewer segments than AIC across most dataset categories. 
+The influence of this formulation is clearly visible in Table \ref{tab:PELTseriesAICQRMSE}. When the PELT algorithm is used with the same penalty parameter $\beta = 40$ for both cost functions, the QRMSE criterion generally produces fewer segments than AIC across most dataset categories. 
 For example, in several M4 categories the average number of detected segments decreases noticeably under QRMSE, reflecting the reduced tendency of the criterion to split long segments.
 
 Among the three methods, Pelt often produces the smallest number of segments, reflecting the influence of the penalty term in the objective function. 
@@ -532,7 +533,7 @@ As a result, WBS typically requires longer CPU times compared with the other two
 \begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
 	\toprule
 	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSPP} \\
-	Bench & Category & avg.n & max.n & avg.t & max.t & avg.n & max.n & avg.t & max.t & med.t & max.t \\
+	Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.t & max.t \\
 	\midrule
 	M3 & Demographic &  3.8 & 7.0 & 0.0 & 0.0 & 2.8 & 4.0 & 0.0 & 0.0 & 0.41 & 0.59\\
 	M3 & Finance     &  3.6 & 9.0 & 0.0 & 0.0 & 3.6 & 7.0 & 0.0 & 0.0 & 0.40 & 0.56\\
@@ -559,7 +560,7 @@ As a result, WBS typically requires longer CPU times compared with the other two
 \begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
 	\toprule
 	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSPP} \\
-	Bench & Category & avg.n & max.n & avg.t & max.t & avg.n & max.n & avg.t & max.t & med.t & max.t \\
+	Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.t & max.t \\
 	\midrule
 	M3 & Demographic  &  9.6 & 10.0 & 0.0 & 0.0 &  9.6 & 10.0 & 0.0 & 0.0 & 0.41 & 0.59\\
 	M3 & Finance      &  9.8 & 10.0 & 0.0 & 0.1 &  9.8 & 10.0 & 0.0 & 0.0 & 0.40 & 0.56\\
@@ -585,7 +586,7 @@ As a result, WBS typically requires longer CPU times compared with the other two
 \begin{tabular}{@{}cl|rr|rr|rr|rr|rr}
 	\toprule
 	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSPP} \\
-	Bench & Category & avg.n & max.n & avg.t & max.t & avg.n & max.n & avg.t & max.t & med.gap & max.gap \\
+	Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.gap & max.gap \\
 	\midrule
 	M3 & Demographic  &  8.0 & 11.0 & 0.2 & 0.3 &  5.6 &  8.0 & 0.2 & 0.3 & 1.30 &  9.26\\
 	M3 & Finance      &  8.0 & 11.0 & 0.2 & 0.2 &  7.0 & 12.0 & 0.2 & 0.3 & 1.28 &  8.62\\
