@@ -73,13 +73,13 @@
 \corres{Correspondence: vittorio.maniezzo@unibo.it}
 
 % Abstract (Do not insert blank lines, i.e. \\)
-\abstract{Detecting changepoints in time series is a fundamental task in statistical modeling and data-driven decision-making. We introduce a novel set covering-based model for changepoint detection that leverages combinatorial optimization to identify an optimal set of segments explaining the observed data.
-Unlike conventional methods based on dynamic programming (DP), which often impose strict structural constraints on the objective function (e.g., additivity), our formulation uses Mixed-Integer Linear Programming (MILP). This approach offers significantly increased expressiveness and flexibility in the cost structure, accommodating diverse, non-additive loss functions and complex penalty schemes.
+\abstract{Detecting changepoints in time series is a fundamental task in statistical modeling and data-driven decision-making. We introduce a novel set partitioning-based model for changepoint detection that leverages combinatorial optimization to identify an optimal set of segments explaining the observed data.
+Unlike conventional methods based on dynamic programming (DP), which often impose strict structural constraints on the objective function (e.g., additivity), our formulation uses Integer Linear Programming (ILP). This approach offers significantly increased expressiveness and flexibility in the cost structure, accommodating diverse, non-additive loss functions and complex penalty schemes.
 Our formulation guarantees global optimality under this flexible cost structure, a critical advantage over heuristic or approximate approaches. The model’s design enables high adaptability to different application domains, including finance, bioinformatics, and industrial monitoring.
-The increased efficiency of standard MILP solvers, coupled with tailored dominance rules, ensures practical scalability, achieving computational efficiency on datasets with several thousands of observations. Extensive experiments demonstrate that our approach outperforms state-of-the-art methods in both accuracy and runtime, offering a robust and interpretable solution for optimal changepoint detection.}
+The efficiency of modern MILP solvers, combined with tailored dominance rules, enables the solution of instances with several hundreds of observations in practical time. Computational results indicate that the approach extends tractability beyond previously studied settings, effectively handling classes of instances whose structural constraints could not be accommodated by existing methods, while retaining robustness and interpretability.}
 
 % Keywords
-\keyword{Time series; Set partitioning; segmentation; change point detection}
+\keyword{Time series; set partitioning problem; segmentation; change point detection}
 
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,37 +87,35 @@ The increased efficiency of standard MILP solvers, coupled with tailored dominan
 
 Changepoint detection (CPD) is the task of identifying abrupt changes in the statistical properties of a time series and constitutes a foundational problem across statistics, machine learning, and signal processing \cite{LMS14,AC17,TOV20}. The objective of CPD is to partition a temporal sequence into contiguous, non-overlapping segments, each characterized by internally homogeneous behavior. Such segmentation enables a clearer understanding of the underlying data-generating process and facilitates the application of targeted analytical or predictive models at the segment level. As a result, effective changepoint detection plays a critical role not only in descriptive analysis, but also in forecasting, anomaly detection, and data-driven decision-making.
 
-CPD plays a critical role in a wide range of application domains, including financial market analysis (regime shifts), industrial process monitoring (fault detection), climate science (trend changes), and bioinformatics (genomic variation analysis). Across these domains, a CPD method must satisfy two key requirements: (i) accurately segment the data so as to faithfully represent the underlying process, and (ii) provide a globally optimal solution, since suboptimal segmentation can propagate errors downstream and lead to significant real-world costs.
+CPD assumes a pivotal function in a wide range of application domains, including financial market analysis (regime shifts), industrial process monitoring (fault detection), climate science (trend changes), and bioinformatics (genomic variation analysis). Across these domains, a CPD method must satisfy two key requirements: (i) accurately segment the data so as to faithfully represent the underlying process, and (ii) provide a globally optimal solution, since suboptimal segmentation can propagate errors downstream and lead to significant real-world costs.
 
-Time series segmentation has therefore attracted extensive attention, leading to the development of a broad spectrum of methodologies, including classical statistical techniques, Bayesian approaches, machine learning algorithms, and hybrid models. Among these, segmentation based on linear models remains particularly prominent due to its computational efficiency and interpretability. This setting, commonly referred to as piecewise linear regression \cite{KCHP02}, assumes that the time series can be approximated by a sequence of linear trends, each corresponding to a distinct segment. 
+Time series segmentation has therefore attracted extensive attention, leading to the development of a broad spectrum of methodologies, including classical statistical techniques, Bayesian approaches, machine learning algorithms, and hybrid models. Among these, segmentation based on linear models remains particularly prominent due to its computational efficiency and interpretability. This setting, commonly referred to as {\it piecewise linear regression} \cite{KCHP02}, assumes that the time series can be approximated by a sequence of linear trends, each corresponding to a distinct segment. 
 
-For exact and globally optimal changepoint detection under additive cost structures, the dominant methodological paradigm is dynamic programming (DP). Methods such as Optimal Partitioning exploit the recursive structure of the problem, constructing the optimal segmentation for a sequence of length 
-N from optimal solutions to shorter prefixes. This approach yields polynomial-time algorithms under suitable assumptions and has proven highly effective in practice. However, the DP framework relies fundamentally on the additivity of segment-wise costs, typically combined with a penalty proportional to the number of segments.
+For exact and globally optimal changepoint detection under additive cost structures, the dominant methodological paradigm is dynamic programming (DP). Methods such as Optimal Partitioning exploit the recursive structure of the problem, constructing the optimal segmentation for a sequence of length $n$ from optimal solutions to shorter prefixes. This approach yields polynomial-time algorithms under suitable assumptions and has proven highly effective in practice. However, the effectiveness of the DP framework relies fundamentally on the additive decomposability of segment-wise costs, typically combined with a penalty proportional to the number of segments. Accelerated variants additionally require regularity conditions on the cost function, which can be interpreted as a superadditivity-type inequality, to justify pruning.
 
 This additive and recursive structure imposes a significant modeling limitation. In many practical settings, the analyst wishes to enforce global structural constraints that couple properties of all selected segments. Examples include limiting the total duration of short segments, bounding the number of changepoints within specific time windows, or enforcing regularity in segment lengths to avoid excessively fragmented solutions. While certain such constraints can, in principle, be approximated through state augmentation or penalty tuning, doing so rapidly compromises the tractability and scalability of DP-based methods. As a result, DP frameworks remain largely confined to locally additive objectives, restricting their applicability in scenarios where global control over the segmentation structure is essential.
 
-To overcome this limitation, we propose a novel formulation of the CPD problem as a combinatorial optimization model, specifically a set covering problem. In this formulation, all feasible segments are pre-enumerated and treated as decision variables, and the task of changepoint detection becomes the selection of a minimum-cost subset of segments that exactly covers the time series. Unlike breakpoint-indicator or network-flow formulations, this approach directly models segments as atomic objects, naturally enabling rich interactions among them.
+To overcome this limitation, we propose a novel formulation of the CPD problem as a combinatorial optimization model, specifically a set partitioning problem, possibly extended to its set covering relaxation. In this formulation, all feasible segments are pre-enumerated and treated as decision variables, and changepoint detection reduces to selecting a minimum-cost subset of segments that exactly covers the time series. Unlike breakpoint-indicator or network-flow formulations, this representation models segments as atomic objects, thereby naturally supporting richer interactions and more expressive global constraints.
 
-The key advantage of the MILP framework lies not only in its ability to reproduce the classical additive cost structure, but more importantly in its capacity to enforce complex global constraints through simple linear inequalities. These constraints can link arbitrary subsets of segment variables, control aggregate properties such as the number, length, or distribution of segments, and encode domain-specific structural requirements that are difficult or impractical to express within DP-based models. Unlike breakpoint-indicator or network-flow formulations, the proposed set-covering approach provides a direct and flexible mechanism for global control over the segmentation. While MILP solving is NP-hard in general, recent advances in solver technology, together with problem-specific preprocessing and bounding techniques, make this approach computationally viable for problem sizes of practical interest.
+The key advantage of the MILP framework lies not only in its ability to reproduce the classical additive cost structure, but more importantly in its capacity to enforce complex global constraints through simple linear (in)equalities. These constraints can link arbitrary subsets of segment variables, control aggregate properties such as the number, length, or distribution of segments, and encode domain-specific structural requirements that are difficult or impractical to express within DP-based models. Unlike breakpoint-indicator or network-flow formulations, the proposed set partitioning approach provides a direct and flexible mechanism for global control over the segmentation. While MILP solving is NP-hard in general, recent advances in solver technology, together with problem-specific preprocessing and bounding techniques, make this approach computationally viable for problem sizes of practical interest.
 
-In this paper, we introduce Set-Covering based Changepoint Detection (SC-CPD), a novel MILP framework for optimal time series segmentation. Our main contributions are as follows:
+In this paper, we introduce Set-Pertitioning based Changepoint Detection (SP-CPD) as a framework for optimal time series segmentation. Our main contributions are as follows:
 
-A set-covering MILP formulation for CPD with global structural control.
-We formulate the changepoint detection problem as a set covering model, enabling the direct incorporation of global constraints that are beyond the practical reach of dynamic programming methods.
+A set-partitioning MILP formulation with additional constraints for CPD with global structural control.
+We formulate the changepoint detection problem as a set partitioning model, enabling the direct incorporation of global constraints that are beyond the practical reach of dynamic programming methods.
 
 Enhanced modeling fidelity through global constraints.
 We demonstrate the practical value of the proposed framework by introducing and analyzing several global constraints that improve the interpretability, robustness, and domain relevance of the resulting segmentations.
 
-Scalability through preprocessing and dominance rules.
-We develop specialized preprocessing techniques, including dominance rules and bounding strategies, that significantly reduce the number of candidate segments and allow the model to scale to time series with several thousand observations.
+%Scalability through preprocessing and dominance rules.
+%We develop specialized preprocessing techniques, including dominance rules and bounding strategies, that significantly reduce the number of candidate segments and allow the model to scale to time series with several thousand observations.
 
 Competitive computational performance and solution quality.
-Through extensive computational experiments, we show that SC-CPD produces higher-quality segmentations while achieving runtimes that are comparable to, and in many cases competitive with, state-of-the-art DP-based and heuristic methods.
+Through extensive computational experiments, we show that SP-CPD produces higher-quality segmentations while achieving runtimes that, up to mid-sized series, are comparable to state-of-the-art DP-based and heuristic methods.
 
-The paper further illustrates the versatility of the proposed approach through a range of real-world applications, including financial time series, epidemiological data, and environmental monitoring. Common challenges such as noise, irregular sampling, and high-dimensional feature spaces are discussed, highlighting the advantages of MIP-based changepoint detection in addressing domain-specific structural requirements.
+The paper further illustrates the versatility of the proposed approach through a range of real-world applications, including financial time series, epidemiological data, and environmental monitoring. Common challenges such as noise, high variances, and non stationarity are included, highlighting the advantages of MIP-based changepoint detection in addressing domain-specific structural requirements.
 
-The remainder of this paper is organized as follows... 
-
+The remainder of the paper is organized as follows. Section \ref{sec:literature} reviews the relevant literature. Section \ref{sec:SCPmodel} presents the proposed set partitioning model. Section \ref{sec:computation} reports the computational results. Finally, Section \ref{sec:conclusions} concludes and outlines directions for future research.
 
 \section{Related literature} 					\label{sec:literature}
 The problem of optimal changepoint detection and time series segmentation has been extensively studied, and a wide range of exact and approximate methods have been proposed. Comprehensive surveys are provided in \cite{AC17,TOV20}, which classify approaches into statistical, Bayesian, algorithmic, and learning-based families. In this section, we focus specifically on exact optimization-based formulations for changepoint detection and highlight their modeling assumptions and limitations relative to the proposed approach.
@@ -137,36 +135,36 @@ Mixed-Integer Programming (MIP) has been previously applied to changepoint detec
 In breakpoint-based formulations, binary variables indicate whether a changepoint occurs at a given time index, while continuous variables model segment-specific parameters. These models allow regression and segmentation decisions to be optimized jointly and can accommodate certain side constraints. However, constraints involving segment-level properties—such as length distributions, aggregate statistics of selected segments, or interactions between non-adjacent segments—typically require additional auxiliary variables and complex logical constraints, leading to weak linear relaxations and limited scalability.
 Assignment-based formulations, in which observations are assigned to segments via binary variables, suffer similar difficulties when enforcing contiguity and global structural constraints. In both cases, segmentation is encoded implicitly, rather than directly treating segments as decision objects.
 
-The approach proposed in this paper differs fundamentally from the above paradigms by adopting a set-based perspective. Each feasible segment is explicitly represented as a decision variable, and the segmentation problem is formulated as a set covering problem in which the time axis must be covered once. While set covering and set partitioning models are classical tools in combinatorial optimization \cite{B69,S03}, they have received comparatively little attention in the changepoint detection literature.
+The approach proposed in this paper differs fundamentally from the above paradigms by adopting a set-based perspective. Each feasible segment is explicitly represented as a decision variable, and the segmentation problem is formulated as a set paritioning (or covering) problem in which the time axis must be covered (at least) once. While set covering and set partitioning models are classical tools in combinatorial optimization \cite{B69,S03}, they have received comparatively little attention in the changepoint detection literature.
 
-By associating segments with decision variables, the set-covering formulation provides a natural mechanism for expressing global structural constraints directly at the segment level. Aggregate constraints on the number, length, distribution, or interaction of segments can be imposed through simple linear inequalities, without resorting to state augmentation or intricate logical constructs. This distinguishes the proposed SC-CPD framework from existing MIP formulations and enables a level of modeling expressiveness that is difficult to achieve within DP-based, shortest-path, or breakpoint-indicator models.
+By associating segments with decision variables, the set-partitioning formulation provides a natural mechanism for expressing global structural constraints directly at the segment level. Aggregate constraints on the number, length, distribution, or interaction of segments can be imposed through simple linear inequalities, without resorting to state augmentation or intricate logical constructs. This distinguishes the proposed SP-CPD framework from existing MIP formulations and enables a level of modeling expressiveness that is difficult to achieve within DP-based, shortest-path, or breakpoint-indicator models.
 
 In summary, existing optimal CPD models exhibit a clear trade-off between computational efficiency and modeling flexibility. Dynamic programming and graph-based approaches provide excellent performance for additive objectives but offer limited support for global structural constraints. Prior MIP formulations increase modeling power but typically encode segmentation implicitly and encounter scalability issues when complex segment-level constraints are introduced.
 
-The proposed SC-CPD framework occupies a complementary position in this landscape. By combining a set-covering formulation with modern MILP techniques and problem-specific preprocessing, it delivers global optimality while substantially expanding the class of constraints that can be handled in a principled and scalable manner. This positions SC-CPD as a flexible and extensible optimization framework for changepoint detection in applications where global structure and domain-specific requirements play a central role.
+The proposed SP-CPD framework occupies a complementary position in this landscape. By combining a set-partitioning formulation with modern MILP techniques and problem-specific preprocessing, it delivers global optimality while substantially expanding the class of constraints that can be handled in a principled and scalable manner. This positions SP-CPD as a flexible and extensible optimization framework for changepoint detection in applications where global structure and domain-specific requirements play a central role.
 
 
-\section{Partitioning and extended set covering models}  \label{sec:SCPmodel}
-The problem can be naturally modeled according with a set partitioning perspective: all subsequences satisfying predefined structural properties—termed feasible runs—are generated and scored according to a segment-specific quality metric, subject to an addivity cost assumption. The segmentation problem is then formulated as the selection of a collection of runs that forms a partition of the time index set while optimizing a global objective function based on residual loss or model fit. The resulting mixed-integer linear program provides a flexible framework in which additional modeling requirements can be seamlessly encoded via linear constraints and handled by state-of-the-art MIP solvers \cite{FLS09}.
+\section{Extended set partitioning and covering models}  \label{sec:SCPmodel}
+The CPD problem can be naturally modeled from a set partitioning perspective: all subsequences satisfying predefined structural properties—termed feasible runs—are generated and scored according to a segment-specific quality metric, under an additivity assumption on the cost function. The segmentation problem is then formulated as the selection of a collection of runs that partitions the time index set while optimizing a global objective based on residual loss or model fit. The resulting formulation is a 0–1 integer linear program, which can be viewed as a special case of a mixed-integer linear program (MILP), thereby allowing the use of state-of-the-art MILP solvers \cite{FLS09}. This framework provides considerable flexibility, as additional modeling requirements can be seamlessly encoded via linear constraints.
 
 A Set Partitioning Problem (SPP) lies at the core of the formulation. The objective is to minimize an aggregate residual-based cost, while the constraints enforce that each time index of the series is covered exactly once by the selected segments. No restriction is imposed on the functional form of the segment model: it may consist of linear regression (yielding piecewise linear regression), but also of nonlinear or nonparametric specifications. Moreover, different runs may be associated with different model classes without altering the structure of the optimization problem.
 
-Formally, let $X = [x_j]$, $j = 1,\ldots,nruns$, denote the binary decision variables, where $x_j = 1$ if run $j$ is selected and $x_j = 0$ otherwise. Feasible runs may be generated so as to incorporate preliminary dominance rules, for instance by excluding segments that are too short or too long. Each run $j$ is assigned a cost $c_j$, computed according to any suitable goodness-of-fit or loss metric proposed in the literature, including $R^2$, SER, $\chi^2$, RMSE, variance-based criteria, etc. The covering constraints ensure that every series point is included in exactly one selected run.
+Formally, let $X = [x_j]$, $j = 1,\ldots,nruns$, denote the binary decision variables, where $x_j = 1$ if run $j$ is selected and $x_j = 0$ otherwise. Feasible runs may be generated so as to incorporate preliminary dominance rules, for instance by excluding segments that are too short or too long. Each run $j$ is assigned a cost $c_j$, computed according to any suitable goodness-of-fit or loss metric proposed in the literature, including $R^2$, SER, $\chi^2$, RMSE, variance-based criteria, etc. The partitioning / covering constraints ensure that every series point is included in (exactly) one selected run.
 
-The resulting Time Series Set Partitioning (TSSP) model is defined as follows. Let $a_{ij} \in \{0,1\}$ be a coefficient equal to 1 if and only if run $j$ covers time index $i$, for $i = 1,\ldots,npoints$ and $j = 1,\ldots,nruns$.
+The resulting Time Series Set Partitioning (TSSP) model is defined as follows. Let $a_{ij} \in \{0,1\}$ be a coefficient equal to 1 if and only if run $j$ covers time index $i$, for $i = 1,\ldots,npoints$ and $j = 1,\ldots,nruns$. In formulation TSSP we also included a constraint on the cardinality of the solution set.
 
 \begin{alignat}{4}
 	(TSSP) \hspace{0.5cm} z_{TSSC} = \min &\; \sum_{j=1}^{nruns} c_j x_{j}  \label{eq:SCPobj} \\
 	s.t. &\; \sum_{j=1}^{nruns}a_{ij}x_{j} = 1, & \hspace{1.5cm} i=1,\dots,npoints  \label{eq:SCPcov} \\
-	&\; \sum_{j=1}^{nruns} x_{j} = maxruns \label{eq:SPPext}\\
+	&\; \sum_{j=1}^{nruns} x_{j} \leq maxruns \label{eq:SPPext}\\
 	&\; x_j \in \{0,1\}, &\; j=1,\dots,nruns  \label{eq:SCPvar}
 \end{alignat}
 
 Additional variables can be included in the model associating them with the $X$ decision variables, for example it is possible to associate the starting time $s_i$, the end time $e_i$ with each variable $x_i \in X$. While redundant in this formulation, they might become important to express the constraints listed in subsection \ref{subsec:additional_constraints}.
 
-Unfortunately, in real-world applications the number of feasible runs can be very large, making the resulting SPP computationally demanding and, in some cases, intractable within acceptable time limits. From a polyhedral perspective, the set partitioning formulation is typically tighter but also harder to explore computationally, as the equality constraints induce a more restrictive feasible region and a combinatorially demanding branching structure. To mitigate this issue, we relax the equality constraints \ref{eq:SPPext} into inequalities, thereby transforming the formulation into a Set Covering Problem (SCP). The covering polyhedron is generally easier to handle algorithmically and can be solved in significantly larger dimensions, albeit with a weaker linear programming relaxation. 
+Unfortunately, in real-world applications the number of feasible runs can be very large, making the resulting SPP computationally demanding and, in some cases, intractable within acceptable time limits. From a polyhedral perspective, the set partitioning formulation is typically tighter but also harder to explore computationally, as the equality constraints induce a more restrictive feasible region and a combinatorially demanding branching structure. To mitigate this issue, we can relax the equality constraints \ref{eq:SPPext} into inequalities, thereby transforming the formulation into a Set Covering Problem (SCP). The covering polyhedron is generally easier to handle algorithmically and can be solved in significantly larger dimensions, albeit with a weaker linear programming relaxation. 
 
-The relaxation allows multiple runs to cover the same series points, and therefore a postprocessing phase is required to extract a feasible segmentation from the (possibly overlapping) covering solution. The resulting set covering formulation is denoted by TSSC.
+The SCP relaxation allows multiple runs to cover the same series points, and therefore a postprocessing phase is required to extract a feasible segmentation from the (possibly overlapping) covering solution. The resulting set covering formulation is denoted by TSSC.
 
 State-of-the-art MIP solvers are highly effective on SCP formulations; however, very large instances may still entail substantial computational effort. To further enhance scalability, \cite{M24} proposed a Lagrangian matheuristic \cite{the_book} for the TSSC problem where  all covering constraints (\ref{eq:SCPcov}) are relaxed by associating a Lagrangian multiplier $\lambda_i$ with each constraint, $1 \leq i \leq npoints$, while retaining only the relaxed covering constraint in the formulation. 
 The resulting Lagrangian model is solved via a subgradient optimization scheme. The corresponding Lagrangian subproblem is computationally simple: at each iteration, it amounts to selecting at most the $maxruns$ variables with the most negative reduced costs. A simple fixing heuristic is embedded within the procedure: the incumbent solution of the subproblem, which may be infeasible with respect to the relaxed covering constraints, is iteratively augmented by adding selected variables until feasibility is restored. This relaxation makes it possible to easily include constraints such as the maximum number of segments allowed. However, in most cases, additional constraints must be added to the subproblem or relaxed themselves, which makes the approach impractical.
@@ -177,17 +175,25 @@ In any case, after solving a set covering relaxation, postprocessing is required
 
 Models TSSP and TSSC are suitable for offline (or anytime) analysis assuming additive costs. The model is independent on the specific function used to quantify the cost associated with each segment. The CPD literature proposes different cost functions, including negative log-likelihood (Horvath 1993; Chen and Gupta 2000), quadratic loss or cumulative sums (e.g., Inclan and Tiao 1994; Rigaill 2010), but any statistical measure of fit can be used for the task. Each measure favors different characteristics of the model and the results can be widely different.
 
-In practical applications of changepoint detection (CPD), model quality is often judged less by its formal optimality properties and more by the interpretability of the resulting segmentation. In many real-world settings, the most useful segmentation is not necessarily the one that minimizes a given objective function, but rather the one that aligns with human perception of structural changes or provides a coherent narrative for subsequent decision-making. Accordingly, the utility of a cost function may depend as much on the clarity and explanatory power of its segmentation as on its predictive accuracy.
+In practical applications of CPD, model quality is often judged less by its formal optimality properties and more by the interpretability of the resulting segmentation. In many real-world settings, the most useful segmentation is not necessarily the one that minimizes a given objective function, but rather the one that aligns with human perception of structural changes or provides a coherent narrative for subsequent decision-making. Accordingly, the utility of a cost function may depend as much on the clarity and explanatory power of its segmentation as on its predictive accuracy.
 
 To reconcile algorithmic outputs with visual or domain-based expectations, many selection procedures incorporate penalty terms that regulate the number of detected changepoints. These penalizations effectively allow practitioners to adjust the segmentation to better match subjective expectations. However, the resulting models should be regarded as practically useful approximations rather than representations of an underlying “true” model, which is unlikely to be included among the finite set of candidate models considered in practice [10].
 
 A further limitation of user-defined penalization schemes is that they implicitly require human feedback. In heterogeneous datasets, appropriate penalty calibration often needs to be tailored on a per-series basis, which limits scalability and automation. To reduce this dependency on manual tuning, we evaluated several alternative cost functions drawn from both information-theoretic and optimization-based frameworks, with the aim of identifying a more robust and resilient formulation suitable for automated CPD analysis.
 
-We evaluated a broad range of cost functions, including AIC, BIC, Chi-square statistics, MSE, QRMSE, $R^2$, RMSE, SER, and simple variance; comparative visual results on a M6 benchmark instance are reported in Figure \ref{fig:costfunctions}. No single criterion consistently dominates the others across all benchmark instances. Performance varies depending on the underlying signal structure, noise characteristics, and segment length distribution, supporting the claim that cost-function performance is inherently context-dependent.
+We evaluated a broad range of cost functions, including AIC, BIC, Chi-square statistics, MSE, QRMSE, $R^2$, RMSE, SER, and simple variance; comparative visual results on a standard benchmark instance are represented in Figure \ref{fig:costfunctions}. No single criterion consistently dominates the others across all benchmark instances. Performance varies depending on the underlying signal structure, noise characteristics, and segment length distribution, supporting the claim that cost-function performance is inherently context-dependent.
 
 For the subsequent analysis, we focus on two representative and complementary criteria: AIC and QRMSE. AIC is well established in the CPD literature, particularly through its equivalence to penalized negative log-likelihood formulations, and provides a theoretically grounded likelihood-based benchmark.
 
-QRMSE (Quasi-RMSE) \cite{M24}, by contrast, lies between MSE and RMSE in terms of segment-length sensitivity. Relative to MSE, it places less emphasis on short segments, while avoiding the stronger preference for long segments induced by RMSE. This intermediate behavior makes it attractive in applications where neither aggressive segmentation nor excessive smoothing is desirable.
+QRMSE (Qarter-root-RMSE) \cite{M24}, by contrast, lies between MSE and RMSE in terms of segment-length sensitivity. Relative to MSE, it places less emphasis on short segments, while avoiding the stronger preference for long segments induced by RMSE. This intermediate behavior makes it attractive in applications where neither aggressive segmentation nor excessive smoothing is desirable.
+Specifically, QRMSE is obtained from the residual sum of squares as
+
+$$
+QRMSE = \sqrt{\frac{SSE}{\sqrt{n}}}
+$$
+
+\noindent This formulation reduces the implicit penalty associated with long segments compared with classical RMSE or MSE-based criteria. 
+As a consequence, longer segments are penalized less strongly and the resulting segmentations tend to be smoother.
 
 Importantly, although QRMSE is additive across segments and can therefore be used within optimal partitioning frameworks, it does not satisfy the inequality condition required for pruning in algorithms such as PELT. In particular, the cost of a merged segment may be lower than the sum of the costs of two adjacent subsegments. This violation prevents the use of the pruning guarantees that underpin the computational efficiency of such methods, limiting the practical applicability of QRMSE in large-scale settings.
 
@@ -317,7 +323,7 @@ We implemented models TSSP and TSSC in C++ and ran them on a Windows 11 Intel i7
 
 \subsection{Dynamic programming approaches} \label{subsec:DPcodes}
 
-This section reviews three established baselines for offline Change Point Detection (CPD): exact dynamic programming with a fixed number of change points (called Dynp in ruptures), the Pelt algorithm for penalized optimal partitioning and the Wild Binary Segmentation (WBS).
+This section reviews three established baselines for offline CPD: exact dynamic programming with a fixed number of change points (called {\it Dynp} in ruptures), the PELT algorithm for penalized optimal partitioning and the Wild Binary Segmentation (WBS).
 The first two methods are globally optimal for their respective objective function under a segment-additive structure while the WBS method is a randomized recursive strategy that does not solve a single global optimization problem.
 
 \subsubsection{Additive segmentation framework}
@@ -386,7 +392,6 @@ The Ruptures implementation includes practical mechanisms to reduce computationa
 
 \subsubsection{PELT: penalized optimal partitioning with pruning}
 The PELT algorithm \cite{KFE12} solves the penalized problem \eqref{eq:penalized_general} exactly. 
-
 Let
 \[
 G(t)
@@ -407,11 +412,16 @@ denote the minimum penalized cost of segmenting $y_{1:t}$. The dynamic programmi
 	\right\},
 \end{equation}
 
-with initialization $G(0) = -\beta$.
+\noindent with initialization $G(0) = -\beta$.
 
 The number of change points $k$ is not fixed but determined by the optimization through the penalty term.
-The key contribution of PELT is a pruning rule that maintains a candidate set of potential last change points and discards those that can be proven suboptimal for all future $t' > t$. It requires the segment cost to satisfy a weak subadditivity condition, 
-$\mathcal{C}(s+1,t) \geq \mathcal{C}(s+1,u) + \mathcal{C}(u+1,t)$, $s < u < t$, a condition that holds for several common costs, such as minus the log-likelihood or AIC but that does not hold for other ones, for example for RMSE.
+The key contribution of PELT is a pruning rule that maintains a candidate set of potential last changepoints and discards those that can be proven suboptimal for all future $t' > t$. This rule relies on a regularity condition on the segment cost function, typically expressed as a superadditivity-type inequality up to an additive constant,
+
+\begin{equation}
+\mathcal{C}(s+1,t) \ge \mathcal{C}(s+1,u) + \mathcal{C}(u+1,t) + K, \quad s < u < t,
+\end{equation}
+
+\noindent for some constant $K$. This condition is satisfied by several commonly used costs, such as those based on (minus) log-likelihood or AIC-type criteria, but may fail for others, such as RMSE-based costs.
 
 It can be shown that the expected number of retained candidates remains bounded as $n$ increases. Consequently, the expected computational complexity becomes linear in $n$. 
 As in Dynp, the Ruptures implementation of PELT includes minimum segment length and candidate grid restrictions.
@@ -441,16 +451,7 @@ Together, the M3, M4, and M6 benchmarks offer a diverse and demanding experiment
 
 \subsubsection{Cost functions}
 
-Section \ref{subsec:costfunc} introduced the considerations motivating the choice of the cost functions used in our experiments. In particular, we focused on two alternatives: AIC and QRMSE. The former is well established in the changepoint literature, while the latter, {\it Quarter-root RMSE}, an in-between MSE and RMSE which effectively corresponds to scaling the residual sum of squares with an exponent proportional to $n^{1/4}$, was found in our experiments to produce segmentations that better align with visual expectations than the commonly used RMSE, of which it represents a minor variant. 
-
-Specifically, QRMSE is obtained from the residual sum of squares as
-
-$$
-QRMSE = \sqrt{\frac{SSE}{\sqrt{n}}}
-$$
-
-\noindent This formulation reduces the implicit penalty associated with long segments compared with classical RMSE or MSE-based criteria. 
-As a consequence, longer segments are penalized less strongly and the resulting segmentations tend to be smoother.
+Section \ref{subsec:costfunc} introduced the considerations motivating the choice of the cost functions used in our experiments. In particular, we focused on two alternatives: AIC and QRMSE. The former is well established in the changepoint literature, while the latter, {\it Quarter-root RMSE}, an in-between MSE and RMSE which effectively corresponds to scaling the residual sum of squares with an exponent proportional to $n^{1/4}$ (see Section \ref{subsec:costfunc}), was found in our experiments to produce segmentations that better align with visual expectations than the commonly used RMSE, of which it represents a minor variant. 
 
 
 Figure \ref{fig:twocosts} illustrates the typical impact of these two criteria on the segmentation results for series N2745. In both cases, model TSPP was applied under the constraints that the minimum segment length be 8 observations and the maximum number of segments be 10.
@@ -497,15 +498,15 @@ Because of this diversity, relying on a single cost function often entails a hum
 
 \subsubsection{Unconstrained segmentation}
 
-In this section we report the results obtained using the three unconstrained changepoint detection algorithms described earlier, namely Pelt, Dynp and Wild Binary Segmentation (WBS). 
-The experiments were conducted on the M3, M4 and M6 benchmark datasets in order to provide baseline results for comparison with the proposed set-covering MILP framework. Both Pelt and Dynp, which are exact optimization methods, were tun using the implementation provided by the Ruptures library \cite{rupweb}.
+In this section we report the results obtained using the three unconstrained changepoint detection algorithms described earlier, namely PELT, Dynp and Wild Binary Segmentation (WBS). 
+The experiments were conducted on the M3, M4 and M6 benchmark datasets in order to provide baseline results for comparison with the proposed set-covering MILP framework. Both PELT and Dynp, which are exact optimization methods, were tun using the implementation provided by the Ruptures library \cite{rupweb}.
 
 To ensure a consistent experimental setting across all algorithms, the minimum segment length was fixed to 8 observations. 
 This choice prevents the detection of extremely short segments and aligns the unconstrained methods with the structural constraints that will later be considered.
 
 The parameters of the three algorithms were selected through preliminary calibration experiments carried out on a small number of representative series drawn from different dataset categories. For each method, several parameter configurations were tested and the final parameter values were chosen so as to obtain segmentations whose number of segments is broadly comparable with the segmentation structures considered in the experiments with the proposed set-covering MILP framework.
 
-For the Pelt algorithm, the penalty parameters were set to $\beta=40$ for both the AIC function cost and the QRMSE function cost, with \texttt{jump} $=1$ and \texttt{min\_size} $=8$.  
+For the PELT algorithm, the penalty parameters were set to $\beta=40$ for both the AIC function cost and the QRMSE function cost, with \texttt{jump} $=1$ and \texttt{min\_size} $=8$.  
 
 For Dynp, the number of breakpoints was fixed to $9$, corresponding to a target segmentation of $10$ segments. This choice was motivated by the fact that the experiments with the proposal framework consider segmentations with up to $10$ segments. The minimum segment length was again set to $8$ observations. For shorter series, the requested number of breakpoints may not always be feasible under this constraint; in those cases, the number of breakpoints was automatically reduced to the largest admissible value.
 
@@ -518,10 +519,10 @@ The first observation is that the number of segments detected varies substantial
 The influence of this formulation is clearly evident in Table \ref{tab:PELTseriesAICQRMSE}. When the PELT algorithm is used with the same penalty parameter, $\beta = 40$, for both cost functions, the QRMSE criterion generally produces fewer segments than the AIC criterion across most dataset categories. 
 For instance, the average number of detected segments decreases notably in several M4 categories under QRMSE, reflecting the criterion's reduced tendency to split long segments.
 
-Of the three methods, Pelt often produces the fewest segments, reflecting the influence of the penalty term in the objective function. 
+Of the three methods, PELT often produces the fewest segments, reflecting the influence of the penalty term in the objective function. 
 Dynp, on the other hand, aims to generate segmentations closer to the desired number of ten segments since the number of breakpoints is fixed. Finally, WBS typically exhibits the greatest variability in the number of detected segments, due to the interval sampling procedure. 
 
-Of the two algorithms, Pelt is usually the fastest, since its pruning strategy enables it to discard many candidate changepoints during the search process.
+Of the two algorithms, PELT is usually the fastest, since its pruning strategy enables it to discard many candidate changepoints during the search process.
 The Dynp algorithm generally takes slightly longer to run because it relies on a dynamic programming procedure whose complexity increases with the length of the series and the number of requested breakpoints. 
 In contrast, WBS is not an exact optimization method; it repeatedly evaluates change-point statistics over a large number of randomly generated intervals ($M = 400$ in our experiments), which increases the computational burden. 
 Consequently, despite its heuristic approach, WBS typically requires longer CPU times compared with the other two methods.
@@ -754,13 +755,13 @@ As a final remark, the changepoints identified on this Covid-19 series admit a c
 
 \section{Conclusions}              			\label{sec:conclusions}
 
-The paper presents an MIP-based approach, both a Lagrangian matheuristic and an exact model, to time series segmentation. The underlying mathematical model is able to adapt to different requirements on the resulting model, making it more tolerant to residuals or more representative of short trends.
-The analysis imposes no constraints on the model associated with each segment, which can be linear, polynomial, or defined on any distribution function of interest. It can even be a combination of different models, allowing for linearity on some segments and, for example, exponential increases on others.
+In this work, we proposed a novel formulation of the changepoint detection (CPD) problem based on an extended set partitioning (SPP) model, together with a relaxed set covering (SCP) variant. The proposed approach provides an exact optimization framework that remains computationally competitive with state-of-the-art dynamic programming methods on instances of moderate size in settings where such methods are applicable.
 
-This flexibility comes at the cost of having to solve a NP problem on large size instances. The increase in effectiveness of general MIP solvers allows to consider the solution of real-world instances to optimality, and it also provides the basis for the design of mathematically grounded heuristics. We report preliminary results on sensor data series obtained in an environmental monitoring, but also two experiments on financial and healthcare use cases.
+A key advantage of the proposed formulation lies in its modeling flexibility. By representing feasible segments as atomic decision variables, the framework can naturally accommodate a wide range of structural and global constraints that are difficult or impossible to incorporate within classical dynamic programming approaches. This allows the method to address a broader class of CPD problems, extending its applicability beyond traditional settings.
 
-The results so far provide only a first indication of the possibilities offered by mathematical models, but also of the difficulties to be overcome. Besides the obvious limit imposed by the NP-hardiness of the problem (the "curse of dimensionality"), which is only partially alleviated by heuristic solving, there are problem-specific issues to be faced, such as which cost function to use or which constraint to impose on the runs. In fact, the final result is only indirectly determined by our model, and there are still cases where results are unsatisfactory to the eye, even though they are numerically satisfying.
-Current results have already proven useful in the motivating application domain, both for missing value imputation and for short-term forecasting, obtained by decomposing the series down to the last segment and using the identified components to extend it into the near future. Moreover, these results do not seem to be affected by the application domain.
+Computational results on a diverse collection of benchmark time series, including those from the M3, M4, and M6 competitions, demonstrate the practical viability of the approach. The experiments show that the method is capable of producing high-quality segmentations across heterogeneous datasets while maintaining reasonable computational effort.
+
+Several directions for future research emerge from this work. A natural extension is the development of formulations that jointly optimize both the segmentation and the parameters of the segment models, rather than relying on a preprocessing phase to enumerate feasible segments. Further improvements may be obtained by integrating advanced decomposition techniques, such as column generation or branch-and-price methods, to handle larger instances more efficiently. Finally, the design of specialized cutting planes and problem-specific heuristics could further enhance scalability and solution quality.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{6pt}
@@ -773,7 +774,7 @@ Current results have already proven useful in the motivating application domain,
 
 \informedconsent{``Not applicable''}
 
-\dataavailability{We encourage all authors of articles published in MDPI journals to share their research data. In this section, please provide details regarding where data supporting reported results can be found, including links to publicly archived datasets analyzed or generated during the study. }
+\dataavailability{Data and codes used in the analysis will be made public upon acceptance}
 
 \acknowledgments{“During the preparation of this manuscript/study, the authors used GenAI only for the purposes of syntax and style checking.”}
 
@@ -795,29 +796,6 @@ MIP  & Mixed Integer Programming\\
 NP   & Nondeterministic Polynomial
 \end{tabular}
 }
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Optional
-\appendixtitles{no} % Leave argument "no" if all appendix headings stay EMPTY (then no dot is printed after "Appendix A"). If the appendix sections contain a heading then change the argument to "yes".
-
-\appendixstart
-\appendix
-
-\section[\appendixname~\thesection]{}
-The appendix is an optional section that can contain details and data supplemental to the main text---for example, explanations of experimental details that would disrupt the flow of the main text but nonetheless remain crucial to understanding and reproducing the research shown; figures of replicates for experiments of which representative data are shown in the main text can be added here if brief, or as Supplementary Data. Mathematical proofs of results not central to the paper can be added as an appendix.
-
-\begin{table}[H] 
-	\caption{This is a table caption.\label{tab5}}
-	%\newcolumntype{C}{>{\centering\arraybackslash}X}
-	\begin{tabularx}{\textwidth}{CCC}
-		\toprule
-		\textbf{Title 1}	& \textbf{Title 2}	& \textbf{Title 3}\\
-		\midrule
-		Entry 1		& Data			& Data\\
-		Entry 2		& Data			& Data\\
-		\bottomrule
-	\end{tabularx}
-\end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \isPreprints{}{% This command is only used for ``preprints''.
