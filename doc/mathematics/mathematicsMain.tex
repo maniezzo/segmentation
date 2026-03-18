@@ -99,7 +99,7 @@ To overcome this limitation, we propose a novel formulation of the CPD problem a
 
 The key advantage of the MILP framework lies not only in its ability to reproduce the classical additive cost structure, but more importantly in its capacity to enforce complex global constraints through simple linear (in)equalities. These constraints can link arbitrary subsets of segment variables, control aggregate properties such as the number, length, or distribution of segments, and encode domain-specific structural requirements that are difficult or impractical to express within DP-based models. Unlike breakpoint-indicator or network-flow formulations, the proposed set partitioning approach provides a direct and flexible mechanism for global control over the segmentation. While MILP solving is NP-hard in general, recent advances in solver technology, together with problem-specific preprocessing and bounding techniques, make this approach computationally viable for problem sizes of practical interest.
 
-In this paper, we introduce Set-Pertitioning based Changepoint Detection (SP-CPD) as a framework for optimal time series segmentation. Our main contributions are as follows:
+In this paper, we introduce Set-Partitioning based Changepoint Detection (SP-CPD) as a framework for optimal time series segmentation. Our main contributions are as follows:
 
 A set-partitioning MILP formulation with additional constraints for CPD with global structural control.
 We formulate the changepoint detection problem as a set partitioning model, enabling the direct incorporation of global constraints that are beyond the practical reach of dynamic programming methods.
@@ -135,7 +135,7 @@ Mixed-Integer Programming (MIP) has been previously applied to changepoint detec
 In breakpoint-based formulations, binary variables indicate whether a changepoint occurs at a given time index, while continuous variables model segment-specific parameters. These models allow regression and segmentation decisions to be optimized jointly and can accommodate certain side constraints. However, constraints involving segment-level properties—such as length distributions, aggregate statistics of selected segments, or interactions between non-adjacent segments—typically require additional auxiliary variables and complex logical constraints, leading to weak linear relaxations and limited scalability.
 Assignment-based formulations, in which observations are assigned to segments via binary variables, suffer similar difficulties when enforcing contiguity and global structural constraints. In both cases, segmentation is encoded implicitly, rather than directly treating segments as decision objects.
 
-The approach proposed in this paper differs fundamentally from the above paradigms by adopting a set-based perspective. Each feasible segment is explicitly represented as a decision variable, and the segmentation problem is formulated as a set paritioning (or covering) problem in which the time axis must be covered (at least) once. While set covering and set partitioning models are classical tools in combinatorial optimization \cite{B69,S03}, they have received comparatively little attention in the changepoint detection literature.
+The approach proposed in this paper differs fundamentally from the above paradigms by adopting a set-based perspective. Each feasible segment is explicitly represented as a decision variable, and the segmentation problem is formulated as a set partitioning (or covering) problem in which the time axis must be covered (at least) once. While set covering and set partitioning models are classical tools in combinatorial optimization \cite{B69,S03}, they have received comparatively little attention in the changepoint detection literature.
 
 By associating segments with decision variables, the set-partitioning formulation provides a natural mechanism for expressing global structural constraints directly at the segment level. Aggregate constraints on the number, length, distribution, or interaction of segments can be imposed through simple linear inequalities, without resorting to state augmentation or intricate logical constructs. This distinguishes the proposed SP-CPD framework from existing MIP formulations and enables a level of modeling expressiveness that is difficult to achieve within DP-based, shortest-path, or breakpoint-indicator models.
 
@@ -185,7 +185,7 @@ We evaluated a broad range of cost functions, including AIC, BIC, Chi-square sta
 
 For the subsequent analysis, we focus on two representative and complementary criteria: AIC and QRMSE. AIC is well established in the CPD literature, particularly through its equivalence to penalized negative log-likelihood formulations, and provides a theoretically grounded likelihood-based benchmark.
 
-QRMSE (Qarter-root-RMSE) \cite{M24}, by contrast, lies between MSE and RMSE in terms of segment-length sensitivity. Relative to MSE, it places less emphasis on short segments, while avoiding the stronger preference for long segments induced by RMSE. This intermediate behavior makes it attractive in applications where neither aggressive segmentation nor excessive smoothing is desirable.
+QRMSE (Quarter-root-RMSE) \cite{M24}, by contrast, lies between MSE and RMSE in terms of segment-length sensitivity. Relative to MSE, it places less emphasis on short segments, while avoiding the stronger preference for long segments induced by RMSE. This intermediate behavior makes it attractive in applications where neither aggressive segmentation nor excessive smoothing is desirable.
 Specifically, QRMSE is obtained from the residual sum of squares as
 
 $$
@@ -217,7 +217,7 @@ For the sake of our discussion, it is important to distinguish between two class
 
 \subsubsection{Local segment constraints} \label{subsubsec:segment_level_constraint}
 
-Segment-level constraints restrict the admissible properties of each segment independently of the rest of the segmentation. Thee constraints can be implemented in the data generation phase, do not require additions to formulations TSSP or TSSC and are easily included in DP approaches. 
+Segment-level constraints restrict the admissible properties of each segment independently of the rest of the segmentation. These constraints can be implemented in the data generation phase, do not require additions to formulations TSSP or TSSC and are easily included in DP approaches. 
 Typical segment-level constraints include:
 \begin{itemize}
 	\item {\it Minimum and maximum segment length}.	Bounds on the length of each segment (minimum spacing between changepoints) prevent over-fragmentation and excessively long segments In optimal partitioning approaches,  minimum segment size constraints can be naturally incorporated. For instance, the PELT algorithm \cite{KFE12} allows restricting the set of admissible segmentations by enforcing a lower bound on segment length and also by limiting admissible segment endpoints according to a predefined minimum segment size. This constraint is expressed as
@@ -248,7 +248,7 @@ Typical segment-level constraints include:
 
 \subsubsection{Global series constraints} \label{subsubsec:global_series_constraints}
 
-In constrast to segment-level constraints, global series constraints impose conditions that couple multiple segments and operate on the segmentation as a whole. 
+In contrast to segment-level constraints, global series constraints impose conditions that couple multiple segments and operate on the segmentation as a whole. 
 Mixed-Integer Programming formulations can support several types of constraints belonging to this class through possibly linear inequalities linking multiple segment-selection variables.
 
 A list of global constraints reported in the literature is presented below. We note that several of these constraint classes generate a number of constraints that grows superlinearly with the number of feasible segments (often quadratically in practice). Explicitly including all such constraints in the model is therefore impractical. Instead, we anticipate incorporating them via a cutting-plane strategy: constraints are added on demand as violated cuts because their separation can be performed efficiently for the constraint types considered.
@@ -454,7 +454,7 @@ Together, the M3, M4, and M6 benchmarks offer a diverse and demanding experiment
 Section \ref{subsec:costfunc} introduced the considerations motivating the choice of the cost functions used in our experiments. In particular, we focused on two alternatives: AIC and QRMSE. The former is well established in the changepoint literature, while the latter, {\it Quarter-root RMSE}, an in-between MSE and RMSE which effectively corresponds to scaling the residual sum of squares with an exponent proportional to $n^{1/4}$ (see Section \ref{subsec:costfunc}), was found in our experiments to produce segmentations that better align with visual expectations than the commonly used RMSE, of which it represents a minor variant. 
 
 
-Figure \ref{fig:twocosts} illustrates the typical impact of these two criteria on the segmentation results for series N2745. In both cases, model TSPP was applied under the constraints that the minimum segment length be 8 observations and the maximum number of segments be 10.
+Figure \ref{fig:twocosts} illustrates the typical impact of these two criteria on the segmentation results for series N2745. In both cases, model TSSP was applied under the constraints that the minimum segment length be 8 observations and the maximum number of segments be 10.
 
 When AIC is used as the cost function (Figure \ref{fig:AICcost}), the resulting model exploits the full fragmentation allowed by the constraints, producing a segmentation with the maximum number of segments in order to achieve a close fit to the observed data points. In contrast, when QRMSE is used (Figure \ref{fig:QRMSEcost}), the resulting segmentation tends to favor longer segments, tolerating a higher variance of observations around the fitted segments and thereby producing a smoother representation of the series.
 
@@ -477,7 +477,7 @@ These results demonstrate the impact of the choice of cost function on the balan
 
 We emphasize that there is no universally “correct” cost function for segmentation. Different criteria emphasize different characteristics of the fitted model and may therefore align better or worse with the expectations placed on the resulting segments. Beyond these modeling preferences, the statistical properties of the series itself also play an important role in determining which cost function performs more satisfactorily.
 
-Figure \ref{fig:categories} reports the optimal TSPP segmentation, obtained under the same constraints as in the previous experiment, for four series belonging to different economic categories. The results highlight the considerable heterogeneity present in these datasets. Even within a single category, series may exhibit markedly different structural properties, such as variability, seasonality, or frequency of structural changes.
+Figure \ref{fig:categories} reports the optimal TSSP segmentation, obtained under the same constraints as in the previous experiment, for four series belonging to different economic categories. The results highlight the considerable heterogeneity present in these datasets. Even within a single category, series may exhibit markedly different structural properties, such as variability, seasonality, or frequency of structural changes.
 
 Because of this diversity, relying on a single cost function often entails a human-in-the-loop process in which the analyst repeatedly adjusts optimization control parameters to obtain satisfactory segmentations. In contrast, selecting a cost function whose properties are known to match the statistical characteristics of the series can already guide the optimization toward the expected segmentation, reducing or eliminating the need for manual intervention.
 
@@ -499,7 +499,7 @@ Because of this diversity, relying on a single cost function often entails a hum
 \subsubsection{Unconstrained segmentation}
 
 In this section we report the results obtained using the three unconstrained changepoint detection algorithms described earlier, namely PELT, Dynp and Wild Binary Segmentation (WBS). 
-The experiments were conducted on the M3, M4 and M6 benchmark datasets in order to provide baseline results for comparison with the proposed set-covering MILP framework. Both PELT and Dynp, which are exact optimization methods, were tun using the implementation provided by the Ruptures library \cite{rupweb}.
+The experiments were conducted on the M3, M4 and M6 benchmark datasets in order to provide baseline results for comparison with the proposed set-covering MILP framework. Both PELT and Dynp, which are exact optimization methods, were run using the implementation provided by the Ruptures library \cite{rupweb}.
 
 To ensure a consistent experimental setting across all algorithms, the minimum segment length was fixed to 8 observations. 
 This choice prevents the detection of extremely short segments and aligns the unconstrained methods with the structural constraints that will later be considered.
@@ -527,20 +527,20 @@ The Dynp algorithm generally takes slightly longer to run because it relies on a
 In contrast, WBS is not an exact optimization method; it repeatedly evaluates change-point statistics over a large number of randomly generated intervals ($M = 400$ in our experiments), which increases the computational burden. 
 Consequently, despite its heuristic approach, WBS typically requires longer CPU times compared with the other two methods.
 
-We also ran the TSPP model while constraining it to generate exactly the same number of segments as Dynp, in order to allow a fair performance comparison in a setting compatible with the other algorithms. In this case, both TSPP and Dynp yield optimal solutions; therefore, only the computational times are reported for TSPP.
+We also ran the TSSP model while constraining it to generate exactly the same number of segments as Dynp, in order to allow a fair performance comparison in a setting compatible with the other algorithms. In this case, both TSSP and Dynp yield optimal solutions; therefore, only the computational times are reported for TSSP.
 
-The higher asymptotic complexity and longer setup time of TSPP are evident in Tables \ref{tab:PELTseriesAICQRMSE} and \ref{tab:DYNPseriesAICQRMSE}. In particular, the degradation in TSPP performance becomes apparent for longer time series.
+The higher asymptotic complexity and longer setup time of TSSP are evident in Tables \ref{tab:PELTseriesAICQRMSE} and \ref{tab:DYNPseriesAICQRMSE}. In particular, the degradation in TSSP performance becomes apparent for longer time series.
 
 Nevertheless, computational times remain below three minutes even for instances leading to constraint matrices with nearly 1000 rows and more than 300,000 columns (see Table \ref{tab:SPP_SCP}). This demonstrates the practical viability of relying on state-of-the-art solvers even for time series whose length would normally motivate data aggregation (e.g., subsampling or smoothing) for visualization purposes.
 
-Finally, Table \ref{tab:DYNPseriesAICQRMSE} also compares the relative effectiveness of TSPP and WSB. The median percentage error of WSB is generally small, with medians below 3\% and equal to 0\% for the M6 series. However, in some cases the heuristic solutions fail to converge to an acceptable quality.
+Finally, Table \ref{tab:DYNPseriesAICQRMSE} also compares the relative effectiveness of TSSP and WSB. The median percentage error of WSB is generally small, with medians below 3\% and equal to 0\% for the M6 series. However, in some cases the heuristic solutions fail to converge to an acceptable quality.
 
 \begin{table}[ht]
 	\centering
 	\caption{PELT: Data series results, AIC-QRMSE cost}\label{tab:PELTseriesAICQRMSE}%
 \begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
 	\toprule
-	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSPP} \\
+	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSSP} \\
 	Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.t & max.t \\
 	\midrule
 	M3 & Demographic  & 3.0 & 7.0 & 0.0 & 0.0 & 3.0 & 4.0 & 0.0 & 0.0 & 0.41 & 0.59\\
@@ -567,7 +567,7 @@ Finally, Table \ref{tab:DYNPseriesAICQRMSE} also compares the relative effective
 	\caption{DYNP: Data series results, AIC-QRMSE cost}\label{tab:DYNPseriesAICQRMSE}%
 \begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
 	\toprule
-	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSPP} \\
+	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSSP} \\
 	Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.t & max.t \\
 	\midrule
 	M3 & Demographic  & 10.0 & 10.0 & 0.0 & 0.0 & 10.0 & 10.0 & 0.0 & 0.1 & 0.41 & 0.59\\
@@ -593,7 +593,7 @@ Finally, Table \ref{tab:DYNPseriesAICQRMSE} also compares the relative effective
 	\caption{WBS: Data series results, AIC-QRMSE cost}\label{tab:WBSeriesAICQRMSE}%
 \begin{tabular}{@{}cl|rr|rr|rr|rr|rr}
 	\toprule
-	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSPP} \\
+	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSSP} \\
 	Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.gap & max.gap \\
 	\midrule
 	M3 & Demographic  & 10.0 & 11.0 & 0.3 & 0.3 & 5.0 & 8.0 & 0.2 & 0.3 & 1.30 &  9.26\\
@@ -616,7 +616,7 @@ Finally, Table \ref{tab:DYNPseriesAICQRMSE} also compares the relative effective
 
 \subsubsection{Constrained segmentation}
 
-In this section, we consider globally constrained series; therefore, the only suitable models for application are the TSPP and its heuristic relaxation, the TSCP. In the examples, the models were constrained to propose a maximum of 10 segments (rather than an exact number of 10, as managed by Dynp), as well as a minimum segment length of 8. However, any of the additional constraints listed in \ref{subsec:additional_constraints} could have been included.
+In this section, we consider globally constrained series; therefore, the only suitable models for application are the TSSP and its heuristic relaxation, the TSSC. In the examples, the models were constrained to propose a maximum of 10 segments (rather than an exact number of 10, as managed by Dynp), as well as a minimum segment length of 8. However, any of the additional constraints listed in \ref{subsec:additional_constraints} could have been included.
 
 The results are summarized in tables \ref{tab:seriesQRMSE} and \ref{tab:seriesAIC}. The columns show compatible data in both tables, that is the benchmark set of origin of the series ({\it bench}), the category of the series ({\it category}), the average and maximum number of data points in the group series ({\it avg.n} and {\it max.n}), the corresponding average and maximum number of generated runs ({\it avg.nrun} and {\it max.nrun}), the average and maximum number of chosen segments ({\it avg.nseg} and {max.nsegm}), and the average and maximum CPU time in seconds to solve the extended SCP model, inclusive of the time needed to generate the runs ({\it avg.t} and {\it max.t}).
 
@@ -645,7 +645,7 @@ bench & category & avg.n & max.n & avg.nrun & max.nrun & avg.nseg & max.nseg & a
 %\end{adjustwidth}
 \end{table}
 
-Table \ref{tab:seriesQRMSE} reports aggregate results obtained with the TSPP model using QRMSE as the cost function. The results show that relatively short series—up to a few hundred observations—lead to integer programming instances of moderate size that can be solved very efficiently even on standard hardware.
+Table \ref{tab:seriesQRMSE} reports aggregate results obtained with the TSSP model using QRMSE as the cost function. The results show that relatively short series—up to a few hundred observations—lead to integer programming instances of moderate size that can be solved very efficiently even on standard hardware.
 
 As the length of the series increases, the non-polynomial complexity of the exact integer programming search becomes more apparent. When the series approaches about 500 observations, solution times begin to require minutes of CPU time. This increase is primarily due to the rapid growth of the IP formulation, whose constraint matrix (the “tableau”) may reach dimensions close to 1000 rows and more than 300,000 columns.
 
@@ -683,7 +683,7 @@ The CPU time required for the optimization, however, is influenced by the numeri
 	\caption{Partitioning vs. covering comparison}\label{tab:SPP_SCP}%
 	\begin{tabular}{@{}lrrrrrrr}
 		\toprule
-		name & rows & cols & nonzeros & truns & GAP & tSPP & tSCP \\
+		name & rows & cols & nonzeros & truns & GAP & tSSP & tSSC \\
 		\midrule
 Q13050 & 736 & 245350 &  66244500 & 2 & 0.06 & 219 & 162 \\
 Q22221 & 739 & 247456 &  67060576 & 4 & 0.81 & 294 & 119 \\
@@ -696,9 +696,9 @@ Q23661 & 702 & 222778 &  57476724 & 6 & 0.99 & 242 & 143 \\
 	%\end{adjustwidth}
 \end{table}
 
-A final remark concerns the relative effectiveness of the two models, TSPP and TSCP. This comparison is reported in Table \ref{tab:SPP_SCP}. The columns show: the instance name {\it name}, the number of rows {\it rows} and columns {\it cols} of the constraint matrix, and the number of nonzero coefficients {\it nonzeros}. The remaining columns report the CPU time, in seconds, required to generate all feasible segment runs {\it truns}, to solve the instance using model TSPP {\it tSPP}, and to solve it using model TSCP {\it tSCP}. The latter includes the time required by the fixing heuristic used to ensure feasibility of the final TSCP solution. Column {\it GAP} reports the percentage cost gap between the heuristic TSCP solution and the optimal TSPP solution.
+A final remark concerns the relative effectiveness of the two models, TSSP and TSSC. This comparison is reported in Table \ref{tab:SPP_SCP}. The columns show: the instance name {\it name}, the number of rows {\it rows} and columns {\it cols} of the constraint matrix, and the number of nonzero coefficients {\it nonzeros}. The remaining columns report the CPU time, in seconds, required to generate all feasible segment runs {\it truns}, to solve the instance using model TSSP {\it tSSP}, and to solve it using model TSSC {\it tSSC}. The latter includes the time required by the fixing heuristic used to ensure feasibility of the final TSSC solution. Column {\it GAP} reports the percentage cost gap between the heuristic TSSC solution and the optimal TSSP solution.
 
-The table summarizes results for the longest series included in our benchmark set. The figures highlight the limited computational burden associated with the preliminary generation of segment runs, as well as the effectiveness of modern MIP solvers, which are able to handle matrices of substantial size and densities exceeding 36\% within a few minutes of CPU time. As expected, the {\it TSPP} model requires longer solution times, whereas {\it TSCP} is on average about 40\% faster. The fixing heuristic runs in negligible time and produces solutions whose average optimality gap with respect to {\it TSPP} remains consistently below 1\%.
+The table summarizes results for the longest series included in our benchmark set. The figures highlight the limited computational burden associated with the preliminary generation of segment runs, as well as the effectiveness of modern MIP solvers, which are able to handle matrices of substantial size and densities exceeding 36\% within a few minutes of CPU time. As expected, the {\it TSSP} model requires longer solution times, whereas {\it TSSC} is on average about 40\% faster. The fixing heuristic runs in negligible time and produces solutions whose average optimality gap with respect to {\it TSSP} remains consistently below 1\%.
 
 %\begin{figure*}[ht]
 %    \centering
