@@ -533,60 +533,59 @@ The higher asymptotic complexity and longer setup time of TSSP are evident in Ta
 
 Nevertheless, computational times remain below three minutes even for instances leading to constraint matrices with nearly 1000 rows and more than 300,000 columns (see Table \ref{tab:SPP_SCP}). This demonstrates the practical viability of relying on state-of-the-art solvers even for time series whose length would normally motivate data aggregation (e.g., subsampling or smoothing) for visualization purposes.
 
-Finally, Table \ref{tab:DYNPseriesAICQRMSE} also compares the relative effectiveness of TSSP and WSB. The median percentage error of WSB is generally small, with medians below 3\% and equal to 0\% for the M6 series. However, in some cases the heuristic solutions fail to converge to an acceptable quality.
-
 \begin{table}[ht]
 	\centering
 	\caption{PELT: Data series results, AIC-QRMSE cost}\label{tab:PELTseriesAICQRMSE}%
-\begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
-	\toprule
-	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSSP} \\
-	Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.t & max.t \\
-	\midrule
-	M3 & Demographic  & 3.0 & 7.0 & 0.0 & 0.0 & 3.0 & 4.0 & 0.0 & 0.0 & 0.41 & 0.59\\
-	M3 & Finance      & 3.0 & 9.0 & 0.0 & 0.0 & 2.0 & 7.0 & 0.0 & 0.0 & 0.40 & 0.56\\
-	M3 & Industry     & 1.0 & 2.0 & 0.0 & 0.0 & 1.0 & 12.0 & 0.0 & 0.0 & 0.55 & 0.69\\
-	M3 & Macro        & 3.0 & 5.0 & 0.0 & 0.0 & 2.0 & 3.0 & 0.0 & 0.0 & 0.43 & 0.59\\
-	M3 & Micro        & 1.0 & 2.0 & 0.0 & 0.0 & 1.0 & 1.0 & 0.0 & 0.0 & 0.33 & 0.5\\
-	M3 & Other        & 3.0 & 4.0 & 0.0 & 0.0 & 1.0 & 4.0 & 0.0 & 0.0 & 0.27 & 0.45\\
-	M4 & Demographic & 4.0 & 26.0 & 0.0 & 0.1 & 8.0 & 10.0 & 0.0 & 0.0 & 0.30 & 170.68\\
-	M4 & Finance & 5.0 & 17.0 & 0.0 & 0.1 & 5.0 & 10.0 & 0.0 & 0.0 & 0.33 & 88.24 \\
-	M4 & Industry & 5.0 & 10.0 & 0.0 & 0.1 & 6.0 & 7.0 & 0.0 & 0.0 & 0.58 & 71.77\\
-	M4 & Macro & 5.0 & 35.0 & 0.0 & 0.1 & 2.0 & 17.0 & 0.0 & 0.0 & 0.41 & 153.33 \\
-	M4 & Micro & 3.0 & 9.0 & 0.0 & 0.1 & 4.0 & 6.0 & 0.0 & 0.0 & 0.30 & 69.87\\
-	M4 & Other & 7.0 & 28.0 & 0.0 & 0.0 & 2.0 & 9.0 & 0.0 & 0.0 & 1.03 & 55.1\\
-	M6 & Finance & 6.5 & 8.0 & 0.0 & 0.0 & 1.0 & 1.0 & 0.0 & 0.0 & 2.72 & 3.10\\
-	\bottomrule
-\end{tabular}
-%\end{adjustwidth}
+	\begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
+		\toprule
+		& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSSP} \\
+		Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.t & max.t \\
+		\midrule
+		M3 & Demographic  & 3.0 & 7.0 & 0.0 & 0.0 & 3.0 & 4.0 & 0.0 & 0.0 & 0.41 & 0.59\\
+		M3 & Finance      & 3.0 & 9.0 & 0.0 & 0.0 & 2.0 & 7.0 & 0.0 & 0.0 & 0.40 & 0.56\\
+		M3 & Industry     & 1.0 & 2.0 & 0.0 & 0.0 & 1.0 & 12.0 & 0.0 & 0.0 & 0.55 & 0.69\\
+		M3 & Macro        & 3.0 & 5.0 & 0.0 & 0.0 & 2.0 & 3.0 & 0.0 & 0.0 & 0.43 & 0.59\\
+		M3 & Micro        & 1.0 & 2.0 & 0.0 & 0.0 & 1.0 & 1.0 & 0.0 & 0.0 & 0.33 & 0.5\\
+		M3 & Other        & 3.0 & 4.0 & 0.0 & 0.0 & 1.0 & 4.0 & 0.0 & 0.0 & 0.27 & 0.45\\
+		M4 & Demographic & 4.0 & 26.0 & 0.0 & 0.1 & 8.0 & 10.0 & 0.0 & 0.0 & 0.30 & 170.68\\
+		M4 & Finance & 5.0 & 17.0 & 0.0 & 0.1 & 5.0 & 10.0 & 0.0 & 0.0 & 0.33 & 88.24 \\
+		M4 & Industry & 5.0 & 10.0 & 0.0 & 0.1 & 6.0 & 7.0 & 0.0 & 0.0 & 0.58 & 71.77\\
+		M4 & Macro & 5.0 & 35.0 & 0.0 & 0.1 & 2.0 & 17.0 & 0.0 & 0.0 & 0.41 & 153.33 \\
+		M4 & Micro & 3.0 & 9.0 & 0.0 & 0.1 & 4.0 & 6.0 & 0.0 & 0.0 & 0.30 & 69.87\\
+		M4 & Other & 7.0 & 28.0 & 0.0 & 0.0 & 2.0 & 9.0 & 0.0 & 0.0 & 1.03 & 55.1\\
+		M6 & Finance & 6.5 & 8.0 & 0.0 & 0.0 & 1.0 & 1.0 & 0.0 & 0.0 & 2.72 & 3.10\\
+		\bottomrule
+	\end{tabular}
+	%\end{adjustwidth}
 \end{table}
-
 
 \begin{table}[ht]
 	\centering
 	\caption{DYNP: Data series results, AIC-QRMSE cost}\label{tab:DYNPseriesAICQRMSE}%
-\begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
-	\toprule
-	& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSSP} \\
-	Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.t & max.t \\
-	\midrule
-	M3 & Demographic  & 10.0 & 10.0 & 0.0 & 0.0 & 10.0 & 10.0 & 0.0 & 0.1 & 0.41 & 0.59\\
-	M3 & Finance     & 10.0 & 10.0 & 0.0 & 0.1 & 10.0 & 10.0 & 0.0 & 0.0 & 0.40 & 0.56\\
-	M3 & Industry     & 10.0 & 10.0 & 0.0 & 0.0 & 10.0 & 10.0 & 0.0 & 0.0 & 0.55 & 0.69\\
-	M3 & Macro        & 10.0 & 10.0 & 0.0 & 0.1 & 10.0 & 10.0 & 0.0 & 0.0 & 0.43 & 0.59\\
-	M3 & Micro        & 8.0 & 10.0 & 0.0 & 0.0 & 8.0 & 10.0 & 0.0 & 0.0 & 0.33 & 0.5\\
-	M3 & Other        & 8.0 & 10.0 & 0.0 & 0.0 & 8.0 & 10.0 & 0.0 & 0.0  & 0.27 & 0.45\\
-	M4 & Demographic & 10.0 & 10.0 & 0.0 & 2.5 & 10.0 & 10.0 & 0.0 & 2.8 & 0.30 & 170.68\\
-	M4 & Finance & 10.0 & 10.0 & 0.0 & 2.5 & 10.0 & 10.0 & 0.0 & 2.7 & 0.33 & 88.24\\
-	M4 & Industry & 10.0 & 10.0 & 0.0 & 2.5 & 10.0 & 10.0 & 0.0 & 2.7 & 0.58 & 71.77\\
-	M4 & Macro & 10.0 & 10.0 & 0.0 & 3.7 & 10.0 & 10.0 & 0.0 & 4.1 & 0.41 & 153.33\\
-	M4 & Micro & 10.0 & 10.0 & 0.0 & 2.5 & 10.0 & 10.0 & 0.0 & 2.7 & 0.30 & 69.87\\
-	M4 & Other & 10.0 & 10.0 & 0.1 & 2.2 & 10.0 & 10.0 & 0.1 & 2.4 & 1.03 & 55.1\\
-	M6 & Finance & 10.0 & 10.0 & 0.2 & 0.2 & 10.0 & 10.0 & 0.2 & 0.2& 2.72 & 3.10 \\
-	\bottomrule
-\end{tabular}
-%\end{adjustwidth}
+	\begin{tabular}{@{}cl|lr|rr|rr|rr|rr}
+		\toprule
+		& & \multicolumn{4}{c|}{AIC} & \multicolumn{4}{c}{QRMSE} & \multicolumn{2}{|c}{TSSP} \\
+		Bench & Category & med.n & max.n & med.t & max.t & med.n & max.n & med.t & max.t & med.t & max.t \\
+		\midrule
+		M3 & Demographic  & 10.0 & 10.0 & 0.0 & 0.0 & 10.0 & 10.0 & 0.0 & 0.1 & 0.41 & 0.59\\
+		M3 & Finance     & 10.0 & 10.0 & 0.0 & 0.1 & 10.0 & 10.0 & 0.0 & 0.0 & 0.40 & 0.56\\
+		M3 & Industry     & 10.0 & 10.0 & 0.0 & 0.0 & 10.0 & 10.0 & 0.0 & 0.0 & 0.55 & 0.69\\
+		M3 & Macro        & 10.0 & 10.0 & 0.0 & 0.1 & 10.0 & 10.0 & 0.0 & 0.0 & 0.43 & 0.59\\
+		M3 & Micro        & 8.0 & 10.0 & 0.0 & 0.0 & 8.0 & 10.0 & 0.0 & 0.0 & 0.33 & 0.5\\
+		M3 & Other        & 8.0 & 10.0 & 0.0 & 0.0 & 8.0 & 10.0 & 0.0 & 0.0  & 0.27 & 0.45\\
+		M4 & Demographic & 10.0 & 10.0 & 0.0 & 2.5 & 10.0 & 10.0 & 0.0 & 2.8 & 0.30 & 170.68\\
+		M4 & Finance & 10.0 & 10.0 & 0.0 & 2.5 & 10.0 & 10.0 & 0.0 & 2.7 & 0.33 & 88.24\\
+		M4 & Industry & 10.0 & 10.0 & 0.0 & 2.5 & 10.0 & 10.0 & 0.0 & 2.7 & 0.58 & 71.77\\
+		M4 & Macro & 10.0 & 10.0 & 0.0 & 3.7 & 10.0 & 10.0 & 0.0 & 4.1 & 0.41 & 153.33\\
+		M4 & Micro & 10.0 & 10.0 & 0.0 & 2.5 & 10.0 & 10.0 & 0.0 & 2.7 & 0.30 & 69.87\\
+		M4 & Other & 10.0 & 10.0 & 0.1 & 2.2 & 10.0 & 10.0 & 0.1 & 2.4 & 1.03 & 55.1\\
+		M6 & Finance & 10.0 & 10.0 & 0.2 & 0.2 & 10.0 & 10.0 & 0.2 & 0.2& 2.72 & 3.10 \\
+		\bottomrule
+	\end{tabular}
+	%\end{adjustwidth}
 \end{table}
+
+Finally, Table \ref{tab:WBSeriesAICQRMSE} compares the relative effectiveness of TSSP and WSB by reporting the percentage deviation of the cost of the solution produced by WSB from that of TSSP, computed on the same instance and for the same number of segments. The median percentage error of WSB is generally small, with values below 3\% and equal to 0\% for the M6 series. However, in some cases the heuristic fails to converge to solutions of acceptable quality.
 
 \begin{table}[ht]
 	\centering
