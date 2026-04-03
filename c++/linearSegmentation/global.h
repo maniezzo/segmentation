@@ -11,6 +11,7 @@ using namespace std;
 
 extern std::string baseDir;
 extern std::string dsName;    // dataset name (file col .csv)
+extern std::string global;    // tipo di vincolo globale, serie da ottimizzare
 extern int maxIter;      // max nunm of lagrangian iterations
 extern int maxTime;      // max secs of lagrangian runs
 extern int nMaxSegm;     // max num segments

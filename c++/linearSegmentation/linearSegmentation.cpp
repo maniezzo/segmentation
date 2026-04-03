@@ -3,6 +3,7 @@
 #include "gurobiMIP.h"
 #include "cplexMIP.h"
 #include "hexalyMIP.h"
+#include "cuttingPlanes.h"
 #include "json.h"
 
 // checks the feasibility of a solution
@@ -1095,6 +1096,7 @@ int readConfig()
    idcost   = JSV["idcost"].ToInt();
    nMaxSegm = JSV["nMaxSegm"].ToInt();// max num segments
    minlength = JSV["minlength"].ToInt();// min segment length
+   global   = JSV["global"].ToString();
 
    cout << baseDir << endl;
    cout << dsName << endl;
@@ -1180,6 +1182,13 @@ int main(int argc, char** argv)
    vector<double> x,y;
    string dataFile = baseDir + dsName + ".csv";
    int minidc,maxidc,idrow;
+
+   if(global!="")
+   {
+      vector<string> elem = split(global,';');
+      goCutPlanes(elem[0],elem[1]);
+      goto TERMINATE;
+   }
 
    idrow = firstRow;
 

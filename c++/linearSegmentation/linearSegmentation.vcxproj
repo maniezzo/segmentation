@@ -137,6 +137,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cplexMIP.cpp" />
+    <ClCompile Include="cuttingPlanes.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="gurobiMIP.cpp" />
     <ClCompile Include="hexalyMIP.cpp" />
@@ -145,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cplexMIP.h" />
+    <ClInclude Include="cuttingPlanes.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="gurobiMIP.h" />
     <ClInclude Include="hexalyMIP.h" />

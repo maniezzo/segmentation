@@ -33,6 +33,9 @@
     <ClCompile Include="hexalyMIP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cuttingPlanes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="json.h">
@@ -51,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hexalyMIP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cuttingPlanes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

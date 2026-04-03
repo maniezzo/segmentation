@@ -1,6 +1,6 @@
 {
 	"basedir" : "..\\..\\data\\",
-	"dsName"  : "M6\\VXX",
+	"dsName"  : "M3\\M3month",
 	"maxIter" : 500,
 	"maxTime" : 300,
     "idcost"  : 8,    "commentCost"  : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC",
@@ -8,5 +8,6 @@
 	"nMaxSegm": 10,   "commentNtot"  : "max numero di segmenti accettato",
 	"minlength": 8,   "commentMinl"  : "min numero di punti in un segmento",
 	"firstRow": 1,    "commentFirst" : "prima riga di M3_4_sample da ottimizzare",
-	"lastRow" : 5,    "commentFirst" : "prima riga di M3_4_sample ESCLUSA"
+	"lastRow" : 5,    "commentFirst" : "prima riga di M3_4_sample ESCLUSA",
+	"global"  : "N1906;updown"
 }

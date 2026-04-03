@@ -1,6 +1,7 @@
 #include "global.h"
 string baseDir = "";
 string dsName = "";
+string global = "";
 char solver = 'h';
 vector<vector<int>> colids;
 vector<vector<int>> rowids;
