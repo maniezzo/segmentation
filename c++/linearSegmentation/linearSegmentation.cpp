@@ -112,18 +112,6 @@ vector<int> reconstructSolution(vector<tuple<int, int, double, double, double>> 
    return sol;
 }
 
-// split di una stringa in un array di elementi delimitati da separatori
-vector<string> split(string str, char sep)
-{  vector<string> tokens;
-   size_t start;
-   size_t end = 0;
-   while ((start = str.find_first_not_of(sep, end)) != std::string::npos) {
-      end = str.find(sep, start);
-      tokens.push_back(str.substr(start, end - start));
-   }
-   return tokens;
-}
-
 int readData(string dataFileName, vector<int>& X, vector<double>& Y)
 {  int i, cont, id,n=0;
    double d;
@@ -148,6 +136,44 @@ int readData(string dataFileName, vector<int>& X, vector<double>& Y)
          X.push_back(id);
          d = stod(elem[1]);
          Y.push_back(d);
+l0:      cont++;
+      }
+      f.close();
+      n = Y.size();  // number of input records
+   }
+   else cout << "Cannot open dataset input file\n";
+   return n;
+}
+
+// legge i dati dal file M3month
+int readM3Data(string dataFile, string series, vector<double>& X, vector<double>& Y)
+{  int i, cont, id,n=0;
+   double d;
+   string line;
+   vector<string> elem;
+
+   // leggo i punti
+   ifstream f;
+   string dataSetFile = dataFile;
+   cout << "Opening datafile " << dataSetFile << endl;
+   f.open(dataSetFile);
+   if (f.is_open())
+   {
+      getline(f, line);  // headers
+      cout << line << endl;
+      elem = split(line, ',');
+
+      while (getline(f, line))
+      {  cont = 0;
+         elem = split(line, ',');
+         if(elem[0] == series)
+         {
+            for(i=6;i<elem.size();i++)
+            {
+               X.push_back(i-6);
+               Y.push_back(stod(elem[i]));
+            }
+         }
 l0:      cont++;
       }
       f.close();
@@ -1134,6 +1160,38 @@ bool entryExists(string filename, string& name, string& costFun, int idrow = -1)
    return false;
 }
 
+// scrive i risultati finali su file
+void writeResults(vector<tuple<int, int, double, double, double>> lstOLS,
+                  vector<double> x, string baseDir, string seriesName, string costFunc)
+{  int j,cont,n_brk;
+   double cost = 0.0;
+
+   cont = 0;
+   ofstream dsFile(baseDir+seriesName+"_"+costFunc+"_segments.csv");
+   dsFile<<"id,low,hi,m,q,"<<costFunc<<endl;
+   for (j = 0; j<x.size(); j++)
+      if (x[j]>0.01)
+      {
+         cout<<cont<<") column "<<j<<" value="<<x[j];
+         cout<<" segm: "<<get<0>(lstOLS[j])<<","
+            <<get<1>(lstOLS[j])<<","
+            <<get<2>(lstOLS[j])<<","
+            <<get<3>(lstOLS[j])<<","
+            <<get<4>(lstOLS[j])<<endl;
+         dsFile<<j<<","<<get<0>(lstOLS[j])<<","
+            <<get<1>(lstOLS[j])<<","
+            <<get<2>(lstOLS[j])<<","
+            <<get<3>(lstOLS[j])<<","
+            <<get<4>(lstOLS[j])<<endl;
+         cont++;
+         cost += get<4>(lstOLS[j]);
+
+         n_brk = cont-1;
+      }
+   dsFile.close();
+   cout<<"Final number of segments: "<<cont<<" cost "<<cost<<endl;
+}
+
 int main(int argc, char** argv)
 {  bool   fLagrangian = false;
    bool   fGurobi     = false;
@@ -1183,10 +1241,17 @@ int main(int argc, char** argv)
    string dataFile = baseDir + dsName + ".csv";
    int minidc,maxidc,idrow;
 
+   vector<tuple<int, int, double, double, double>> lstOLS;
+   int minlag = minlength; // max(minlength, n/20); // minimal segment length, updated
+
    if(global!="")
    {
       vector<string> elem = split(global,';');
-      goCutPlanes(elem[0],elem[1]);
+      n = readM3Data(dataFile, elem[0], x, y);
+      lstOLS = computeRuns(minlag, y, idcost);
+      writeListOLS(lstOLS, seriesName); // write csv file with candidate segments
+      x = goCutPlanes(y, lstOLS, nMaxSegm, elem[1]);
+      writeResults(lstOLS,x,baseDir,seriesName,costFunc);
       goto TERMINATE;
    }
 
@@ -1234,8 +1299,6 @@ int main(int argc, char** argv)
          }
 
          vector<tuple<int, int, double, double, double>> lstOLS;
-         int minlag = minlength; // max(minlength, n/20); // minimal segment length, updated
-
          tstart = clock();
 
          // se segmenti già calcolati li legge, altrimenti li calcola

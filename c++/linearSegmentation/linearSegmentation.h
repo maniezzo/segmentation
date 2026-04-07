@@ -1,6 +1,4 @@
 #pragma once
-#include <fstream>
-#include <stdlib.h>
 #include <numeric>   // accumulate
 #include <algorithm> // for_each
 #include <iomanip>   // setprecision

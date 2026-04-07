@@ -5,7 +5,8 @@
 #include <sstream>
 #include <time.h>
 #include <tuple>
-
+#include <fstream>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -20,3 +21,5 @@ extern int firstRow;     // prima istanza in M3_4_sample da ottimizzare
 extern int lastRow;      // prima istanza in M3_4_sample ESCLUSA
 extern char solver;
 extern std::vector<std::vector<int>> rowids, colids;  // compression of indices, by row and by col
+
+vector<string> split(string str, char sep);

@@ -1,7 +1,8 @@
 #pragma once
 #include "global.h"
-#include <fstream>
-#include <stdlib.h>
 #include <ilcplex/cplex.h>
 
-void goCutPlanes(string series, string cons);
+vector<double> goCutPlanes(vector<double> y,
+   vector<tuple<int, int, double, double, double>> lstOLS,
+   int nMaxSegm, string cons);
+vector<int> separateUpDownCuts(const vector<double>& x);
