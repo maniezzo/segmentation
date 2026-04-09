@@ -1247,7 +1247,14 @@ int main(int argc, char** argv)
    if(global!="")
    {
       vector<string> elem = split(global,';');
-      n = readM3Data(dataFile, elem[0], x, y);
+      seriesName = elem[0];
+      baseDir += "M3\\";
+      switch (idcost)
+      {  case 6: costFunc = "costQRMSE";  break;
+         case 8: costFunc = "costAIC"; break;
+         default: cout<<"ERROR 1"<<endl;
+      }
+      n = readM3Data(dataFile, seriesName, x, y);
       lstOLS = computeRuns(minlag, y, idcost);
       writeListOLS(lstOLS, seriesName); // write csv file with candidate segments
       x = goCutPlanes(y, lstOLS, nMaxSegm, elem[1]);

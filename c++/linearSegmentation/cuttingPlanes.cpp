@@ -28,7 +28,7 @@ vector<int> separateUpDownCuts(const vector<double>& x,
             m2 = get<2>(lstOLS[j]);
             startj = get<0>(lstOLS[j]);
             if(startj == endi+1)
-               if (m1*m2<0)
+               if (m1*m2>0)
                {  newCut.push_back(j);
                   if(x[j] > 0.001) 
                   {  isCut = true;
@@ -185,13 +185,12 @@ int populatebyrowCPX(CPXENVptr env, CPXLPptr lp, vector<double> y,
          cout << "Constr " << i << endl;
    }
 
-   // Cardinality constraint
+   // Max cardinality constraint
    rmatbeg.push_back(numnz);
    numrows++;
-
    {
       ostringstream osstr;
-      osstr << "ntot";
+      osstr << "maxn";
       rowname.push_back(osstr.str());
    }
 
@@ -205,7 +204,29 @@ int populatebyrowCPX(CPXENVptr env, CPXLPptr lp, vector<double> y,
    sense.push_back('L');
    rhs.push_back(nMaxSegm);
 
-   cout << "Constr ntot" << endl;
+   cout << "Constr max num" << endl;
+
+   // Min cardinality constraint
+   int nMinSegm = 5;
+   rmatbeg.push_back(numnz);
+   numrows++;
+   {
+      ostringstream osstr;
+      osstr << "minn";
+      rowname.push_back(osstr.str());
+   }
+
+   for (j = 0; j < n; j++)
+   {
+      rmatind.push_back(j);
+      rmatval.push_back(1.0);
+      numnz++;
+   }
+
+   sense.push_back('G');
+   rhs.push_back(nMinSegm);
+
+   cout << "Constr minn" << endl;
 
    char** rname = new char*[rowname.size()];
    for (int index = 0; index < (int)rowname.size(); index++)
@@ -287,7 +308,7 @@ vector<double> goCutPlanes(vector<double> y,
    // PHASE 1: LP CUT GENERATION LOOP
    cout << "----- START LP CUT GENERATION -----" << endl;
    cont = 0;
-   while (cont < 100)
+   while (cont < 0)
    {  status = CPXlpopt(env, lp);
       if (status)
       {  cout << "Failed to optimize LP relaxation." << endl;
@@ -383,6 +404,7 @@ vector<double> goCutPlanes(vector<double> y,
          cout<<"Added MIP cut "<<cutId<<" with "<<newCoef.size()<<" variables."<<endl;
 
          cutId++;
+         cont++;
          cur_numrows = CPXgetnumrows(env, lp);
       }
    }
@@ -400,7 +422,7 @@ vector<double> goCutPlanes(vector<double> y,
       goto TERMINATE;
    }
 
-   cout << "Final solution value = " << objval << endl;
+   cout << "Final solution value = " << objval << " num cuts " << cont << endl;
    cout << "Total CPU time = " << tCpuOpt << endl;
 
    status = CPXgetx(env, lp, &x[0], 0, cur_numcols - 1);
