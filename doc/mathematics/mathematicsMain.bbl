@@ -110,6 +110,22 @@ Schrijver, A.
 \newblock {\em Combinatorial Optimization: Polyhedra and Efficiency}; Springer,
    2003.
 
+\bibitem[Box et~al.(2015)Box, Jenkins, Reinsel, and Ljung]{box2015}
+Box, G.E.P.; Jenkins, G.M.; Reinsel, G.C.; Ljung, G.M.
+\newblock {\em Time Series Analysis: Forecasting and Control}, 5th ed.; John
+  Wiley \& Sons,  2015.
+
+\bibitem[Hyndman and Athanasopoulos(2018)]{hyndman2018}
+Hyndman, R.J.; Athanasopoulos, G.
+\newblock {\em Forecasting: Principles and Practice}, 2nd ed.; OTexts,  2018.
+
+\bibitem[Lopez~Bernal et~al.(2021)Lopez~Bernal, Cummins, and
+  Gasparrini]{lopez2021}
+Lopez~Bernal, J.; Cummins, S.; Gasparrini, A.
+\newblock Interrupted time series analysis using autoregressive integrated
+  moving average ({ARIMA}) models.
+\newblock {\em BMC Medical Research Methodology} {\bf 2021}, {\em 21}.
+
 \bibitem[Fischetti et~al.(2009)Fischetti, Lodi, and Salvagnin]{FLS09}
 Fischetti, M.; Lodi, A.; Salvagnin, D.
 \newblock Just {MIP} It! In {\em Matheuristics}; Maniezzo, V.; St{\"u}tzle, T.;

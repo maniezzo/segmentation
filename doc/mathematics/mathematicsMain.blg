@@ -1,50 +1,48 @@
-This is BibTeX, Version 0.99d
+This is BibTeX, Version 0.99d (TeX Live 2025)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: mathematicsMain.aux
-Reallocating 'name_of_file' (item size: 1) to 17 items.
 The style file: Definitions/mdpi.bst
-Reallocating 'name_of_file' (item size: 1) to 20 items.
 Database file #1: mathematicsMain.bib
 Warning--empty journal in PRSS25
-You've used 32 entries,
+You've used 35 entries,
             2887 wiz_defined-function locations,
-            787 strings with 8879 characters,
-and the built_in function-call counts, 12100 in all, are:
-= -- 1065
-> -- 620
-< -- 22
-+ -- 279
-- -- 164
-* -- 990
-:= -- 1826
-add.period$ -- 95
-call.type$ -- 32
-change.case$ -- 32
-chr.to.int$ -- 32
-cite$ -- 34
-duplicate$ -- 604
-empty$ -- 1065
-format.name$ -- 231
-if$ -- 2589
+            805 strings with 9346 characters,
+and the built_in function-call counts, 13120 in all, are:
+= -- 1147
+> -- 689
+< -- 23
++ -- 309
+- -- 182
+* -- 1069
+:= -- 1989
+add.period$ -- 102
+call.type$ -- 35
+change.case$ -- 37
+chr.to.int$ -- 35
+cite$ -- 37
+duplicate$ -- 658
+empty$ -- 1153
+format.name$ -- 257
+if$ -- 2810
 int.to.chr$ -- 1
-int.to.str$ -- 32
-missing$ -- 33
-newline$ -- 160
-num.names$ -- 98
-pop$ -- 312
+int.to.str$ -- 35
+missing$ -- 38
+newline$ -- 173
+num.names$ -- 107
+pop$ -- 347
 preamble$ -- 0
-purify$ -- 32
+purify$ -- 35
 quote$ -- 0
-skip$ -- 356
+skip$ -- 385
 stack$ -- 0
-substring$ -- 558
-swap$ -- 134
+substring$ -- 564
+swap$ -- 142
 text.length$ -- 5
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 212
+type$ -- 227
 warning$ -- 1
-while$ -- 100
+while$ -- 106
 width$ -- 0
-write$ -- 386
+write$ -- 422
 (There was 1 warning)
