@@ -48,7 +48,7 @@ if __name__ == "__main__":
       y = ds.iloc[idFile,4:].dropna().values
    elif(baseDir == "M3"):
       df = pd.read_csv(f"..//..//..//data//M3//M3month.csv")
-      name = "N2798"
+      name = "N2465"
       ds = df[df.iloc[:, 0] == name]
       y = ds.iloc[0,6:].dropna().values
    x = np.arange(len(y))

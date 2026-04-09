@@ -53,6 +53,7 @@
 % Full title of the paper (Capitalized)
 \Title{Optimal Partitioning Changepoint Analysis}
 
+\newcommand{\rev}[1]{{\color{blue}#1}}
 % Author Orchid ID: enter ID or remove command
 \newcommand{\orcidauthorA}{0000-0002-1220-1235} % Add \orcidA{} behind the author's name
 \newcommand{\orcidauthorB}{0000-0000-0000-000X} % Add \orcidB{} behind the author's name
@@ -720,6 +721,91 @@ The table summarizes results for the longest series included in our benchmark se
 %    \caption{Economics and healthcare dataseries}
 %    \label{fig:nonenv}
 %\end{figure*}
+
+\rev{
+	\subsubsection{Cutting planes insertions}
+	
+	When dealing with global constraints—i.e., constraints acting on the entire series rather than on individual segments—the number of constraints to be included in the formulation may become prohibitive. To address this limitation, such constraints can be incorporated in a cutting-plane fashion, being added only when they are violated and thus effectively restrict the feasible region.
+	
+	As an illustrative example, consider a setting in which the desired segmentation must satisfy three types of global constraints: a {\it minimum cardinality}, a {\it maximum cardinality}, and {\it change direction} constraints. While the first two can be enforced by a single inequality each, the third class induces a number of constraints that grows quadratically with the length of the time series. The corresponding formulation is denoted as $TSSP_G$
+	
+	\begin{alignat}{4}
+		(TSSP_G) \hspace{0.5cm} z_{TSSC} = \min     &\; \sum_{j=1}^{nruns} c_j x_{j}  \label{eq:SCPobjG} \\
+		s.t. &\; \sum_{j=1}^{nruns}a_{ij}x_{j} = 1, & \hspace{1.5cm} i=1,\dots,npoints  \label{eq:SCPcovG} \\
+		&\; \sum_{j=1}^{nruns} x_{j} \leq maxruns \label{eq:SPPmaxG}\\
+		&\; \sum_{j=1}^{nruns} x_{j} \geq minruns \label{eq:SPPminG}\\
+		&\; x_j + \sum_{i \in I_j} x_i \leq 1  & \hspace{1.5cm} j=1,\dots,nruns  \label{eq:updown}\\
+		&\; x_j \in \{0,1\},                   &\; j=1,\dots,nruns  \label{eq:SCPvarG}
+	\end{alignat}
+	\noindent where the notation $I_j$ in constraint \ref{eq:updown} denotes the index set of variables associated with segments having the same slope as the segment associated with variable $x_j$.
+	
+	We implemented this formulation by adding constraints \ref{eq:updown} in a cutting-plane fashion. In our setting, the separation routine is straightforward: for each selected variable, it suffices to check whether another contiguous segment with the same slope is simultaneously included in the solution. If this occurs, a cut is generated forbidding the corresponding variables from being selected together. The cut is then lifted to include all contiguous segments sharing the same slope as the one under consideration.
+	
+	Change direction constraints are of particular interest when modeling periodic series. To evaluate their impact, we selected the 10 series from the M3 benchmark set exhibiting the highest degree of seasonality and instantiated formulation $TSSP_G$ with $minruns = 5$ and $maxruns = 25$. The results are reported in Table \ref{tab:global}, where, for both AIC and QRMSE cost functions, we provide the number of segments in the final solution ($n.segm$), the CPU time required to obtain the solution ($t.cpu$), and the number of cuts generated during the optimization ($n.cuts$).
+	
+	\begin{table}[ht]
+		\centering
+		\caption{Global constraints}\label{tab:global}%
+		\begin{tabular}{@{}crc|rrr|rrr}
+			\toprule
+			& & &  \multicolumn{3}{c|}{AIC} & \multicolumn{3}{c}{QRMSE}\\
+			Series & N & Category & n.segm & t.cpu & n.cuts & n.segm & t.cpu & n.cuts \\
+			\midrule
+			N1906 & 134 &    INDUSTRY & 22 &    8.81 &   5 & 5 &   7.97 & 4 \\
+			N2577 & 134 &     FINANCE &  9 & 5577.86 & 921 & 5 & 150.94 & 178 \\
+			N2465 & 132 &       MACRO & 22 &  859.49 & 299 & 5 & 259.80 & 37 \\
+			N2747 & 132 & DEMOGRAPHIC & 22 &    1.63 &   0 & 5 &   5.71 & 2 \\
+			N2504 & 108 &       MACRO & 17 &  354.38 & 262 & 5 &  47.67 & 44 \\
+			N2572 & 134 &     FINANCE &  5 &   17.05 &   6 & 5 &  21.48 & 9 \\
+			N2568 & 134 &     FINANCE &  5 &   13.20 &   6 & 5 &  21.16 & 9 \\
+			N2799 &  96 &       OTHER & 16 &    0.29 &   0 & 5 &   6.91 & 18 \\
+			N1907 & 144 &    INDUSTRY & 24 &    8.37 &   4 & 5 &   5.22 & 3 \\
+			N2798 &  96 &       OTHER & 16 &    0.30 &   0 & 5 &   1.00 & 1 \\
+			\bottomrule
+		\end{tabular}
+		%\end{adjustwidth}
+	\end{table}
+	
+	Several observations can be drawn from the results reported in Table \ref{tab:global}. First, highly seasonal series arise across a wide range of domains; indeed, even within the first 10 selected series, most of the categories represented in the M3 benchmark are covered. Second, the QRMSE cost function tends to model the series using a small number of long segments. Since all selected instances exhibit relatively high-frequency seasonality, this results in segmentations with the minimum number of segments allowed by the constraints. In contrast, AIC tends to favor more fragmented segmentations, adhering more closely to the observed data points within the limits imposed by the constraints.
+	
+	The number of cuts required varies significantly across instances, although it remains substantially smaller than the total number of potential cuts. This variability has a marked impact on the computational effort: while most instances are solved quickly, a small subset requires a substantially larger number of cuts, leading to a sharp increase in CPU time.
+	
+	Figures \ref{fig:changedir} illustrate the impact of the change direction constraints. Figure \ref{fig:bareAIC} presents the optimal solution obtained with the AIC cost for series N2747 without imposing these constraints, while Figure \ref{fig:cdAIC} shows the corresponding solution when the constraints are enforced. The difference between the two highlights the additional search effort required to transform the former solution into the latter.
+	
+	\begin{figure*}[ht]
+		\centering
+		\subfloat[Without change direction constraints]{%
+			\includegraphics[width=0.49\textwidth]{figs/N2465-bare-costAIC.eps}
+			\label{fig:bareAIC}%
+		}%
+		\hfill%
+		\subfloat[With change direction constraints]{%
+			\includegraphics[width=0.49\linewidth]{figs/N2465-ud-costAIC.eps}%
+			\label{fig:cdAIC}%
+		}%
+		\caption{Series N2465, impact of change direction constraints}
+		\label{fig:changedir}
+	\end{figure*}
+	Finally, Figures \ref{fig:sameSegm} illustrate the impact of the remaining constraints. The AIC cost function is prone to fragmentation and is therefore primarily affected by the constraint on the maximum number of segments. In contrast, QRMSE favors longer segments and is thus more sensitive to the constraint on the minimum number of segments.
+	
+	When the number of segments is fixed to be the same, Figure \ref{fig:wAIC} shows that AIC tends to adhere more closely to the high-slope runs on the right-hand side of the series, whereas QRMSE favors longer segments spanning those regions.
+
+\begin{figure*}[ht]
+	\centering
+	\subfloat[AIC cost function]{%
+		\includegraphics[width=0.49\textwidth]{figs/N2465-costAIC}
+		\label{fig:wAIC}%
+	}%
+	\hfill%
+	\subfloat[QRMSE cost function]{%
+		\includegraphics[width=0.49\linewidth]{figs/N2465-costQRMSE}%
+		\label{fig:wQRMSE}%
+	}%
+	\caption{Series N2465, equivalent constraints}
+	\label{fig:sameSegm}
+\end{figure*}
+}
+
 
 \subsubsection{Nonlinear models}
 

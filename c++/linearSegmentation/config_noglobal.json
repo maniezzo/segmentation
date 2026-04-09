@@ -5,7 +5,7 @@
 	"maxTime" : 300,
     "idcost"  : 8,    "commentCost"  : "R2, MSE, Chi2, SER, var, RMSE, QRMSE, QRMSEn, AIC, BIC",
 	"solver"  : "c",  "commentSolver": " c cplex, g gurobi, h hexaly",
-	"nMaxSegm": 5,   "commentNtot"  : "max numero di segmenti accettato",
+	"nMaxSegm": 6,   "commentNtot"  : "max numero di segmenti accettato",
 	"minlength": 5,   "commentMinl"  : "min numero di punti in un segmento",
 	"firstRow": 1,    "commentFirst" : "prima riga di M3_4_sample da ottimizzare",
 	"lastRow" : 5,    "commentFirst" : "prima riga di M3_4_sample ESCLUSA",

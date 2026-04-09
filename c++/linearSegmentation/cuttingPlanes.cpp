@@ -207,7 +207,7 @@ int populatebyrowCPX(CPXENVptr env, CPXLPptr lp, vector<double> y,
    cout << "Constr max num" << endl;
 
    // Min cardinality constraint
-   int nMinSegm = 5;
+   int nMinSegm = 6;
    rmatbeg.push_back(numnz);
    numrows++;
    {

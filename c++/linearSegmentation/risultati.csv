@@ -246,3 +246,5 @@ M6\ABBV,costVar, n_runs,30381,t_runs 0.21,tMIP,3.26,idrow,-1,t.cpu,3.26,segm,,co
 M6\ABBV,costAIC, n_runs,30381,t_runs 0.19,tMIP,2.72,idrow,-1,t.cpu,2.72,segm,,cost,239.496,n_brk,9
 M6\VXX,costAIC, n_runs,33411,t_runs 0.25,tMIP,3.10,idrow,-1,t.cpu,3.10,segm,,cost,-312.168,n_brk,9
 M6\VXX,costAIC, n_runs,33411,t_runs 0.23,tMIP,3.28,idrow,-1,t.cpu,3.28,segm,,cost,-312.168,n_brk,9
+M3\N2465,costAIC, n_runs,8256,t_runs 0.36,tMIP,0.48,idrow,-1,t.cpu,0.48,segm,,cost,1578.961,n_brk,5
+M3\N2465,costAIC, n_runs,8256,t_runs 0.35,tMIP,0.56,idrow,-1,t.cpu,0.56,segm,,cost,1593.046,n_brk,4
