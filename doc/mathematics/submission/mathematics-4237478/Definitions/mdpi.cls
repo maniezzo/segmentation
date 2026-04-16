@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%	MDPI class for LaTeX files	 16 December 2025
+%%%%	MDPI class for LaTeX files	 10 December 2025
 %% %%	For any information please send an e-mail to:
 %% %%		latex@mdpi.com
 %% %%
@@ -24,7 +24,7 @@
 
 %% IDENTIFICATION
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{Definitions/mdpi}[16/12/2025 MDPI paper class]
+\ProvidesClass{Definitions/mdpi}[10/12/2025 MDPI paper class]
 
  %% PRELIMINARY DECLARATIONS
 \LoadClass[10pt,a4paper]{article}
@@ -274,6 +274,7 @@
 		\OR \equal{\@journal}{genealogy}
 		\OR \equal{\@journal}{histories}
 		\OR \equal{\@journal}{humanities}
+		\OR \equal{\@journal}{jintelligence}
 		\OR \equal{\@journal}{laws}
 		\OR \equal{\@journal}{literature}
 		\OR \equal{\@journal}{religions}
@@ -299,7 +300,6 @@
 		\OR \equal{\@journal}{humans}         % Transfer to APA type
 		\OR \equal{\@journal}{ijcs}               % Transfer to APA type
 		\OR \equal{\@journal}{ijfs}               % Transfer to APA type
-		\OR \equal{\@journal}{jintelligence}   % Transfer to APA type from 19 Dec. 2025
 		\OR \equal{\@journal}{journalmedia} % Transfer to APA type
 		\OR \equal{\@journal}{jrfm}              % Transfer to APA type
 		\OR \equal{\@journal}{jsam}             % New APA Journal
@@ -561,6 +561,7 @@
 \newcommand{\AuthorNames}[1]{\gdef\@AuthorNames{#1}}%
 \newcommand{\firstpage}[1]{\gdef\@firstpage{#1}}
 \newcommand{\doinum}[1]{\gdef\@doinum{#1}}
+\newcommand{\hreflink}[1]{\gdef\@hreflink{#1}}
 
 % DOI number
 % Create command to add a leading zero if 1 digit
