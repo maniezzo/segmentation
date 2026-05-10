@@ -40,12 +40,12 @@ void FnBsegmentation::run_FnB()
    bool fFnB = true;
    if(fFnB)
    {  cout<<"\n---------------------------------------------------- FnB"<<endl;
-      Fstage = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX); // c'è anche lo 0
+      Fstage = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX); // crea un unique_ptr alla table, c'è anche lo 0
       Bstage = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
       Fexpanded = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
       Bexpanded = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
 
-      Fstage->updateCell(0, 0, 0.0, vector<int>{0});     // nbrk,t,z,chpt
+      Fstage->updateCell(0, 0, 0.0, vector<int>{0});     // num changepoints,time t,cost z, new changepoint
       Bstage->updateCell(0,n-1,0.0, vector<int>{ n-1 }); // nbrk,t,z,chpt
 
       tstart = clock();
@@ -72,24 +72,28 @@ bool FnBsegmentation::forward()
    tend = min(n,maxLength);
 
    for(i=0;i<n;i++) // stage
-   {  if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength
-
+   {  if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength all'inizio
+      if(i>n-minLength) continue;       // non ho segmenti più corti di minLength per chiudere
+      cout << "i=" << i << endl;
       for(k=0;k<delta;k++) // beam width
       {  // find the least cost unexpanded node at this level
-         z         = get<0>( Fstage->queryMinCost(maxNumEdges,i) ); // cost up to stage i
-         nSegm     = get<1>( Fstage->queryMinCost(maxNumEdges,i) ); // num of segments up to stage i
-         lstPoints = get<2>( Fstage->queryMinCost(maxNumEdges,i) ); // changepoints up to stage i
-
          if(Fstage->isEmpty(i))
             continue;
 
+         tuple<double, int, vector<int>> cell = Fstage->queryMinCost(maxNumEdges,i);
+         z         = get<0>( cell ); // cost up to stage i
+         nSegm     = get<1>( cell ); // num of segments up to stage i
+         lstPoints = get<2>( cell ); // changepoints up to stage i
+
+
          // remove from unexpanded and add to expanded
-         Fexpanded->updateCell(nSegm, i, z, lstPoints);
-         Fstage->updateCell(nSegm,i,DBL_MAX,{});  // rimuove la cella da quelle non espanze
+         Fexpanded->updateCell(nSegm, i, z, lstPoints); // just stores these two values
+         Fstage->updateCell(nSegm,i,DBL_MAX,{});  // rimuove la cella da quelle non espanse
 
          hasMatch = match(true, i, nSegm, z);
          if(hasMatch) continue;
 
+         // calcolo lower bound
          if (i<(n-minLength))
          {  lb = DBL_MAX;
             for(t2=i+1;t2<n;t2++)
@@ -287,7 +291,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
          }
       }
    }
-   else
+   else // backward
       if(i<maxt)
       {  lb = get<0>( Fexpanded->queryMinCost(maxNumEdges-numSegm,i-1) );
          if(lb==0 || lb==DBL_MAX) goto l0; // no feasible expansion
@@ -563,7 +567,7 @@ int FnBsegmentation::writeSolCsv(vector<tuple<int, int, double, double, double>>
    return 0;
 }
 
-// cost as quasi RMSE
+// cost as quadric RMSE
 tuple<int, int, double, double, double> FnBsegmentation::costQRMSE(int t1, int t2)
 {  int i, n;
    double m, q, r, sumres2 = 0, sumchi = 0;

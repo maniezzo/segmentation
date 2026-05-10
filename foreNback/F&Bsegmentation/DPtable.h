@@ -4,12 +4,12 @@
 // table of the dynamic programming recursion, it holds stage dat
 class DPtable {
 private:
-   struct Cell {double z; vector<int> chpt;};
+   struct Cell {double z; vector<int> chpt;}; // i changepoints che hanno portato al costo z
    vector<vector<Cell>> table;
 
 public:
    // Constructor: initialize the table with given rows and columns
-   DPtable(size_t rows, size_t cols, double defaultZ = 0.0)
+   DPtable(size_t rows, size_t cols, double defaultZ = DBL_MAX)
       : table(rows, std::vector<Cell>(cols, Cell{defaultZ, {}})) {}
 
 
