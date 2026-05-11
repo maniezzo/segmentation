@@ -13,8 +13,7 @@ private:
    struct Edge { int end1, end2, segm; double cost; }; // an edge in bellman ford
 
    unique_ptr<DPtable> Fstage, Bstage; // expansion stages, unexpanded nodes
-   unique_ptr<DPtable> Fexpanded, Bexpanded; // expanded nodes
-   vector<int>   changepoints; // final changepoints
+   vector<int> changepoints; // final changepoints
 
    bool forward();
    bool backward();

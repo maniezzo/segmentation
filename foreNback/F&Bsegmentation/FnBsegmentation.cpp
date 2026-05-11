@@ -42,11 +42,11 @@ void FnBsegmentation::run_FnB()
    {  cout<<"\n---------------------------------------------------- FnB"<<endl;
       Fstage = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX); // crea un unique_ptr alla table, c'è anche lo 0
       Bstage = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
-      Fexpanded = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
-      Bexpanded = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
+      //Fexpanded = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
+      //Bexpanded = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
 
-      Fstage->updateCell(0, 0, 0.0, vector<int>{0});     // num changepoints,time t,cost z, new changepoint
-      Bstage->updateCell(0,n-1,0.0, vector<int>{ n-1 }); // nbrk,t,z,chpt
+      Fstage->updateCell(false, 0, 0, 0.0, vector<int>{0});     // num changepoints,time t,cost z, new changepoint
+      Bstage->updateCell(false, 0,n-1,0.0, vector<int>{ n-1 }); // nbrk,t,z,chpt
 
       tstart = clock();
       do
@@ -85,16 +85,14 @@ bool FnBsegmentation::forward()
          nSegm     = get<1>( cell ); // num of segments up to stage i
          lstPoints = get<2>( cell ); // changepoints up to stage i
 
-
          // remove from unexpanded and add to expanded
-         Fexpanded->updateCell(nSegm, i, z, lstPoints); // just stores these two values
-         Fstage->updateCell(nSegm,i,DBL_MAX,{});  // rimuove la cella da quelle non espanse
+         Fstage->updateCell(true, nSegm,i,z,{});  // rimuove la cella da quelle non espanse
 
          hasMatch = match(true, i, nSegm, z);
          if(hasMatch) continue;
 
-         // calcolo lower bound
-         if (i<(n-minLength))
+         // calcolo lower bound DA CONTROLLARE !!!
+         if (isLB && i<(n-minLength))
          {  lb = DBL_MAX;
             for(t2=i+1;t2<n;t2++)
             {  bool boh = Bstage->isEmpty(t2); // for some reasons, putting this inside the if below doesn't work
@@ -186,13 +184,14 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
       if(t2-t1 < minLength)
          return false;  // segmento troppo corto, può capitare a causa di t1=0
    }
-   tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costQRMSE(t1, t2);
-   z = cost+get<4>(res);
-   lstPoints.push_back(t2);
-   nbrk = lstPoints.size();
+   tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costo, es. costQRMSE(t1, t2);
+   z = cost + get<4>(res);  // costo in t2
+   lstPoints.push_back(t2); // arrivo in t2, quindi t2 è un changepoint
+   nbrk = lstPoints.size(); // qualli di prima + 1
 
+   // completata la serie
    if (t2==(n-1) && z<zub)
-   {  zub = z;
+   {  zub  = z;
       topt = (clock()-tstart)/CLOCKS_PER_SEC;
       changepoints = lstPoints;
       if(isVerbose)
@@ -200,15 +199,10 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
       }
    }
 
-   //zstage = get<0>( Fstage[t2].queryMinCost(nbrk) ); // cost up to t2
-   //if(zstage<z)   // conosco già una soluzione parziale migliore
-   //{  nFathomed++;
-   //   goto l0;
-   //}
-
-   double zprev = get<0>(Fstage->queryMinCost(nSegm+1, t2));
+   const DPtable::Cell& cell = Fstage->table[nSegm+1][t2];
+   double zprev = cell.z;  // costo già noto in t2
    if(z < zub && z < zprev)
-   {  Fstage->updateCell(nSegm+1,t2, z, lstPoints);
+   {  Fstage->updateCell(false, nSegm+1, t2, z, lstPoints);
       isImproved = true;
    }
    else
