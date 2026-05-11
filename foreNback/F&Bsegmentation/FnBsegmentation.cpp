@@ -71,10 +71,11 @@ bool FnBsegmentation::forward()
    vector<int> lstPoints;
    tend = min(n,maxLength);
 
+   cout << "Forward ---->" << endl;
    for(i=0;i<n;i++) // stage
    {  if(i>0 && i<minLength) continue;  // non ho segmenti più corti di minLength all'inizio
       if(i>n-minLength) continue;       // non ho segmenti più corti di minLength per chiudere
-      cout << "i=" << i << endl;
+      //cout << "i=" << i << endl;
       for(k=0;k<delta;k++) // beam width
       {  // find the least cost unexpanded node at this level
          if(Fstage->isEmpty(i))
@@ -127,26 +128,29 @@ bool FnBsegmentation::backward()
    bool isImproved = false, hasMatch;
    vector<int> lstPoints;
 
+   cout << "Backward <---" << endl;
    int maxt = n-1;
    for(i=maxt;i>=0;i--)
    {  if (i<maxt && (maxt-i)<minLength) continue;  // non ho segmenti più corti di minLength
 
       for(k=0;k<delta;k++) // beam width
-      {  
-         z         = get<0>( Bstage->queryMinCost(maxNumEdges,i) ); // cost up to stage i
-         nSegm     = get<1>( Bstage->queryMinCost(maxNumEdges,i) ); // num of segments up to stage i
-         lstPoints = get<2>( Bstage->queryMinCost(maxNumEdges,i) ); // changepoints up to stage i
-
+      {  // find the least cost unexpanded node at this level
          if(Bstage->isEmpty(i))
             continue;
+
+         tuple<double, int, vector<int>> cell = Bstage->queryMinCost(maxNumEdges,i);
+         z         = get<0>( cell ); // cost up to stage i
+         nSegm     = get<1>( cell ); // num of segments up to stage i
+         lstPoints = get<2>( cell ); // changepoints up to stage i
+
          // remove from unexpanded and add to expanded
-         Bexpanded->updateCell(nSegm, i, z, lstPoints);
-         Bstage->updateCell(nSegm,i,DBL_MAX,{});  // rimuove la cella da quelle non espanze
+         Bstage->updateCell(true,nSegm,i,z,{});  // rimuove la cella da quelle non espanze
 
          hasMatch = match(false, i, nSegm, z);
          if(hasMatch) continue;
 
-         if (i>minLength)
+         // calcolo lower bound DA CONTROLLARE !!!
+         if (isLB && i>minLength)
          {  lb = DBL_MAX;
             for(t1=i-1;t1>=0;t1--)
                if(!Fstage->isEmpty(t1))
@@ -241,15 +245,10 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
       }
    }
 
-   //zstage = get<0>( Bstage[t1].queryMinCost(nbrk) ); // cost up to t2
-   //if(zstage<z)   // conosco già una soluzione parziale migliore
-   //{  nFathomed++;
-   //   goto l0;
-   //}
-
-   double zprev = get<0>(Bstage->queryMinCost(nSegm+1, t1));
+   const DPtable::Cell& cell = Fstage->table[nSegm+1][t1];
+   double zprev = cell.z;  // costo già noto in t1
    if(z < zub && z < zprev)
-   {  Bstage->updateCell(nSegm+1,t1, z, lstPoints);
+   {  Bstage->updateCell(false, nSegm+1,t1, z, lstPoints);
       isImproved = true;
    }
    else
@@ -267,7 +266,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
    int maxt = n-1;
    if (isForward)
    {  if (i<maxt)
-      {  lb = get<0>( Bexpanded->queryMinCost(maxNumEdges-numSegm,i+1) );
+      {  lb = get<0>( Bstage->queryMinCost(maxNumEdges-numSegm,i+1) );
          if(lb==0 || lb==DBL_MAX) goto l0; // no feasible match
          hasMatch = true;
          numMatch++;
@@ -275,8 +274,9 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
          {  // new incumbent
             zub = z + lb;
             topt = (clock()-tstart)/CLOCKS_PER_SEC;
-            changepoints = get<2>(Fexpanded->queryMinCost(numSegm,i));
-            vector<int> vb = get<2>(Bexpanded->queryMinCost(maxNumEdges-numSegm,i+1));
+
+            changepoints = get<2>(Fstage->queryMinCost(numSegm,i));
+            vector<int> vb = get<2>(Bstage->queryMinCost(maxNumEdges-numSegm,i+1));
             for(int i=0;i<vb.size()-1;i++) vb[i]--; // changepoints are defined in foreward
             changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
@@ -287,7 +287,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
    }
    else // backward
       if(i<maxt)
-      {  lb = get<0>( Fexpanded->queryMinCost(maxNumEdges-numSegm,i-1) );
+      {  lb = get<0>( Fstage->queryMinCost(maxNumEdges-numSegm,i-1) );
          if(lb==0 || lb==DBL_MAX) goto l0; // no feasible expansion
          hasMatch = true;
          numMatch++;
@@ -295,8 +295,9 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
          {  // new incumbent
             zub = z + lb;
             topt = (clock()-tstart)/CLOCKS_PER_SEC;
-            changepoints = get<2>(Bexpanded->queryMinCost(numSegm,i));
-            vector<int> vb = get<2>(Fexpanded->queryMinCost(maxNumEdges-numSegm,i-1));
+
+            changepoints = get<2>(Bstage->queryMinCost(numSegm,i));
+            vector<int> vb = get<2>(Fstage->queryMinCost(maxNumEdges-numSegm,i-1));
             changepoints.insert(changepoints.end(), vb.begin()+1, vb.end()); // Append vb
             std::sort(changepoints.begin(), changepoints.end()); // Sort the merged vector
             if(isVerbose)
@@ -312,12 +313,12 @@ double FnBsegmentation::computeLB()
 
    iterLB = DBL_MAX;
    for(i=minLength;i<n-minLength;i++)
-   {  lbf = get<0>( Fexpanded->queryMinCost(maxNumEdges,i-1) );
+   {  lbf = get<0>( Fstage->queryMinCost(maxNumEdges,i-1) );
       lbb = get<0>( Bstage->queryMinCost(maxNumEdges,i) ); // forward
       lb = lbf + lbb;
       if(lb > 0 && lb < iterLB) iterLB = lb;
 
-      lbb = get<0>( Bexpanded->queryMinCost(maxNumEdges,i) );
+      lbb = get<0>( Bstage->queryMinCost(maxNumEdges,i) );
       lbf = get<0>( Fstage->queryMinCost(maxNumEdges,i-1) ); // backward
       lb = lbf + lbb;
       if(lb > 0 && lb < iterLB) iterLB = lb;
