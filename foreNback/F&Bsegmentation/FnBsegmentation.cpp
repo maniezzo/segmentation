@@ -21,6 +21,7 @@ void FnBsegmentation::run_FnB()
       //case 9 : pntCost = &FnBsegmentation::costBIC;    break;
       default: cout << "------- ERROR IN ASSIGNING COST FUNCTION ----------";
    }
+   precompute_segm();
 
    bool fDAG = false;
    if(fDAG)
@@ -59,6 +60,27 @@ void FnBsegmentation::run_FnB()
       } while ((isImprovedF||isImprovedB)&&ttot<maxcpu);
       cout<<"FnB: t.cpu "<<ttot<<endl;
       reconstructFnBsolution();
+   }
+}
+
+// precalcolo costi
+void FnBsegmentation::precompute_segm()
+{  int cont;
+   tuple<int, int, double, double, double> tup;
+
+   cout << "Precomputing edges:" << endl;
+   cont=0;
+   _arrOLS.assign(n * n, DBL_MAX); // initialize with all DBL_MAX's
+   for (int t1 = 0; t1 < n-minLength; ++t1) 
+   {  if(t1>0 && t1<minLength) continue;
+      tend = min(n,t1+maxLength);
+      for (int t2 = t1+minLength; t2 < tend; ++t2) 
+      {  if(t2<n-1 && t2 > n-minLength) continue;
+         //arrOLS.push_back((this->*pntCost)(t1, t2)); //costQRMSE(t1,t2));
+         tup = (this->*pntCost)(t1, t2);
+         arrOLS(t1,t2) = get<4>(tup);
+         cont++;
+      }
    }
 }
 
@@ -188,8 +210,13 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
       if(t2-t1 < minLength)
          return false;  // segmento troppo corto, può capitare a causa di t1=0
    }
-   tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costo, es. costQRMSE(t1, t2);
-   z = cost + get<4>(res);  // costo in t2
+   if(t2<n-1 && t2 > n-minLength) 
+      return false;  // resterebbe da coprire un segmento troppo corto
+   //tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costo, es. costQRMSE(t1, t2);
+   //double d1 = arrOLS(t1,t2);
+   //double d2 = get<4>(res);;
+   //assert(d1==d2 && "valori diversi");
+   z = cost + arrOLS(t1,t2);  // costo in t2
    lstPoints.push_back(t2); // arrivo in t2, quindi t2 è un changepoint
    nbrk = lstPoints.size(); // qualli di prima + 1
 
@@ -228,9 +255,11 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
       if(t2-t1 < minLength)
          return false;  // segmento troppo corto, può capitare a causa di t1=0
    }
+   if (t1>0 && t2<minLength)
+      return false;  // resterebbe da coprire un segmento troppo corto
+   //tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2);  //costo, es. costQRMSE(t1, t2);
+   z = cost + arrOLS(t1,t2);  // costo in t2
 
-   tuple<int,int,double,double,double> res = (this->*pntCost)(t1, t2); //costQRMSE(t1, t2);
-   z = cost+get<4>(res);
    lstPoints.insert(lstPoints.begin(), t1);
    nbrk = lstPoints.size();
 

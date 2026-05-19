@@ -1,6 +1,6 @@
 {
    "basedir" : "../../data/",
-   "dsName"  : "M3/N1881",
+   "dsName"  : "M4/Q13050",
    "maxNumEdges" : 8,
    "minLength"   : 8, 	  "minLengthComment": "minimal segment length",
    "maxLength"   : 10000, "maxLengthComment": "maximal segment length",
