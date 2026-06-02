@@ -3,7 +3,7 @@
 
 // n number of points, maxt maximum time (=n-1)
 void FnBsegmentation::run_FnB()
-{  int i;
+{  int i,count;
    bool isImprovedF = true, isImprovedB = true;
 
    // 2. Assign the pointer based on idcost
@@ -21,7 +21,6 @@ void FnBsegmentation::run_FnB()
       //case 9 : pntCost = &FnBsegmentation::costBIC;    break;
       default: cout << "------- ERROR IN ASSIGNING COST FUNCTION ----------";
    }
-   precompute_segm();
 
    bool fDAG = false;
    if(fDAG)
@@ -41,6 +40,11 @@ void FnBsegmentation::run_FnB()
    bool fFnB = true;
    if(fFnB)
    {  cout<<"\n---------------------------------------------------- FnB"<<endl;
+      tstart = clock();
+      precompute_segm();
+      tend   = clock();
+      tprec  = 1.0*(tend-tstart)/CLOCKS_PER_SEC;
+
       Fstage = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX); // crea un unique_ptr alla table, c'è anche lo 0
       Bstage = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
       //Fexpanded = make_unique<DPtable>(maxNumEdges+1, n, DBL_MAX);
@@ -49,6 +53,7 @@ void FnBsegmentation::run_FnB()
       Fstage->updateCell(false, 0, 0, 0.0, vector<int>{0});     // num changepoints,time t,cost z, new changepoint
       Bstage->updateCell(false, 0,n-1,0.0, vector<int>{ n-1 }); // nbrk,t,z,chpt
 
+      numBF = 0;
       tstart = clock();
       do
       {
@@ -56,7 +61,8 @@ void FnBsegmentation::run_FnB()
          isImprovedB = backward();
          computeLB();
          tend = clock();
-         ttot = (tend-tstart)/CLOCKS_PER_SEC;
+         ttot = 1.0*(tend-tstart)/CLOCKS_PER_SEC;
+         numBF++;
       } while ((isImprovedF||isImprovedB)&&ttot<maxcpu);
       cout<<"FnB: t.cpu "<<ttot<<endl;
       reconstructFnBsolution();
@@ -223,7 +229,7 @@ bool FnBsegmentation::generateFoffspring(int t1, int t2, int nSegm, double cost,
    // completata la serie
    if (t2==(n-1) && z<zub)
    {  zub  = z;
-      topt = (clock()-tstart)/CLOCKS_PER_SEC;
+      topt = 1.0*(clock()-tstart)/CLOCKS_PER_SEC;
       changepoints = lstPoints;
       if(isVerbose)
       {  cout << "F) New zub: "<< zub << " t.cpu " << topt << endl;
@@ -266,7 +272,7 @@ bool FnBsegmentation::generateBoffspring(int t2, int t1, int nSegm, double cost,
    if (t1==0 && z<zub)
    {  zub = z;
       changepoints = lstPoints;
-      topt = (clock()-tstart)/CLOCKS_PER_SEC;
+      topt = 1.0*(clock()-tstart)/CLOCKS_PER_SEC;
       for (i=1;i<changepoints.size()-1;i++)
          changepoints[i]--;   // il changepoint è la fine del segmento prima
       if(isVerbose)
@@ -302,7 +308,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
          if(z + lb < zub)
          {  // new incumbent
             zub = z + lb;
-            topt = (clock()-tstart)/CLOCKS_PER_SEC;
+            topt = 1.0*(clock()-tstart)/CLOCKS_PER_SEC;
 
             changepoints = get<2>(Fstage->queryMinCost(numSegm,i));
             vector<int> vb = get<2>(Bstage->queryMinCost(maxNumEdges-numSegm,i+1));
@@ -323,7 +329,7 @@ bool FnBsegmentation::match(bool isForward, int i, int numSegm, double z)
          if(z + lb < zub)
          {  // new incumbent
             zub = z + lb;
-            topt = (clock()-tstart)/CLOCKS_PER_SEC;
+            topt = 1.0*(clock()-tstart)/CLOCKS_PER_SEC;
 
             changepoints = get<2>(Bstage->queryMinCost(numSegm,i));
             vector<int> vb = get<2>(Fstage->queryMinCost(maxNumEdges-numSegm,i-1));
@@ -366,27 +372,34 @@ double FnBsegmentation::computeLB()
    return lb;
 }
 
-// ricostruisce la soluzione FnB
+// ricostruisce la soluzione FnB e stampa risultati finali
 void FnBsegmentation::reconstructFnBsolution()
 {  int i;
-   double sum = 0;
+   double sum = 0, sum2 = 0;
    vector<tuple<int, int, double, double, double>> sol;
-   ttot = (clock() - tstart) / CLOCKS_PER_SEC;
 
+   std::cout << std::defaultfloat << std::setprecision(3);
    int t1 = 0;
    cout << "Segments: "<<endl;
    for (i=1;i<changepoints.size();i++)
    {  int t2 = changepoints[i];
       tuple<int, int, double, double, double> tup = (this->*pntCost)(t1, t2); //costQRMSE(t1,t2);
-      sum += get<4>(tup);
+      //sum2 += get<4>(tup);
       sol.push_back(tup);
-      cout << to_string(get<0>(tup))+" "+to_string(get<1>(tup))+" "+to_string(get<4>(tup))+" " << endl;
+      sum += arrOLS(t1,t2);
+      cout << to_string(t1)+" "+to_string(t2)+" "+to_string(arrOLS(t1,t2))+" " << endl;
       t1 = t2+1;
    }
-   cout << "Changepoints: "; for(int x:changepoints) std::cout << x << ' '; std::cout << endl;
-   cout << dsName << " n " << n << " func " << idcost << " costo " << sum << " t.cpu " << ttot << " topt " << topt << " num.matches " << numMatch << " n.fathomed " << nFathomed << " n.brk " << changepoints.size()-2 << endl;
-   if(abs(sum-zub) > 0.001)
+   double gap = abs(sum-zub);
+   if(gap > 0.001)
       cout<<"------- ERROR IN RECONSTRUCTING FnB SOLUTION ----------"<<endl;
+   cout << "Changepoints: "; for(int x:changepoints) std::cout << x << ' '; std::cout << endl;
+   cout << std::fixed << dsName << " n " << n << " func " << idcost << " costo " << sum << " gapBF " << gap << " t.prec " << tprec << " t.cpu " << ttot << " topt " << topt << " num.matches " << numMatch << " n.fathomed " << nFathomed << " n.brk " << changepoints.size()-2 << " num b-f " << numBF << endl;
+   ofstream outF("reslist.txt",std::ios::app); // Open file for writing
+   outF << std::fixed << dsName << " n " << n << " func " << idcost << " costo " << sum << " gapBF " << gap << " t.prec " << tprec << " t.cpu " << ttot << " topt " << topt << " num.matches " << numMatch << " n.fathomed " << nFathomed << " n.brk " << changepoints.size()-2 << " num b-f " << numBF << endl;
+   outF.close(); // Close the file
+
+   //cout << sum2 << endl;
    writeSolCsv(sol,"test_sol.csv");
 }
 
@@ -460,7 +473,7 @@ int FnBsegmentation::run_BF()
    vector<tuple<int, int, double, double, double>> lstOLS;
    vector<tuple<int, int, double, double, double>> sol;
 
-   cout << "Precomputing edges:" << endl;
+   cout << "Precomputing BF edges:" << endl;
    tstart = clock();
    cont=0;
    for (int t1 = 0; t1 < n-minLength; ++t1) 
@@ -512,6 +525,8 @@ vector<tuple<int, int, double, double, double>> FnBsegmentation::bellmanFord(vec
          if(u>0) du = cost0[u-1]; // costo per arrivare al primo estremo
          if (cost0[u] != DBL_MAX  && (du + w) < cost1[v])
          {  cost1[v] = du + w;
+            if(cost1[v] < 0)
+               cout << "MIN 0 " << v << endl;
             prev[v] = u;
             minsegm[v]  = edges[j].segm;
             if(u>0)
@@ -643,8 +658,10 @@ tuple<int, int, double, double, double> FnBsegmentation::costAIC(int t1, int t2)
       rss += e * e;
    }
 
-   // MLE of sigma^2 is RSS/n
+   // MLE of sigma^2 is RSS/n, scaled to avoid log 0
    double mse = rss / n;
+   double minMse = 0.001;
+   mse = max(mse, minMse);
 
    // Number of estimated parameters: slope, intercept, and error variance sigma^2
    const int k = 3;
@@ -658,7 +675,7 @@ tuple<int, int, double, double, double> FnBsegmentation::costAIC(int t1, int t2)
 
    // here it becomes AICc
    if(n<40)
-      aic = aic + (2*k*k+2*k)/(n-k+1);
+      aic = aic+(2*k*(k+1))/(n-k+1);
 
    return { t1, t2, m, q, aic};
 }

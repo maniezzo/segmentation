@@ -9,8 +9,9 @@
 class FnBsegmentation
 {
 private:
-   int nFathomed;        // eliminated by the bound
-   string costName;      // name of the cost function
+   int nFathomed;    // eliminated by the bound
+   int numBF;        // number of back and forth iterations
+   string costName;  // name of the cost function
 
    struct Edge { int end1, end2, segm; double cost; }; // an edge in bellman ford
 

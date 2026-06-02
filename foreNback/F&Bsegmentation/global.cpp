@@ -15,6 +15,7 @@ double   zub         = 0.0;
 double   zlb         = 0.0;
 double   ttot        = 0.0;
 double   topt        = 0.0;
+double   tprec       = 0.0;
 bool     isLB        = false;
 bool     isVerbose   = true;
 clock_t  tstart, tend;

@@ -89,6 +89,51 @@ l0:      cont++;
    return n;
 }
 
+// legge dai file csv delle M series
+int readSeries(const string& filename, string& targetSeries, vector<int>& X, vector<double>& Y)
+{  int n = 0;
+   ifstream file(filename);
+   if (!file) 
+   {  cout<<"Failed to open file: " << filename << endl;
+      exit(0);
+   }
+
+   string line;
+   getline(file, line); // Skip header row
+
+   while (getline(file, line)) 
+   {  if (line.empty()) continue;
+
+      stringstream ss(line);
+      string field;
+
+      // 1. Check Series ID (1st column)
+      if (!getline(ss, field, ',') || field != targetSeries) continue;
+
+      // 2. Skip the next 5 metadata columns: N, NF, Category, Starting Year, Starting Month
+      for (int i = 0; i < 5; ++i) {
+         getline(ss, field, ',');
+      }
+
+      // 3. Parse remaining numeric values into a vector
+      Y.reserve(1000); // max num of observations
+      while (getline(ss, field, ',')) 
+         if (!field.empty()) 
+         {  try 
+            {  Y.push_back(stod(field));
+               X.push_back(n);
+               n++;
+            } catch (...) 
+            {  // Ignore non-numeric/malformed tokens (e.g., trailing commas)
+            }
+         }
+      return n;
+   }
+
+   cout<<"Series '" << targetSeries << "' not found in " << filename << endl;
+   exit(0);
+}
+
 // legge i segmenti precalcolati
 void readSegments(string segmentFileName, vector<tuple<int, int, double, double, double>> & lstOLS)
 {  int i,j,n=0,cont=0;
@@ -136,12 +181,40 @@ int main()
 
    std::cout << std::fixed;
    readConfig();
-   zub = DBL_MAX;
 
-   int    idDataSet = 0;
-   string dataFile        = baseDir + dsName + ".csv";
-   string segmentFileName = baseDir + dsName + "_runs.csv";
-   vector<int> X;
-   n = readData(dataFile,X,Y);
-   FnB.run_FnB();
+   std::ifstream file("listInstances.txt");
+   if (!file)
+   {  std::cout << "Error: Could not open instance file.\n";
+      return 0;
+   }
+
+   string line;
+   cont = 0;
+   while (cont < 1700 && getline(file, line)) 
+   {
+      dsName = line;
+      cout << "Instance: " << dsName << '\n';
+
+      zub = DBL_MAX;
+
+      int    idDataSet = 0;
+      string dataFile        = baseDir + dsName + ".csv";
+      string segmentFileName = baseDir + dsName + "_runs.csv";
+      vector<int> X;
+      Y.clear();
+      Y.shrink_to_fit();
+      //n = readData(dataFile,X,Y);
+      string ss = dsName.substr(3);
+      n = 0;
+      try
+      {  n = readSeries("../../data/M6/M6_small.csv",ss,X,Y);
+      }
+      catch (int errorCode)
+      {  cout << "Sbagliato file istanze" << endl;
+         exit(0);
+      }
+      FnB.run_FnB();
+
+      cont++;
+   }
 }

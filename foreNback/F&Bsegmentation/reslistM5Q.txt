@@ -1,0 +1,9 @@
+M5/6344 n 1941 func 8 costo 7662.675712 gapBF 0.000000 t.prec 6.740000 t.cpu 1.243000 topt 1.024000 num.matches 963 n.fathomed 18552797 n.brk 7 num b-f 6
+M5/15559 n 1941 func 8 costo 2932.889500 gapBF 0.000000 t.prec 6.830000 t.cpu 1.571000 topt 1.501000 num.matches 2038 n.fathomed 41416657 n.brk 7 num b-f 9
+M5/27444 n 1941 func 8 costo 2345.754462 gapBF 0.000000 t.prec 6.986000 t.cpu 1.509000 topt 1.176000 num.matches 3065 n.fathomed 64324064 n.brk 7 num b-f 8
+M5/6776 n 1941 func 8 costo 8732.585064 gapBF 0.000000 t.prec 6.785000 t.cpu 2.049000 topt 1.847000 num.matches 4066 n.fathomed 93861549 n.brk 7 num b-f 12
+M5/13272 n 1941 func 8 costo 6319.847907 gapBF 0.000000 t.prec 6.835000 t.cpu 1.244000 topt 1.131000 num.matches 5014 n.fathomed 110859792 n.brk 7 num b-f 7
+M5/28437 n 1941 func 8 costo 4941.591615 gapBF 0.000000 t.prec 6.710000 t.cpu 1.628000 topt 1.576000 num.matches 6105 n.fathomed 133856002 n.brk 7 num b-f 9
+M5/5859 n 1941 func 8 costo 8803.037529 gapBF 0.000000 t.prec 6.780000 t.cpu 1.620000 topt 1.557000 num.matches 7009 n.fathomed 157277412 n.brk 7 num b-f 11
+M5/18055 n 1941 func 8 costo 12365.874284 gapBF 0.000000 t.prec 6.735000 t.cpu 1.863000 topt 1.636000 num.matches 7983 n.fathomed 185133115 n.brk 7 num b-f 12
+M5/23793 n 1941 func 8 costo 9255.757958 gapBF 0.000000 t.prec 6.839000 t.cpu 1.479000 topt 1.350000 num.matches 8933 n.fathomed 206245302 n.brk 7 num b-f 8
