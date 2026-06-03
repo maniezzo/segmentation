@@ -39,6 +39,7 @@ def arimaAndLess(y, max_p=2, max_d=1, max_q=0, criterion="aic"):
 
                rows.append({
                  "order": order,
+                 "seasonal_model": (0, 0, 0, 0),
                  "aic": res.aic,
                  "bic": res.bic,
                  "params": res.params.to_dict()
@@ -50,6 +51,7 @@ def arimaAndLess(y, max_p=2, max_d=1, max_q=0, criterion="aic"):
             except Exception as e:
                rows.append({
                     "order": order,
+                    "seasonal_model": (0, 0, 0, 0),
                     "aic": np.nan,
                     "bic": np.nan,
                     "error": str(e)
