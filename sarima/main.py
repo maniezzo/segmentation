@@ -96,6 +96,7 @@ def statsmodels_grid_search(
 
 # statsforecast's
 def statsforecasts_autoarima(m, n_jobs=-1, ic="aic"):
+   warnings.filterwarnings("ignore", message="possible convergence problem")
    model = AutoARIMA(
          season_length=m,
          max_p=2,
@@ -117,14 +118,28 @@ def statsforecasts_autoarima(m, n_jobs=-1, ic="aic"):
    
    res = StatsForecast(
             models=[model],
-            freq="M",      #  "M" monthly, "Q" quaterly, ...
+            freq="ME",      #  "ME" monthly, "Q" quaterly, ...
             n_jobs=n_jobs
          )
    return res
 
+
+def extract_statsforecast_arima_info(fitted_model):
+   p, q, P, Q, m, d, D = fitted_model.model_["arma"]
+
+   return {
+      "order": (p, d, q),
+      "seasonal_order": (P, D, Q, m),
+      "coef": fitted_model.model_.get("coef", {}),
+      "sigma2": fitted_model.model_.get("sigma2"),
+      "aic": fitted_model.model_.get("aic"),
+      "bic": fitted_model.model_.get("bic"),
+      "aicc": fitted_model.model_.get("aicc"),
+      "loglik": fitted_model.model_.get("loglik"),
+   }
 def read_series():
    df = pd.read_csv("C:\git\segmentation\data\M3\M3month.csv")
-   ds = df.iloc[0,6:]
+   ds = pd.to_numeric(df.iloc[0,6:].dropna(), errors="coerce")
    return ds
 
 if __name__ == '__main__':
@@ -139,15 +154,24 @@ if __name__ == '__main__':
    
    print(table.head())
    print(best_model.summary())
-   
+
+   from statsforecast.utils import AirPassengersDF
+
    # modello su tutte le colonne di un dataframe, n_jobs dice quali
    print("--------------------------- statsforecasts")
-   df = pd.DataFrame(series)
+   df = pd.DataFrame({
+      "unique_id": 1,  # series identifier (can be any constant if you have one series)
+      "ds": pd.date_range(start="2000-01-01", periods=len(series), freq="ME"),  # datetime index
+      "y": series.values,  # your values
+   })
    sf = statsforecasts_autoarima(m=12, n_jobs=-1, ic="aic")
    sf.fit(df)
    fitted_model = sf.fitted_[0][0]
-   print(fitted_model.model_)
-   
-   forecast = sf.forecast(df=df,h=14) # ha dentro il fit
+
+   info = extract_statsforecast_arima_info(fitted_model)
+   print(f"Order: {info['order']}")
+   print(f"Seasonal order: {info['seasonal_order']}")
+   print(f"coef: {info['coef']}")
+   # forecast = sf.forecast(df=df,h=14) # ha dentro il fit
    
    print("fine")
