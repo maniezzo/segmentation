@@ -1,0 +1,57 @@
+Yes. I would not use the same SARIMA search for all lengths.
+
+A practical rule:
+
+Series length	Recommended model family
+n < 12	naive / mean / simple AR(1), not ARMA
+12 ≤ n < 24	AR(1), AR(2), maybe MA(1); no seasonality
+24 ≤ n < 3m	nonseasonal ARMA/ARIMA only
+3m ≤ n < 5m	allow seasonal naive or fixed seasonal differencing, but very restricted SARIMA
+n ≥ 5m	SARIMA search is reasonable
+n ≥ 8m–10m	fuller SARIMA search becomes safer
+
+For monthly data, m=12, I would use:
+
+n < 24       -> no SARIMA
+24–59        -> ARIMA(p,d,q), p,q <= 2
+60–119       -> restricted SARIMA, P,Q <= 1, D in {0,1}
+120+         -> SARIMA more confidently
+
+For quarterly data, m=4:
+
+n < 12       -> no SARIMA
+12–19        -> ARIMA(p,d,q)
+20–39        -> restricted SARIMA
+40+          -> SARIMA more confidently
+
+The reason is simple: with n=8, you cannot reliably estimate even modest ARMA models. An ARMA(2,2) already has several parameters, and seasonal models consume information very quickly. For seasonal ARIMA, I would want at least 4–5 full seasonal cycles, preferably more.
+
+For your case, I’d implement model tiers:
+
+def choose_candidate_family(n, m):
+    if n < 12:
+        return "simple"
+    elif n < 2 * m:
+        return "small_ar"
+    elif n < 5 * m:
+        return "arima"
+    else:
+        return "restricted_sarima"
+
+For massive production, I would use something like:
+
+n < 12:
+    naive, mean, last value, SES
+
+12 <= n < 2m:
+    AR(1), AR(2), ARIMA(0/1, d, 0/1)
+
+2m <= n < 5m:
+    ARIMA(p,d,q), p,q <= 2, d <= 1
+
+n >= 5m:
+    SARIMA(p,d,q)(0,D,0)m first
+    optionally allow P,Q <= 1 only if n >= 8m
+
+So: ARMA/ARIMA for short series, SARIMA only once you have several seasonal cycles. For monthly data, I would not seriously trust SARIMA before about 60 observations, and I would prefer 100+.
+
