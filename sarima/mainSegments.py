@@ -5,14 +5,14 @@ import sarimaModels as sm
 import shortSeriesModels as ssm
 from model_result import ModelResult
 
-def read_series():
+def read_series(idSeries):
    df = pd.read_csv("C:\git\segmentation\data\M3\M3month.csv")
-   ds = pd.to_numeric(df.iloc[0,6:].dropna(), errors="coerce")
-   return ds
+   ds = pd.to_numeric(df.iloc[idSeries,6:].dropna(), errors="coerce")
+   return df.iloc[idSeries,0],ds
 
 if __name__ == '__main__':
    warnings.filterwarnings("ignore", category = UserWarning)
-   data = read_series()
+   name,data = read_series(0)
    m = 12
    lstModels = []
 
@@ -29,7 +29,7 @@ if __name__ == '__main__':
             print(f"AR(1): {t1} - {t2},  {res.aic}")
          elif(len(series) <= 2*m):
             res = ssm.arimaAndLess(series,max_p=2,max_d=0)
-            lstModels.append((t1,t2,res.aic,res.model,(0,0,0,0),res.params))
+            lstModels.append((t1,t2,res.aic,res.model,res.seasonal_model,res.params))
             print(f"AR(2): {t1} - {t2}, {res.aic}")
          elif(len(series) <= 5*m):
             res = ssm.arimaAndLess(series,max_p=2,max_d=1,max_q=1)
@@ -98,5 +98,5 @@ if __name__ == '__main__':
    tcpu = time.perf_counter() - tstart
    print(f"tcpu {tcpu}")
    df = pd.DataFrame(lstModels)
-   df.to_csv("lstModels.csv")
+   df.to_csv(f"data/{name}models.csv")
    print("fine: >>>>>>>>>>>>>>> LEGGI note.txt <<<<<<<<<<<<<<<<")
