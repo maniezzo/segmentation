@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 def go_Gurobi(df, maxNseg):
    low  = df.iloc[:,0].values
    high = df.iloc[:,1].values
-   cost = df.iloc[:,2].values
+   cost = df.iloc[:,3].values
    nseg = len(cost)  # num of segments
    npoints = high[-1]  # num of points to cover
    status_dict = {
@@ -91,6 +91,6 @@ def plotSol(name, sol, dfdata, dfpoints):
    # plt.legend()
    plt.ylim(ymin - 0.5 * yrange, ymax + 0.5 * yrange)
    plt.title(name)
-   plt.savefig(f"{name}.eps", format="eps")
+   plt.savefig(f"data/{name}.eps", format="eps")
    plt.show()
    return
