@@ -76,7 +76,7 @@ if __name__ == '__main__':
                fitted_model = sf.fitted_[0][0]
    
                res = sm.extract_statsforecast_arima_info(fitted_model)
-               print(f"SARIMA: {t1} - {t2}, {res.aic}")
+               print(f"SARIMA: {t1} - {t2}, {res.aic}, {res.rmse}")
    
                # validazione aic
                sf_coef = fitted_model.model_["coef"]
@@ -93,7 +93,7 @@ if __name__ == '__main__':
    
                print(f'Log likelihood: {out["loglik"]}')
                print(f'AIC check: {out["aic"]}')
-               lstModels.append((t1, t2, out["aic"], out["rmse"], res.model, res.seasonal_model, res.params))
+               lstModels.append((t1, t2, res.aic, res.rmse, res.model, res.seasonal_model, res.params))
    
    tcpu = time.perf_counter() - tstart
    print(f"tcpu {tcpu}")

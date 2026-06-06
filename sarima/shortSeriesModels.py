@@ -55,7 +55,7 @@ def arimaAndLess(y, max_p=2, max_d=1, max_q=0, criterion="aic"):
                if best is None or getattr(res, criterion) < getattr(best, criterion):
                   best = ModelResult(
                      aic=res.aic,
-                     rmse=res.rmse,
+                     rmse=rmse,
                      model=order,
                      seasonal_model=(0, 0, 0, 0),
                      params=res.params.to_dict(),

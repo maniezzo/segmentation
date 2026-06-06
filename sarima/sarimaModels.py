@@ -143,8 +143,11 @@ def extract_statsforecast_arima_info(fitted_model):
    else:
       seasonal_order = (P, D, Q, m_fit)
    print(fitted_model.model_.keys())
+   residuals = fitted_model.model_["residuals"]
+   rmse = np.sqrt(np.mean(residuals ** 2))
    res = ModelResult(
            aic=fitted_model.model_["aic"],
+           rmse=rmse,
            model=(p, d, q),
            seasonal_model=seasonal_order,
            params=fitted_model.model_.get("coef", {}),
