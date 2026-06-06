@@ -25,15 +25,15 @@ if __name__ == '__main__':
          series = data[t1:t2]
          if(len(series) <= m):
             res = ssm.linearInterpolation(series)
-            lstModels.append((t1,t2,res.aic,res.model,res.seasonal_model,res.params))
+            lstModels.append((t1,t2,res.aic,res.rmse,res.model,res.seasonal_model,res.params))
             print(f"AR(1): {t1} - {t2},  {res.aic}")
          elif(len(series) <= 2*m):
             res = ssm.arimaAndLess(series,max_p=2,max_d=0)
-            lstModels.append((t1,t2,res.aic,res.model,res.seasonal_model,res.params))
+            lstModels.append((t1,t2,res.aic,res.rmse,res.model,res.seasonal_model,res.params))
             print(f"AR(2): {t1} - {t2}, {res.aic}")
          elif(len(series) <= 5*m):
             res = ssm.arimaAndLess(series,max_p=2,max_d=1,max_q=1)
-            lstModels.append((t1,t2,res.aic,res.model,(0,0,0,0),res.params))
+            lstModels.append((t1,t2,res.aic,res.rmse,res.model,(0,0,0,0),res.params))
             print(f"ARIMA: {t1} - {t2}, {res.aic}")
          else:
             fStatsModels = False
@@ -93,7 +93,7 @@ if __name__ == '__main__':
    
                print(f'Log likelihood: {out["loglik"]}')
                print(f'AIC check: {out["aic"]}')
-               lstModels.append((t1, t2, out["aic"], res.model, res.seasonal_model, res.params))
+               lstModels.append((t1, t2, out["aic"], out["rmse"], res.model, res.seasonal_model, res.params))
    
    tcpu = time.perf_counter() - tstart
    print(f"tcpu {tcpu}")

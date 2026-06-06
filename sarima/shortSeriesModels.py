@@ -10,11 +10,15 @@ def linearInterpolation(y):
    slope, intercept = np.polyfit(x, y, deg=1)
    yhat = intercept + slope * x
    rss = np.sum((y - yhat) ** 2)
+   
+   rmse = np.sqrt(np.mean((y - yhat) ** 2))
+   
    n = len(y)
    k = 3  # intercept, slope, sigma^2
    aic = n * np.log(rss / n) + 2 * k + n * (1 + np.log(2 * np.pi))
    res = ModelResult(
       aic=aic,
+      rmse=rmse,
       model=(1, 0, 0),
       seasonal_model=(0, 0, 0, 0),
       params=(slope, intercept),
@@ -37,18 +41,21 @@ def arimaAndLess(y, max_p=2, max_d=1, max_q=0, criterion="aic"):
                  order=order,
                  trend=None if d > 0 else "c"
                ).fit()
-
+               rmse = np.sqrt(np.mean(res.resid ** 2))
+               
                rows.append({
                  "order": order,
                  "seasonal_model": (0, 0, 0, 0),
                  "aic": res.aic,
                  "bic": res.bic,
+                 "rmse": rmse,
                  "params": res.params.to_dict()
                })
 
                if best is None or getattr(res, criterion) < getattr(best, criterion):
                   best = ModelResult(
                      aic=res.aic,
+                     rmse=res.rmse,
                      model=order,
                      seasonal_model=(0, 0, 0, 0),
                      params=res.params.to_dict(),
@@ -59,6 +66,7 @@ def arimaAndLess(y, max_p=2, max_d=1, max_q=0, criterion="aic"):
                     "seasonal_model": (0, 0, 0, 0),
                     "aic": np.nan,
                     "bic": np.nan,
+                    "rmse": np.nan,
                     "error": str(e)
                   })
 

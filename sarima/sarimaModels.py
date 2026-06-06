@@ -142,7 +142,7 @@ def extract_statsforecast_arima_info(fitted_model):
       seasonal_order = (0, 0, 0, 0)
    else:
       seasonal_order = (P, D, Q, m_fit)
-
+   print(fitted_model.model_.keys())
    res = ModelResult(
            aic=fitted_model.model_["aic"],
            model=(p, d, q),

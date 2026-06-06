@@ -5,6 +5,7 @@ from typing import Any, Optional
 @dataclass
 class ModelResult:
     aic: float
+    rmse: float
     model: tuple
     seasonal_model: tuple
     params: Optional[dict] = None
