@@ -12,7 +12,7 @@ def read_series(idSeries):
 
 if __name__ == '__main__':
    warnings.filterwarnings("ignore", category = UserWarning)
-   name,data = read_series(0)
+   name,data = read_series(528)  # "N1679"
    m = 12
    lstModels = []
 

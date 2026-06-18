@@ -8,15 +8,15 @@ def read_series(name):
    return df.iloc[idSeries,0],ds
 
 if __name__ == "__main__":
-   name="N1402"
+   name="N1930" #"N1679" "N1402"
    nameCheck,dfpoints = read_series(name)
    df = pd.read_csv("data/"+name+"models.csv",usecols=['0','1','2','3','4'])
    maxNseg = 10
    tstart  = time.time()
-   sol = go_Gurobi(df,maxNseg)
+   lstVar = go_Gurobi(df,maxNseg)
    tend = time.time()
    tcpu = tend-tstart
    # ----------------------- results output section
-   plotSol(name, sol,df,dfpoints)
+   plotSol(name, lstVar,df,dfpoints)
    print(f'fine, t.cpu = {tcpu:.2f}')
    print("fine")
