@@ -1,6 +1,8 @@
-Yes. I would not use the same SARIMA search for all lengths.
+For predictive power, I use ETS or theta. ETS needs a burn-in of 6, theta does not.
+Predictive power measured by rmse over next 6
 
-A practical rule:
+
+Rule in case SARIMA is used:
 
 Series length	Recommended model family
 n < 12	naive / mean / simple AR(1), not ARMA
@@ -10,7 +12,7 @@ n < 12	naive / mean / simple AR(1), not ARMA
 n ≥ 5m	SARIMA search is reasonable
 n ≥ 8m–10m	fuller SARIMA search becomes safer
 
-For monthly data, m=12, I would use:
+For monthly data, m=12, I use:
 
 n < 24       -> no SARIMA
 24–59        -> ARIMA(p,d,q), p,q <= 2

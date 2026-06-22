@@ -17,6 +17,6 @@ if __name__ == "__main__":
    tend = time.time()
    tcpu = tend-tstart
    # ----------------------- results output section
-   plotSol(name, lstVar,df,dfpoints)
+   plotSol(name, lstVar,df,dfpoints,"theta")
    print(f'fine, t.cpu = {tcpu:.2f}')
    print("fine")

@@ -2,13 +2,15 @@ import gurobipy as gp
 from gurobipy import GRB
 import matplotlib.pyplot as plt
 from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.forecasting.theta import ThetaModel
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import ast
 
 # SPP model, low segments endpoint, high upper endpoint, cost segment cost
 def go_Gurobi(df, maxNseg):
    low  = df.iloc[:,0].values
    high = df.iloc[:,1].values
-   cost = df.iloc[:,2].values
+   cost = df.iloc[:,3].values
    nseg = len(cost)  # num of segments
    npoints = high[-1]  # num of points to cover
    status_dict = {
@@ -85,8 +87,14 @@ def reconstruct_arima(t1,t2,model,y):
    pred = fitted.predict()
    return pred
 
+def reconstruct_theta(m):
+   # Fit the Theta model
+   theta_model = ThetaModel(y,period=m)
+   fit = theta_model.fit()
+   return
+
 # plot della soluzione: nome serie, lista var in sol, df segmenti, df punti serie
-def plotSol(name, lstVar, dfdata, dfpoints):
+def plotSol(name, lstVar, dfdata, dfpoints, model):
    ymin = dfpoints.min()
    ymax = dfpoints.max()
    yrange = ymax - ymin
@@ -96,10 +104,17 @@ def plotSol(name, lstVar, dfdata, dfpoints):
    fig, ax = plt.subplots(figsize=(10, 6))
    ax.plot(dfpoints, marker='.', linewidth=0, color='blue')
    for i in lstVar:
-      t1, t2, model = dfdata.iloc[i, 0], dfdata.iloc[i, 1], dfdata.iloc[i, 4]
-      model = ast.literal_eval(model)
+      t1, t2, dfmodel = dfdata.iloc[i, 0], dfdata.iloc[i, 1], dfdata.iloc[i, 4]
       x = range(t1, t2)
-      ypred = reconstruct_arima(t1,t2,model,y)
+      if(model=="theta"):
+         m = 12
+         ypred = reconstruct_theta(m)
+      elif(model=="ARIMA"):
+         model = ast.literal_eval(dfmodel)
+         ypred = reconstruct_arima(t1,t2,model,y)
+      else:
+         print("No acceptable model")
+         return
       print(t1, t2, x)
       ax.plot(x, ypred, linewidth=3, color="red", label=f'm={m}')
       ax.vlines(x=t2, ymin=0, ymax=ymax + 0.5 * yrange, ls='dashed', color="lightgrey")

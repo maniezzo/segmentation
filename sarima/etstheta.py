@@ -6,25 +6,25 @@ from statsmodels.tsa.forecasting.theta import ThetaModel
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 # ETS, Holt Winters
-def go_HW(y):
-   model = ExponentialSmoothing(y, seasonal_periods=4,trend="add",
+def go_HW(y,m,nforecast):
+   model = ExponentialSmoothing(y, seasonal_periods=m,trend="add",
        seasonal     ="mul",
        damped_trend = True,
        use_boxcox   = True,
        initialization_method = "estimated")
    hwfit = model.fit()
    # make forecast
-   yfore = hwfit.predict(len(y), len(y)+11)
-   return yfore
+   yfore = hwfit.predict(len(y), len(y)+nforecast-1)
+   return yfore.values
 
 # Theta
-def go_theta(y):
+def go_theta(y,m,nforecast):
    # Fit the Theta model
-   theta_model = ThetaModel(y,period=12)
+   theta_model = ThetaModel(y,period=m)
    fit = theta_model.fit()
-   print(fit.summary())
-   forecast = fit.forecast(steps=12)  # Forecast 12 months ahead
-   return forecast
+   #print(fit.summary())
+   yfore = fit.forecast(steps=nforecast)  # Forecast nforecast months ahead
+   return yfore.values
 
 if __name__ == '__main__':
    airpass = get_rdataset('AirPassengers').data.value.values
