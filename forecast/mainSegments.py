@@ -5,6 +5,7 @@ import sarimaModels as sm
 import shortSeriesModels as ssm
 from etstheta import go_HW,go_theta
 from model_result import ModelResult
+from statsmodels.tsa.seasonal import STL
 
 def read_series(idSeries):
    df = pd.read_csv("C:\git\segmentation\data\M3\M3month.csv")
@@ -116,12 +117,22 @@ if __name__ == '__main__':
 
    minLength += burnin+validation
    tstart = time.perf_counter()
-
+   
+   # destagionalizzo
+   stl = STL(data, period=m)
+   res = stl.fit()
+   seasonal = res.seasonal     # length n
+   ydeseas  = data - seasonal  # for modelling
+   # Last full seasonal cycle from STL
+   last_cycle = seasonal[-m:]  # shape (m,)
+   # For h-step-ahead forecast, the seasonal additive factor at step h is:
+   seasonal_forecast = np.array([last_cycle[i % m] for i in range(validation)])
+   
    t1 = 0
-   for t1 in range (0,len(data)-minLength):
-      for t2 in range(t1+minLength, len(data) + 1 - validation):
+   for t1 in range (0,len(ydeseas)-minLength):
+      for t2 in range(t1+minLength, len(ydeseas) + 1 - validation):
          print(f"t {t1} - {t2}")
-         series = data[t1:t2]
+         series = ydeseas[t1:t2]
          if(model == "HW" or model == "theta"):
             res = forecast_cost(model,series,m,validation)
          else:
