@@ -1,17 +1,14 @@
 \begin{thebibliography}{999}
 
-\bibitem[Lovri{\'c} et~al.(2014)Lovri{\'c}, Milanovi{\'c}, and
-  Stamenkovi{\'c}]{LMS14}
+\bibitem[Lovri{\'c} et~al.(2014)Lovri{\'c}, Milanovi{\'c}, and Stamenkovi{\'c}]{LMS14}
 Lovri{\'c}, M.; Milanovi{\'c}, M.; Stamenkovi{\'c}, M.
 \newblock Algorithmic Methods for Segmentation of Time Series: An Overview.
-\newblock {\em Journal of Contemporary Economic and Business Issues} {\bf
-  2014}, {\em 1},~31--53.
+\newblock {\em Journal of Contemporary Economic and Business Issues} {\bf 2014}, {\em 1},~31--53.
 
 \bibitem[Aminikhanghahi and Cook(2017)]{AC17}
 Aminikhanghahi, S.; Cook, D.J.
 \newblock A Survey of Methods for Time Series Change Point Detection.
-\newblock {\em Knowledge and Information Systems} {\bf 2017}, {\em
-  51},~339--367.
+\newblock {\em Knowledge and Information Systems} {\bf 2017}, {\em 51},~339--367.
 \newblock {\url{https://doi.org/10.1007/s10115-016-0987-z}}.
 
 \bibitem[Truong et~al.(2020)Truong, Oudre, and Vayatis]{TOV20}
@@ -23,130 +20,104 @@ Truong, C.; Oudre, L.; Vayatis, N.
 \bibitem[Keogh et~al.(2002)Keogh, Chu, Hart, and Pazzani]{KCHP02}
 Keogh, E.; Chu, S.; Hart, D.; Pazzani, M.
 \newblock An online algorithm for segmenting time series.
-\newblock {\em IEEE International Conference on Data Mining} {\bf 2002}, pp.
-  289--296.
+\newblock {\em IEEE International Conference on Data Mining} {\bf 2002}, pp. 289--296.
 
 \bibitem[Auger and Lawrence(1989)]{AL89}
 Auger, I.E.; Lawrence, C.E.
 \newblock Algorithms for the optimal identification of segment neighborhoods.
 \newblock {\em Bulletin of Mathematical Biology} {\bf 1989}, {\em 51},~39--54.
 
-\bibitem[Jackson et~al.(2005)Jackson, Scargle, Barnes, Arabhi, Alt, Gioumousis,
-  Gwin, Sangtrakulcharoen, Tan, and Tsai]{JSB05}
-Jackson, B.; Scargle, J.D.; Barnes, D.; Arabhi, S.; Alt, A.; Gioumousis, P.;
-  Gwin, E.; Sangtrakulcharoen, P.; Tan, L.; Tsai, T.T.
+\bibitem[Jackson et~al.(2005)Jackson, Scargle, Barnes, Arabhi, Alt, Gioumousis, Gwin, Sangtrakulcharoen, Tan, and Tsai]{JSB05}
+Jackson, B.; Scargle, J.D.; Barnes, D.; Arabhi, S.; Alt, A.; Gioumousis, P.; Gwin, E.; Sangtrakulcharoen, P.; Tan, L.; Tsai, T.T.
 \newblock An algorithm for optimal partitioning of data on an interval.
 \newblock {\em IEEE Signal Processing Letters} {\bf 2005}, {\em 12},~105--108.
 
 \bibitem[Killick et~al.(2012)Killick, Fearnhead, and Eckley]{KFE12}
 Killick, R.; Fearnhead, P.; Eckley, I.A.
 \newblock Optimal detection of changepoints with a linear computational cost.
-\newblock {\em Journal of the American Statistical Association} {\bf 2012},
-  {\em 107},~1590--1598.
+\newblock {\em Journal of the American Statistical Association} {\bf 2012}, {\em 107},~1590--1598.
 
 \bibitem[Rigaill(2010)]{R10}
 Rigaill, G.
-\newblock Pruned dynamic programming for optimal multiple change-point
-  detection.
+\newblock Pruned dynamic programming for optimal multiple change-point detection.
 \newblock {\em arXiv preprint arXiv:1004.0887} {\bf 2010}.
 
 \bibitem[Johnson(2013)]{J13}
 Johnson, N.A.
-\newblock A dynamic programming algorithm for the fused lasso and
-  L0-segmentation.
-\newblock {\em Journal of Computational and Graphical Statistics} {\bf 2013},
-  {\em 22},~246--260.
+\newblock A dynamic programming algorithm for the fused lasso and L0-segmentation.
+\newblock {\em Journal of Computational and Graphical Statistics} {\bf 2013}, {\em 22},~246--260.
 
 \bibitem[Hocking et~al.(2013)Hocking, Rigaill, Fearnhead, and Bourque]{HRFB13}
 Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
-\newblock Learning sparse penalties for change-point detection using max-margin
-  interval regression.
+\newblock Learning sparse penalties for change-point detection using max-margin interval regression.
 \newblock {\em International Conference on Machine Learning (ICML)} {\bf 2013}.
 
 \bibitem[Bellman(1961)]{B61}
 Bellman, R.
-\newblock On the approximation of curves by line segments using dynamic
-  programming.
+\newblock On the approximation of curves by line segments using dynamic programming.
 \newblock {\em Communications of the ACM} {\bf 1961}, {\em 4},~284.
 
 \bibitem[Picard and Cook(1975)]{PC75}
 Picard, D.; Cook, R.D.
 \newblock Cross-validation of regression models.
-\newblock {\em Journal of the American Statistical Association} {\bf 1975},
-  {\em 79},~575--583.
+\newblock {\em Journal of the American Statistical Association} {\bf 1975}, {\em 79},~575--583.
 
 \bibitem[Hudson(1966)]{H66}
 Hudson, D.J.
 \newblock Fitting segmented curves whose join points have to be estimated.
-\newblock {\em Journal of the American Statistical Association} {\bf 1966},
-  {\em 61},~1097--1129.
+\newblock {\em Journal of the American Statistical Association} {\bf 1966}, {\em 61},~1097--1129.
 
 \bibitem[Fisher(1958)]{F58}
 Fisher, W.D.
 \newblock On grouping for maximum homogeneity.
-\newblock {\em Journal of the American Statistical Association} {\bf 1958},
-  {\em 53},~789--798.
+\newblock {\em Journal of the American Statistical Association} {\bf 1958}, {\em 53},~789--798.
 
 \bibitem[Bertsimas et~al.(2016)Bertsimas, King, and Mazumder]{BKM16}
 Bertsimas, D.; King, A.; Mazumder, R.
 \newblock Best subset selection via a modern optimization lens.
 \newblock {\em Annals of Statistics} {\bf 2016}, {\em 44},~813--852.
 
-\bibitem[Prokhorov et~al.(2025)Prokhorov, Radchenko, Semenov, and
-  Skrobotov]{PRSS25}
+\bibitem[Prokhorov et~al.(2025)Prokhorov, Radchenko, Semenov, and Skrobotov]{PRSS25}
 Prokhorov, A.; Radchenko, P.; Semenov, A.; Skrobotov, A.
-\newblock Change-Point Detection in Time Series Using Mixed Integer Programming
-  {\bf 2025}.
-\newblock  \href{http://arxiv.org/abs/2408.05665}{{\normalfont
-  [arXiv:econ.EM/2408.05665]}}.
+\newblock Change-Point Detection in Time Series Using Mixed Integer Programming {\bf 2025}.
+\newblock  \href{http://arxiv.org/abs/2408.05665}{{\normalfont [arXiv:econ.EM/2408.05665]}}.
 
 \bibitem[Balinski(1969)]{B69}
 Balinski, M.L.
-\newblock {\em Integer Programming: Methods, Uses, Computation}; Academic
-  Press,  1969.
+\newblock {\em Integer Programming: Methods, Uses, Computation}; Academic Press,  1969.
 
 \bibitem[Schrijver(2003)]{S03}
 Schrijver, A.
-\newblock {\em Combinatorial Optimization: Polyhedra and Efficiency}; Springer,
-   2003.
+\newblock {\em Combinatorial Optimization: Polyhedra and Efficiency}; Springer,  2003.
 
 \bibitem[Box et~al.(2015)Box, Jenkins, Reinsel, and Ljung]{box2015}
 Box, G.E.P.; Jenkins, G.M.; Reinsel, G.C.; Ljung, G.M.
-\newblock {\em Time Series Analysis: Forecasting and Control}, 5th ed.; John
-  Wiley \& Sons,  2015.
+\newblock {\em Time Series Analysis: Forecasting and Control}, 5th ed.; John Wiley \& Sons,  2015.
 
 \bibitem[Hyndman and Athanasopoulos(2018)]{hyndman2018}
 Hyndman, R.J.; Athanasopoulos, G.
 \newblock {\em Forecasting: Principles and Practice}, 2nd ed.; OTexts,  2018.
 
-\bibitem[Lopez~Bernal et~al.(2021)Lopez~Bernal, Cummins, and
-  Gasparrini]{lopez2021}
+\bibitem[Lopez~Bernal et~al.(2021)Lopez~Bernal, Cummins, and Gasparrini]{lopez2021}
 Lopez~Bernal, J.; Cummins, S.; Gasparrini, A.
-\newblock Interrupted time series analysis using autoregressive integrated
-  moving average ({ARIMA}) models.
+\newblock Interrupted time series analysis using autoregressive integrated moving average ({ARIMA}) models.
 \newblock {\em BMC Medical Research Methodology} {\bf 2021}, {\em 21}.
 
 \bibitem[Fischetti et~al.(2009)Fischetti, Lodi, and Salvagnin]{FLS09}
 Fischetti, M.; Lodi, A.; Salvagnin, D.
-\newblock Just {MIP} It! In {\em Matheuristics}; Maniezzo, V.; St{\"u}tzle, T.;
-  Vo{\ss}, S., Eds.; Springer,  2009; Vol.~10, {\em Annals of Information
-  Systems}, pp. 1--20.
+\newblock Just {MIP} It! In {\em Matheuristics}; Maniezzo, V.; St{\"u}tzle, T.; Vo{\ss}, S., Eds.; Springer,  2009; Vol.~10, {\em Annals of Information Systems}, pp. 1--20.
 
 \bibitem[Maniezzo(2024)]{M24}
 Maniezzo, V.
 \newblock Extended Set Covering for Time Series Segmentation.
-\newblock In Proceedings of the 15th Metaheuristics International Conference,
-  MIC 2024; Saveaux, M., Ed. Springer,  2024, Vol. 14753, {\em Lecture Notes in
-  Computer Science}, pp. 193.--199.
+\newblock In Proceedings of the 15th Metaheuristics International Conference, MIC 2024; Saveaux, M., Ed. Springer,  2024, Vol. 14753, {\em Lecture Notes in Computer Science}, pp. 193.--199.
 
 \bibitem[Maniezzo et~al.(2021)Maniezzo, Boschetti, and St{\"u}tzle]{the_book}
 Maniezzo, V.; Boschetti, M.A.; St{\"u}tzle, T.
-\newblock {\em Matheuristics: Algorithms and Implementations}; EURO Advanced
-  Tutorials on Operations Research, Springer,  2021.
+\newblock {\em Matheuristics: Algorithms and Implementations}; EURO Advanced Tutorials on Operations Research, Springer,  2021.
 \newblock {\url{https://doi.org/10.1007/978-3-030-64219-4}}.
 
-\bibitem[Hocking et~al.(2017)Hocking, Rigaill, Fearnhead, and
-  Bourque]{hocking2017constrained}
+\bibitem[Hocking et~al.(2017)Hocking, Rigaill, Fearnhead, and Bourque]{hocking2017constrained}
 Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
 \newblock A Log-Linear Time Algorithm for Constrained Changepoint Detection.
 \newblock {\em arXiv preprint arXiv:1703.03352} {\bf 2017}.
@@ -154,26 +125,21 @@ Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
 \bibitem[Yao(1988)]{Y88}
 Yao, Y.C.
 \newblock Estimating the number of change-points via Schwarz' criterion.
-\newblock {\em Statistics \& Probability Letters} {\bf 1988}, {\em
-  6},~181--189.
+\newblock {\em Statistics \& Probability Letters} {\bf 1988}, {\em 6},~181--189.
 
-\bibitem[Tibshirani et~al.(2005)Tibshirani, Saunders, Rosset, Zhu, and
-  Knight]{tibshirani2005sparsity}
+\bibitem[Tibshirani et~al.(2005)Tibshirani, Saunders, Rosset, Zhu, and Knight]{tibshirani2005sparsity}
 Tibshirani, R.; Saunders, M.; Rosset, S.; Zhu, J.; Knight, K.
 \newblock Sparsity and smoothness via the fused lasso.
-\newblock {\em Journal of the Royal Statistical Society: Series B (Statistical
-  Methodology)} {\bf 2005}.
+\newblock {\em Journal of the Royal Statistical Society: Series B (Statistical Methodology)} {\bf 2005}.
 
 \bibitem[Hocking et~al.(2022)Hocking, Rigaill, Fearnhead, and Bourque]{HRFB22}
 Hocking, T.D.; Rigaill, G.; Fearnhead, P.; Bourque, G.
-\newblock Generalized Functional Pruning Optimal Partitioning (GFPOP) for
-  Constrained Changepoint Detection in Genomic Data.
+\newblock Generalized Functional Pruning Optimal Partitioning (GFPOP) for Constrained Changepoint Detection in Genomic Data.
 \newblock {\em Journal of Statistical Software} {\bf 2022}, {\em 101},~1–31.
 
 \bibitem[Bai and Perron(1998)]{BP98}
 Bai, J.; Perron, P.
-\newblock Estimating and Testing Linear Models with Multiple Structural
-  Changes.
+\newblock Estimating and Testing Linear Models with Multiple Structural Changes.
 \newblock {\em Econometrica} {\bf 1998}, {\em 66},~47--78.
 
 \bibitem[Casini and Perron(2019)]{CP19}
@@ -183,8 +149,7 @@ Casini, A.; Perron, P.
 \bibitem[Tong and Lim(1980)]{TL90}
 Tong, H.; Lim, K.S.
 \newblock Threshold autoregression, limit cycles, and cyclical data.
-\newblock {\em Journal of the Royal Statistical Society: Series B
-  (Methodological)} {\bf 1980}, {\em 42},~245–292.
+\newblock {\em Journal of the Royal Statistical Society: Series B (Methodological)} {\bf 1980}, {\em 42},~245–292.
 
 \bibitem[Rossi et~al.(2006)Rossi, van Beek, and Walsh]{RBW06}
 Rossi, F.; van Beek, P.; Walsh, T., Eds.
@@ -203,7 +168,6 @@ Fryzlewicz, P.
 \bibitem[Makridakis and Hibon(1979)]{MH79}
 Makridakis, S.; Hibon, M.
 \newblock Accuracy of forecasting: An empirical investigation.
-\newblock {\em Journal of the Royal Statistical Society, Series A} {\bf 1979},
-  {\em 142},~97--145.
+\newblock {\em Journal of the Royal Statistical Society, Series A} {\bf 1979}, {\em 142},~97--145.
 
 \end{thebibliography}
