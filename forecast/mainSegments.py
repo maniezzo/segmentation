@@ -12,6 +12,7 @@ def read_series(idSeries):
    ds = pd.to_numeric(df.iloc[idSeries,6:].dropna(), errors="coerce")
    return df.iloc[idSeries,0],ds
 
+# modelli HW a ETS, costi come rmse previsioni
 def forecast_cost(model,series,m,nforecast):
    if(model=="HW"):      ypred = go_HW(series[:-validation],m,nforecast)
    elif(model=="theta"): ypred = go_theta(series[:-validation],m,nforecast)
@@ -99,6 +100,96 @@ def sarima_cost(series):
          print(f'AIC check: {out["aic"]}')
    return res
 
+'''
+deseasoning pipeline (v. aaatobackup/tematiche/forecast/data):
+1) Estimate trend and seasonality jointly with STL using robust=True.
+2) Compute Hyndman's seasonality strength Fs
+3) Remove the seasonal component only if Fs >0.6 (or another threshold validated on your application).
+4) Store FS as a metadata feature—it may prove useful later when analyzing the performance of forecasting methods on the deseasonalized series.
+
+Hyndman: Fs = max(0, 1- var(R)/var(S+R)
+S: seasonal component, R: ramainder
+'''
+
+# calcolo indice di stagionalità (hyndman)
+def stl_seasonality_strength(x, period=12, robust=True):
+    """
+    Compute STL-based seasonality strength:
+        Fs = max(0, 1 - Var(R) / Var(S + R))
+
+    Returns:
+        Fs, trend, seasonal, resid
+    """
+    x = np.asarray(x, dtype=float)
+
+    # If missing values interpolate before this step
+
+    if len(x) < 2 * period:
+        return 0.0, None, None, None
+
+    stl = STL(x,
+              period=period,
+              seasonal=len(x)*2-1,  # Large window forces it to look at all points
+              seasonal_deg=0,   # Forces the seasonal component to be strictly periodic
+              robust=robust)
+    res = stl.fit()
+
+    seasonal = res.seasonal
+    trend = res.trend
+    resid = res.resid
+
+    denom = np.var(seasonal + resid, ddof=1)
+
+    if denom <= 0:
+        Fs = 0.0
+    else:
+        Fs = max(0.0, 1.0 - np.var(resid, ddof=1) / denom)
+
+    return Fs, trend, seasonal, resid
+
+# destagionalizzazione (se Fs>threshold)
+def deseasonalize_if_needed(x, period=12, threshold=0.6):
+    """
+    Deseasonalize only if STL seasonality strength exceeds threshold.
+
+    Returns a dictionary containing:
+        original
+        deseasonalized
+        seasonality_strength
+        removed_seasonality
+        trend
+        seasonal
+        resid
+    """
+    x = np.asarray(x, dtype=float)
+
+    Fs, trend, seasonal, resid = stl_seasonality_strength(
+        x, period=period, robust=False
+    )
+
+    if seasonal is None:
+        return {
+            "deseasonalized": x,
+            "seasonality_strength": Fs,
+            "removed_seasonality": False,
+            "seasonal": None,
+        }
+
+    if Fs > threshold:
+        y = x - seasonal
+        removed = True
+    else:
+        y = x.copy()
+        removed = False
+
+    return {
+        "deseasonalized": y,
+        "seasonality_strength": Fs,
+        "removed_seasonality": removed,
+        "seasonal": seasonal[0:period],
+    }
+
+
 if __name__ == '__main__':
    warnings.filterwarnings("ignore", category = UserWarning)
    name,data = read_series(528)  # "N1680"
@@ -119,14 +210,13 @@ if __name__ == '__main__':
    tstart = time.perf_counter()
    
    # destagionalizzo
-   stl = STL(data, period=m)
-   res = stl.fit()
-   seasonal = res.seasonal     # length n
-   ydeseas  = data - seasonal  # for modelling
-   # Last full seasonal cycle from STL
-   last_cycle = seasonal[-m:]  # shape (m,)
+   res = deseasonalize_if_needed(data, period=12, threshold=0.6)
+   ydeseas = res['deseasonalized']
+   coeff_seas = res['seasonal'] # first full seasonal cycle from STL
+   
    # For h-step-ahead forecast, the seasonal additive factor at step h is:
-   seasonal_forecast = np.array([last_cycle[i % m] for i in range(validation)])
+   # CHECK MODULO !!!! da dove inizia nel periodo (coeff 0-11)
+   seasonal_forecast = np.array([coeff_seas[i % m] for i in range(validation)])
    
    t1 = 0
    for t1 in range (0,len(ydeseas)-minLength):

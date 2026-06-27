@@ -11,7 +11,7 @@ if __name__ == "__main__":
    name="N1930" #"N1679" "N1402"
    nameCheck,dfpoints = read_series(name)
    df = pd.read_csv("data/"+name+"models.csv",usecols=['0','1','2','3','4'])
-   maxNseg = 10
+   maxNseg = 10 # max numero di segmenti in soluzione
    tstart  = time.time()
    lstVar = go_Gurobi(df,maxNseg)
    tend = time.time()
