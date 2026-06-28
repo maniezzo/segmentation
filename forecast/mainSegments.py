@@ -214,8 +214,7 @@ if __name__ == '__main__':
    ydeseas = res['deseasonalized']
    coeff_seas = res['seasonal'] # first full seasonal cycle from STL
    
-   # For h-step-ahead forecast, the seasonal additive factor at step h is:
-   # CHECK MODULO !!!! da dove inizia nel periodo (coeff 0-11)
+   # Esempio ricostruzione previsione (FAKE)
    seasonal_forecast = np.array([coeff_seas[i % m] for i in range(validation)])
    
    t1 = 0
