@@ -135,11 +135,14 @@ def reconstruct_theta(t1, t2, y, m):
 
 # another home-made reconstruction for theta
 def reconstruct_theta2(t1, t2, y, m):
-   preds = [0] * m
+   burnin = m
+   if(m<6): burnin=6  # proprio il minimo numero di osservazioni
+   preds = [None] * burnin
+   period = max(1,m)
    
-   for i in range(t1 + m, t2):
+   for i in range(t1 + burnin, t2):
       y_train = y[t1:i]
-      fitted = ThetaModel(y_train, period=m).fit()
+      fitted = ThetaModel(y_train, period=period).fit()
       pred = fitted.forecast(steps=1).iloc[0]
       preds.append(pred)
    
@@ -153,7 +156,7 @@ def plotSol(name, lstVar, dfdata, dfpoints, model):
    ymin = dfpoints.min()
    ymax = dfpoints.max()
    yrange = ymax - ymin
-   y = dfpoints.values
+   y = dfpoints.values.ravel()
    m=0
    
    fig, ax = plt.subplots(figsize=(10, 6))
