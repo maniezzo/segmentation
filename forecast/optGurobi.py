@@ -161,7 +161,6 @@ def plotSol(name, lstVar, dfdata, dfpoints, model):
    for i in lstVar:
       t1, t2, dfmodel = dfdata.iloc[i, 0], dfdata.iloc[i, 1], dfdata.iloc[i, 4]
       x = range(t1, t2)
-      m = 12
       if(model=="theta"):
          ypred = reconstruct_theta2(t1,t2,y,m)
       elif(model=="HW"):

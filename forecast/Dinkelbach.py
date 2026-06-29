@@ -4,7 +4,7 @@ import pandas as pd
 
 # Initialise lambda with the cost of any single feasible solution.
 # First solution: the standard (sum-cost) SPP.
-def build_and_solve(ncol, nrow, matcons, lmbda: float, silent: bool = True) -> tuple[float, list[int]]:
+def build_and_solve(ncol, nrow, costs, matcons, lmbda: float, silent: bool = True) -> tuple[float, list[int]]:
    """
    Solve  min  sum_j (c_j - lmbda) * x_j
    s.t.   sum_j matcons[i][j] * x_j = 1   for all i   (SPP)
@@ -83,7 +83,7 @@ def solve_spp_average_cost(
    
    # find an initial feasible solution
    # (lambda = 0, it gives the standard min-sum SPP)
-   g0, x0 = build_and_solve(ncols, nrows, matcons, lmbda=0.0)
+   g0, x0 = build_and_solve(ncols, nrows, lstCosts, matcons, lmbda=0.0)
    if x0 is None:
       return {"status": "infeasible"}
    
@@ -95,7 +95,7 @@ def solve_spp_average_cost(
    
    # Dinkelbach iterations
    for k in range(max_iter):
-      g_val, x_new = build_and_solve(ncols, nrows, matcons, lmbda)
+      g_val, x_new = build_and_solve(ncols, nrows, lstCosts, matcons, lmbda)
       
       if x_new is None:
          return {"status": "infeasible"}
@@ -152,5 +152,16 @@ if __name__ == "__main__":
       lstCosts.append(df.iloc[i,4])
    nrows = df.iloc[-1,2]+1 # partono da 0
    result = solve_spp_average_cost(lstIntervals, lstCosts, nrows=nrows, verbose=True)
+   print()
+   if result["status"] == "optimal":
+      sel = result["selected_sets"]
+      print(f"Status        : {result['status']}")
+      print(f"Iterations    : {result['iterations']}")
+      print(f"Selected sets : {sel}")
+      print(f"Costs         : {[lstCosts[j] for j in sel]}")
+      print(f"Average cost  : {result['lambda_star']:.6f}")
+      print(f"Check         : {sum(lstCosts[j] for j in sel)/len(sel):.6f}")
+   else:
+      print(f"Status: {result['status']}")
    print("fine")
         
