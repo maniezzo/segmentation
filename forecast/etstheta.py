@@ -23,7 +23,7 @@ def go_theta(y,m,nforecast):
    theta_model = ThetaModel(y,period=m)
    fit = theta_model.fit()
    #print(fit.summary())
-   yfore = fit.forecast(steps=nforecast)  # Forecast nforecast months ahead
+   yfore = fit.forecast(steps=nforecast)  # Forecast nforecast points ahead
    return yfore.values
 
 if __name__ == '__main__':

@@ -1,17 +1,14 @@
-import pandas as pd, numpy as np, time
-from optGurobi import go_Gurobi,plotSol
+import pandas as pd, util, time
+from optGurobi import go_Gurobi
 from Dinkelbach import solve_spp_average_cost
-
-def read_series(name):
-   df = pd.read_csv("C:\git\segmentation\data\M3\M3month.csv")
-   idSeries = np.where(df['Series'] == name)[0][0]
-   ds = pd.to_numeric(df.iloc[idSeries,6:].dropna(), errors="coerce")
-   return df.iloc[idSeries,0],ds
+from etstheta import go_HW,go_theta
+import numpy as np
 
 if __name__ == "__main__":
    name="N1930" #"N1679" "N1402"
-   nameCheck,dfpoints = read_series(name)
+   nameCheck,dfpoints = util.read_series(name)
    df = pd.read_csv("data/"+name+"models.csv",usecols=['0','1','2','3','4'])
+   isTheta = True # true: theta, false:HW
    tstart = time.time()
 
    # -------------------------- soluzione AIC, no forecast
@@ -45,6 +42,22 @@ if __name__ == "__main__":
    # ----------------------- results output section
    tend = time.time()
    tcpu = tend-tstart
-   plotSol(name, lstVar,df,dfpoints,"theta")
+   
+   if(isTheta):
+      m = 12
+      y = dfpoints.values[:-6]
+      nforecast = 6
+      yBase = go_theta(y,m,nforecast)
+      diff = dfpoints.values[-6:] - yBase
+      rmseBase = np.sqrt(np.dot(diff, diff) / len(yBase))
+      
+      lastChange = df.iloc[lstVar[-1],0]
+      y = y[lastChange:]
+      yfore = go_theta(y,1,nforecast)
+      diff = dfpoints.values[-6:] - yfore
+      rmseFore = np.sqrt(np.dot(diff, diff) / len(yfore))
+
+   util.plotSol(name, lstVar,df,dfpoints, yBase, yfore, "theta")
    print(f'fine, t.cpu = {tcpu:.2f}')
+   print(f"RMSE base = {rmseBase:.2f}, RMSE fore = {rmseFore:.2f}")
    print("fine")
