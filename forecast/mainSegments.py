@@ -214,9 +214,6 @@ if __name__ == '__main__':
    ydeseas = res['deseasonalized']
    coeff_seas = res['seasonal'] # first full seasonal cycle from STL
    
-   # Esempio ricostruzione previsione (FAKE)
-   seasonal_forecast = np.array([coeff_seas[i % m] for i in range(validation)])
-   
    t1 = 0
    for t1 in range (0,len(ydeseas)-minLength):
       for t2 in range(t1+minLength, len(ydeseas) + 1 - validation):
