@@ -13,9 +13,9 @@ def read_series(idSeries):
    return df.iloc[idSeries,0],ds
 
 # modelli HW a ETS, costi come rmse previsioni
-def forecast_cost(model,series,m,nforecast):
-   if(model=="HW"):      ypred = go_HW(series[:-validation],m,nforecast)
-   elif(model=="theta"): ypred = go_theta(series[:-validation],m,nforecast)
+def forecast_cost(model, series, m, validation):
+   if(model=="HW"):      ypred = go_HW(series[:-validation],m,validation)
+   elif(model=="theta"): ypred = go_theta(series[:-validation],m,validation)
    diff = series[-validation:] - ypred
    rmse = np.sqrt(np.dot(diff, diff) / ypred.size)
    res = ModelResult(
@@ -190,13 +190,9 @@ def deseasonalize_if_needed(x, period=12, threshold=0.6):
     }
 
 
-if __name__ == '__main__':
-   warnings.filterwarnings("ignore", category = UserWarning)
-   name,data = read_series(528)  # "N1680"
-   m = 12
+def go_segment(model,m=12):
    minLength = 18
    lstModels = []
-   model = "theta" # "theta" "HW" "SARIMA"
    # HW needs burn-in for internal initializations
    burnin = 0
    if (model == "HW"):
@@ -210,7 +206,7 @@ if __name__ == '__main__':
    tstart = time.perf_counter()
    
    # destagionalizzo
-   res = deseasonalize_if_needed(data, period=12, threshold=0.6)
+   res = deseasonalize_if_needed(data, period=m, threshold=0)
    ydeseas = res['deseasonalized']
    coeff_seas = res['seasonal'] # first full seasonal cycle from STL
    
@@ -229,4 +225,11 @@ if __name__ == '__main__':
    print(f"tcpu {tcpu}")
    df = pd.DataFrame(lstModels)
    df.to_csv(f"data/{name}models.csv")
-   print("fine: >>>>>>>>>>>>>>> LEGGI note.txt <<<<<<<<<<<<<<<<")
+
+if __name__ == '__main__':
+   warnings.filterwarnings("ignore", category = UserWarning)
+   name,data = read_series(528)  # "N1680"
+
+   model = "theta" # "theta" "HW" "SARIMA"
+   go_segment(model)
+   print("fine")

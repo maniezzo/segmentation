@@ -97,6 +97,7 @@ def plotSol(name, lstVar, dfdata, dfpoints, yBase, yfore, model):
    ymax = dfpoints.max()
    yrange = ymax - ymin
    y = dfpoints.values.ravel()
+   #y = dfpoints
    m = 0
    
    fig, ax = plt.subplots(figsize=(10, 6))

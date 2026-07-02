@@ -49,6 +49,7 @@ if __name__ == "__main__":
    yFore = yFore + coeff[:len(yFore)]
    diff = dfpoints.values[-6:] - yFore
    rmseFore = np.sqrt(np.dot(diff, diff) / len(yBase))
+   print(f"full {rmseBase:.2f} fore {rmseFore:.2f}")
    
    plt.figure(figsize=(12,8))
    plt.plot(dfpoints.values)
