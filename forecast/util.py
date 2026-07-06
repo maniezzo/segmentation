@@ -4,6 +4,7 @@ import ast   # abstract syntax tree, generate python code
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.forecasting.theta import ThetaModel
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.seasonal import STL
 from scipy.stats import linregress
 
 
@@ -90,6 +91,20 @@ def reconstruct_theta2(t1, t2, y, m):
 def reconstruct_HW():
    return
 
+# destagionalizzazione serie
+def deseason(y,m=12):
+   stl = STL(y,
+             period=m,
+             seasonal=len(y) * 2 - 1,  # Large window forces it to look at all points
+             seasonal_deg=0,  # Forces the seasonal component to be strictly periodic
+             robust=True)
+   res = stl.fit()
+   
+   coeff_seas = res.seasonal[0:12]
+   trend = res.trend
+   resid = res.resid
+
+   return coeff_seas,trend,resid
 
 # plot della soluzione: nome serie, lista var in sol, df segmenti, df punti serie
 def plotSol(name, lstVar, dfdata, dfpoints, yBase, yfore, model):
