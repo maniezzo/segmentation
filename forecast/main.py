@@ -7,6 +7,6 @@ if __name__ == '__main__':
    isTheta = True
    mainSegments.go_segment(name, dfpoints, isTheta)  # genera i segmenti se non ci sono già
    dfModels = pd.read_csv("data/" + name + "models.csv", usecols=['0', '1', '2', '3', '4'])
-   mainOpt.go_opt(name, dfModels, dfpoints, isTheta)
+   mainOpt.go_opt(name, dfModels, dfpoints)
 
    print("fine: >>>>>>>>>>>>>>> LEGGI note.txt <<<<<<<<<<<<<<<<")

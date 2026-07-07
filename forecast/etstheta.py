@@ -7,15 +7,15 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 # ETS, Holt Winters
 def go_HW(y,m,nforecast):
-   model = ExponentialSmoothing(y, seasonal_periods=m,trend="add",
-       seasonal     ="mul",
-       damped_trend = True,
-       use_boxcox   = True,
+   # no seasonality (Double Exponential Smoothing)
+   model = ExponentialSmoothing(y,
+       trend    = "add",
+       seasonal = None,
        initialization_method = "estimated")
    hwfit = model.fit()
    # make forecast
    yfore = hwfit.predict(len(y), len(y)+nforecast-1)
-   return yfore.values
+   return yfore
 
 # Theta
 def go_theta(y,m,nforecast):
