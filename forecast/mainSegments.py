@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import sarimaModels as sm
 import shortSeriesModels as ssm
-from etstheta import go_HW,go_theta
+from models import go_HW,go_theta
 from model_result import ModelResult
 from statsmodels.tsa.seasonal import STL
 from util import deseason

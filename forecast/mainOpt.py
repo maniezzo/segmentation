@@ -2,7 +2,7 @@ import pandas as pd, util, time
 import numpy as np
 from optGurobi import go_Gurobi
 from Dinkelbach import solve_spp_average_cost
-from etstheta import go_HW,go_theta
+from models import go_HW,go_theta
 
 def go_opt(name, dfModels, dfpoints):
    tstart = time.time()
@@ -46,13 +46,14 @@ def go_opt(name, dfModels, dfpoints):
    tstart = len(y) - nforecast  # primo istante da prevedere
    idCoeff1 = tstart % 12
    coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
-   # previsione con theta
+
+   # ------------------------------------- theta
    isTheta = True
    if(isTheta):
       yTrain = y[:tstart]
       yBase = go_theta(yTrain, m, nforecast)
       yBase = yBase + coeff[:len(yBase)]
-      diff = y[-6:] - yBase
+      diff = dfpoints.values[-6:] - yBase
       rmseBaseTh = np.sqrt(np.dot(diff, diff) / len(yBase))
 
       lastInt = lstVar[-1]
@@ -61,35 +62,34 @@ def go_opt(name, dfModels, dfpoints):
       yFore = go_theta(yTest, m, nforecast)
       yFore = yFore + coeff[:len(yFore)]
       diff = dfpoints.values[-6:] - yFore
-      rmseForeTh = np.sqrt(np.dot(diff, diff) / len(yBase))
+      rmseForeTh = np.sqrt(np.dot(diff, diff) / len(yFore))
       print(f"Theta: full {rmseBaseTh:.2f} fore {rmseForeTh:.2f}")
-
       util.plotSol(name, lstVar, dfModels, dfpoints, yBase, yFore, "theta")
 
-   isTheta = False  # HW
+   isTheta = False  # ------------------------------ HW
    if(not isTheta):
       yTrain = y[:tstart]
-      yBase = go_HW(yTrain, m, nforecast)
+      hwfit,yBase = go_HW(yTrain, m, nforecast)
       yBase = yBase + coeff[:len(yBase)]
-      diff = y[-6:] - yBase
+      diff = dfpoints.values[-6:] - yBase
       rmseBaseSLS = np.sqrt(np.dot(diff, diff) / len(yBase))
 
       lastInt = lstVar[-1]
       t0 = lstIntervals[lastInt][0]
       yTest = y[t0:-6]
-      yFore = go_HW(yTest, m, nforecast)
+      hwfit,yFore = go_HW(yTest, m, nforecast)
       yFore = yFore + coeff[:len(yFore)]
       diff = dfpoints.values[-6:] - yFore
-      rmseForeSLS = np.sqrt(np.dot(diff, diff) / len(yBase))
+      rmseForeSLS = np.sqrt(np.dot(diff, diff) / len(yFore))
       print(f"HW: full {rmseBaseSLS:.2f} fore {rmseForeSLS:.2f}")
-
-      util.plotSol(name, lstVar, dfModels, dfpoints, yBase, yFore, "SLS")
-
+      util.plotSol(name, lstVar, dfModels, dfpoints, yBase, yFore, "HW")
 
    print(f'fine, t.cpu SPP = {tcpuSeg:.2f}')
-   print(f"{name}, n.intervals {len(lstVar)} RMSE base = {rmseBase:.2f}, RMSE fore = {rmseFore:.2f} ")
+   print(f"{name}, n.intervals {len(lstVar)} RMSE base th = {rmseBaseTh:.2f}, RMSE fore th = {rmseForeTh:.2f} ")
+   print(f"{name}, n.intervals {len(lstVar)} RMSE base hw = {rmseBaseSLS:.2f}, RMSE fore hw = {rmseForeSLS:.2f} ")
    with open('data/results.txt', 'a') as f:
-      f.write(f"{name}, n.intervals {len(lstVar)} RMSE base = {rmseBase:.2f}, RMSE fore = {rmseFore:.2f}\n")
+      f.write(f"{name}, n.intervals {len(lstVar)} RMSE base th = {rmseBaseTh:.2f}, RMSE fore th = {rmseForeTh:.2f} ")
+      f.write(f" RMSE base hw = {rmseBaseSLS:.2f}, RMSE fore hw = {rmseForeSLS:.2f} ")
 
 if __name__ == "__main__":
    name = "N1679" # "N1930" "N1679" "N1402"

@@ -3,7 +3,7 @@ import numpy as np, pandas as pd
 from statsmodels.tsa.seasonal import STL
 from statsmodels.tsa.forecasting.theta import ThetaModel
 import util
-from etstheta import *
+from models import *
 
 if __name__ == "__main__":
    name= "N1906" # "N1930" "N1679" "N1402"

@@ -1,4 +1,4 @@
-import numpy as np, pandas as pd
+import numpy as np, pandas as pd,os
 import matplotlib.pyplot as plt
 import ast   # abstract syntax tree, generate python code
 from statsmodels.tsa.arima.model import ARIMA
@@ -9,11 +9,19 @@ from scipy.stats import linregress
 
 
 # legge dati di input
-def read_series(name):
-   df = pd.read_csv("C:\git\segmentation\data\M3\M3month.csv")
-   idSeries = np.where(df['Series'] == name)[0][0]
-   ds = pd.to_numeric(df.iloc[idSeries,6:].dropna(), errors="coerce")
-   return df.iloc[idSeries,0],ds
+def read_series(filedata):
+   basedir, filename, name = filedata.split(',')
+   if filename != '':
+      # leggo la serie come riga da un benchmarck
+      filename = os.path.join(basedir, filename)
+      df = pd.read_csv(filename)
+      idSeries = np.where(df['Series'] == name)[0][0]
+      ds = pd.to_numeric(df.iloc[idSeries,6:].dropna(), errors="coerce") # questa è una dataseries
+   else:
+      # leggo la serie come colonna da un file specifico
+      filename = os.path.join(basedir, f"{name}.csv")
+      ds = pd.read_csv(filename, usecols=[1]).values.flatten() # questo è un array (non sembra fagli male)
+   return name,ds
 
 # predizioni arima dato il modello
 def reconstruct_arima(t1, t2, model, y):
@@ -71,25 +79,46 @@ def reconstruct_theta(t1, t2, y, m):
    
    return in_sample_preds
 
+# THIS ONE home-made reconstruction for theta
+def reconstruct_theta2(t1, t2, y, m, coeff_seas):
+   tstart = t1  # primo istante da prevedere
+   idCoeff1 = tstart % 12
+   coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
+   ysegm = y[t1:t2]
+   coeff_stretch = coeff[np.arange(len(ysegm)+1) % len(coeff)]
 
-# another home-made reconstruction for theta
-def reconstruct_theta2(t1, t2, y, m):
    burnin = m
    if (m < 6): burnin = 6  # proprio il minimo numero di osservazioni
    preds = [None] * burnin
    period = max(1, m)
    
-   for i in range(t1 + burnin, t2):
+   for i in range(t1 + burnin, t2+1):  # estremi inclusi
       y_train = y[t1:i]
       fitted = ThetaModel(y_train, period=period).fit()
       pred = fitted.forecast(steps=1).iloc[0]
       preds.append(pred)
    
+   preds = [p if p is None else p + c for p, c in zip(preds, coeff_stretch)]
    return preds
 
 # ricostruzione ETS Holt-Winters
-def reconstruct_HW():
-   return
+def reconstruct_HW(t1, t2, y, m, coeff_seas):
+   tstart = t1  # primo istante da prevedere
+   idCoeff1 = tstart % 12
+   coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
+   ysegm = y[t1:t2]
+   coeff_stretch = coeff[np.arange(len(ysegm)+1) % len(coeff)]
+   
+   # no seasonality (Double Exponential Smoothing)
+   model = ExponentialSmoothing(y,
+       trend    = "add",
+       seasonal = None,
+       initialization_method = "estimated")
+   hwfit = model.fit()
+   ypred = hwfit.predict(t1,t2)
+   ypred += coeff_stretch
+   
+   return ypred
 
 # destagionalizzazione serie
 def deseason(y,m=12):
@@ -107,25 +136,26 @@ def deseason(y,m=12):
    return coeff_seas,trend,resid
 
 # plot della soluzione: nome serie, lista var in sol, df segmenti, df punti serie
-def plotSol(name, lstVar, dfdata, dfpoints, yBase, yfore, model):
+def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, model):
    ymin = dfpoints.min()
    ymax = dfpoints.max()
    yrange = ymax - ymin
    y = dfpoints.values.ravel()
-   #y = dfpoints
-   m = 0
+   coeff_seas, trend, resid = deseason(y)
+   y = trend+resid  # serie destagionalizzata
+   m = 1
    
    fig, ax = plt.subplots(figsize=(10, 6))
    ax.plot(dfpoints, marker='.', linewidth=0, color='blue')
    ax.plot(range(len(dfpoints)-6,len(dfpoints)),yBase,color="green")
    ax.plot(range(len(dfpoints)-6,len(dfpoints)),yfore,color="red")
    for i in lstVar:
-      t1, t2, dfmodel = dfdata.iloc[i, 0], dfdata.iloc[i, 1], dfdata.iloc[i, 4]
-      x = range(t1, t2)
+      t1, t2, dfmodel = dfModel.iloc[i, 0], dfModel.iloc[i, 1], dfModel.iloc[i, 4]
+      x = range(t1, t2+1)  # estremi inclusi
       if (model == "theta"):
-         ypred = reconstruct_theta2(t1, t2, y, m)
+         ypred = reconstruct_theta2(t1, t2, y, m, coeff_seas)
       elif (model == "HW"):
-         ypred = reconstruct_HW(t1, t2, y, m)
+         ypred = reconstruct_HW(t1, t2, y, m, coeff_seas)
       elif (model == "ARIMA"):
          model = ast.literal_eval(dfmodel)
          ypred = reconstruct_arima(t1, t2, model, y)
@@ -137,7 +167,7 @@ def plotSol(name, lstVar, dfdata, dfpoints, yBase, yfore, model):
       ax.vlines(x=t2, ymin=0, ymax=ymax + 0.5 * yrange, ls='dashed', color="lightgrey")
    # plt.legend()
    plt.ylim(ymin - 0.5 * yrange, ymax + 0.5 * yrange)
-   plt.title(name)
-   plt.savefig(f"data/{name}.eps", format="eps")
+   plt.title(f"{name} - {model}")
+   plt.savefig(f"data/{name}{model}.eps", format="eps")
    plt.show()
    return
