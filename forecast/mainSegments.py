@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import sarimaModels as sm
 import shortSeriesModels as ssm
-from models import go_HW,go_theta
+from models import go_HW,go_theta,go_RF
 from model_result import ModelResult
 from statsmodels.tsa.seasonal import STL
 from util import deseason
@@ -16,8 +16,9 @@ def read_series(idSeries):
 
 # modelli HW a ETS, costi come rmse previsioni
 def forecast_cost(model, series, m, validation):
-   if(model=="HW"):      ypred = go_HW(series[:-validation],m,validation)
-   elif(model=="theta"): ypred = go_theta(series[:-validation],m,validation)
+   if(model=="HW"):      _,ypred = go_HW(series[:-validation],m,validation)
+   elif(model=="theta"): _,ypred = go_theta(series[:-validation],m,validation)
+   elif(model=="RF"):    _,ypred = go_RF(series[:-validation],m,validation)
    diff = series[-validation:] - ypred
    rmse = np.sqrt(np.dot(diff, diff) / ypred.size)
    res = ModelResult(
@@ -32,15 +33,15 @@ def forecast_cost(model, series, m, validation):
 def sarima_cost(series):
    if (len(series) <= m):
       res = ssm.linearInterpolation(series)
-      lstModels.append((t1, t2, res.aic, res.rmse, res.model, res.seasonal_model))
+      lstResults.append((t1, t2, res.aic, res.rmse, res.model, res.seasonal_model))
       print(f"AR(1): {t1} - {t2},  {res.aic}")
    elif (len(series) <= 2 * m):
       res = ssm.arimaAndLess(series, max_p=2, max_d=0)
-      lstModels.append((t1, t2, res.aic, res.rmse, res.model, res.seasonal_model))
+      lstResults.append((t1, t2, res.aic, res.rmse, res.model, res.seasonal_model))
       print(f"AR(2): {t1} - {t2}, {res.aic}")
    elif (len(series) <= 5 * m):
       res = ssm.arimaAndLess(series, max_p=2, max_d=1, max_q=1)
-      lstModels.append((t1, t2, res.aic, res.rmse, res.model, (0, 0, 0, 0)))
+      lstResults.append((t1, t2, res.aic, res.rmse, res.model, (0, 0, 0, 0)))
       print(f"ARIMA: {t1} - {t2}, {res.aic}")
    else:
       fStatsModels = False
@@ -165,9 +166,7 @@ def deseasonalize_if_needed(x, period=12, threshold=0.6):
     """
     x = np.asarray(x, dtype=float)
 
-    Fs, trend, seasonal, resid = stl_seasonality_strength(
-        x, period=period, robust=False
-    )
+    Fs, trend, seasonal, resid = stl_seasonality_strength(x, period=period, robust=False)
 
     if seasonal is None:
         return {
@@ -192,46 +191,50 @@ def deseasonalize_if_needed(x, period=12, threshold=0.6):
     }
 
 
-def go_segment(name, dfpoints, isTheta, m=12, minLength = 18, burnin = 0):
-   if(isTheta): model = "theta"
-   else: model = "HW"
+def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
    
    if os.path.isfile(f'data/{name}models.csv'):
       print("Segment file already exists. ")
    else:
       print("Segment file does not already exist. ")
       
-      lstModels = []
-      # HW needs burn-in for internal initializations
-      if (model == "HW"):
-         burnin = m
-      # in case of forecast costs
-      validation = 0 # forecasted interval
-      if(model == "HW" or model == "theta"):
-         validation = 6
-   
-      minLength += burnin+validation
-      tstart = time.perf_counter()
-      
       # ----------------------------------------------------- destagionalizzo
-      res = deseasonalize_if_needed(dfpoints, period=m, threshold=0)
+      res     = deseasonalize_if_needed(dfpoints, period=m, threshold=0)  # threshold 0 destagionalizzo sempre
       ydeseas = res['deseasonalized']
-      coeff_seas = res['seasonal'] # first full seasonal cycle from STL
+      coeff_seas = res['seasonal']  # first full seasonal cycle from STL
       
-      t1 = 0
-      for t1 in range (0,len(ydeseas)-minLength):
-         for t2 in range(t1+minLength, len(ydeseas) + 1 - validation):
-            print(f"t {t1} - {t2}")
-            series = ydeseas[t1:t2]
-            if(model == "HW" or model == "theta"):
-               res = forecast_cost(model,series,m,validation)
-            else:
-               res = sarima_cost(series)
-            lstModels.append((t1, t2, res.aic, res.rmse, res.model, res.seasonal_model))
+      lstModels = ["HW", "theta", "RF"]
+      tstart = time.perf_counter()
+      lstResults = []
+      # HW would need burn-in for internal initializations
+      # if (model == "HW"):
+      #   burnin = m
+      minLength += burnin + validation
+      
+      for idModel in range(len(lstModels)):
+         model = lstModels[idModel]
+   
+         cont = 0
+         for t1 in range (0,len(ydeseas)-minLength):
+            for t2 in range(t1+minLength, len(ydeseas) + 1 - validation):
+               print(f"t {t1} - {t2}")
+               if(idModel==0):
+                  lstResults.append([t1,t2,np.nan,np.nan,np.nan])
+               if(lstResults[cont][0] != t1 or lstResults[cont][1] != t2):
+                  input("Press Enter to continue...")
+                  
+               series = ydeseas[t1:t2]
+               if(model in lstModels):  # sempre, ma giusto per tenere la chiamata dopo
+                  res = forecast_cost(model,series,0,validation) # m=0 perchè destaginalizzata
+               else:
+                  res = sarima_cost(series)
+               lstResults[cont][idModel+2] = res.rmse
+               cont += 1
       
       tcpu = time.perf_counter() - tstart
       print(f"tcpu segmentation {tcpu}")
-      df = pd.DataFrame(lstModels)
+      df = pd.DataFrame(lstResults)
+      df.columns = ["t1", "t2", "HW", "theta", "RF"]
       df.to_csv(f"data/{name}models.csv")
 
 if __name__ == '__main__':

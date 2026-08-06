@@ -1,4 +1,5 @@
 c:/git/segmentation/data/M3/,,N1879
+
 c:/git/segmentation/data/M3/,M3month.csv,N1906
 c:/git/segmentation/data/M3/,M3month.csv,N1679 
 c:/git/segmentation/data/M3/,M3month.csv,N1930 

@@ -7,36 +7,66 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from sklearn.ensemble import RandomForestRegressor
 
 # random forest
-def go_RF(y,m,nforecast):
-   # --- 1. Setup & Train/Validation Split ---
-   lags = 12  # Number of past observations to use as input features
+def go_RF(y, m, nforecast):
+   """
+   Train a Random Forest on the complete input series and recursively
+   forecast the next nforecast out-of-sample observations.
+
+   Parameters
+   ----------
+   y : array-like
+       Historical time series.
+   m : int
+       Retained for compatibility. Currently unused.
+   nforecast : int
+       Number of future observations to forecast.
+
+   Returns
+   -------
+   model : RandomForestRegressor
+       Fitted Random Forest model.
+   yfore : np.ndarray
+       Recursive out-of-sample forecasts.
+   """
+   y = np.asarray(y, dtype=float).reshape(-1)
+   # Choose the number of lagged observations.
+   lags = 12 if len(y) < 24 else 18
    
-   # --- 2. Create Lagged Features (Supervised Matrix) ---
+   if len(y) <= lags:
+      raise ValueError(
+         f"The series must contain more than {lags} observations."
+      )
+   
+   # Create the training matrix
    X, Y = [], []
    for i in range(lags, len(y)):
       X.append(y[i - lags:i])
       Y.append(y[i])
    
-   X = np.array(X)
-   Y = np.array(Y)
+   X = np.asarray(X)
+   Y = np.asarray(Y)
    
-   # --- 3. Train/Validation Split ---
-   # Keep the last m values for validation
-   X_train, Y_train = X[:-m], Y[:-m]
-   X_val, Y_val = X[-m:], Y[-m:]
+   # Train on all available observations.
+   model = RandomForestRegressor(
+      n_estimators=100,
+      random_state=42
+   )
+   model.fit(X, Y)
    
-   # --- 4. Train Random Forest ---
-   model = RandomForestRegressor(n_estimators=100, random_state=42)
-   model.fit(X_train, Y_train)
+   # Start with the most recent lag window.
+   window = y[-lags:].copy()
+   forecasts = []
    
-   # --- 5. Forecast (Direct Validation Predictions) ---
-   # Predicting the validation set using actual historical lag features
-   yfore = model.predict(X_val)
+   # Recursive sliding-window forecasting.
+   for _ in range(nforecast):
+      next_forecast = model.predict(window.reshape(1, -1))[0]
+      forecasts.append(next_forecast)
+      
+      # Remove the oldest observation and append the forecast.
+      window = np.append(window[1:], next_forecast)
    
-   # Optional: Evaluate accuracy
-   mae = np.mean(np.abs(yfore - Y_val))
-   print(f"Validation MAE: {mae:.4f}")
-   return model,yfore
+   yfore = np.asarray(forecasts)
+   return model, yfore
 
 # ETS, Holt Winters
 def go_HW(y,m,nforecast):
@@ -53,11 +83,11 @@ def go_HW(y,m,nforecast):
 # Theta
 def go_theta(y,m,nforecast):
    # Fit the Theta model
-   theta_model = ThetaModel(y,period=m)
+   theta_model = ThetaModel(y, deseasonalize=False) # lavoro su dati destagionalizzati
    fit = theta_model.fit()
    #print(fit.summary())
    yfore = fit.forecast(steps=nforecast)  # Forecast nforecast points ahead
-   return yfore.values
+   return fit,yfore.values
 
 if __name__ == '__main__':
    #y = get_rdataset('AirPassengers').data.value.values
@@ -69,12 +99,12 @@ if __name__ == '__main__':
    # Deseasonalize
    deseasoned = y - stl.seasonal
    # Forecast deseasonalized (naive)
-   forecast_deseasoned = np.mean(deseasoned[-12:]) * np.ones(m)
+   forecast_deseasoned = np.mean(deseasoned[-nforecast:]) * np.ones(m)
    # Extend seasonal component
    last_seasonal_cycle = stl.seasonal[-m:]
    forecast_seasonal = np.tile(last_seasonal_cycle, (len(forecast_deseasoned) // m + 1))[:len(forecast_deseasoned)]
    
-   ytheta = go_theta(deseasoned,m,nforecast)
+   _,ytheta  = go_theta(deseasoned,m,nforecast)
    hwfit,yHW = go_HW(deseasoned,m,nforecast)
    rffit,yRF = go_RF(deseasoned,m,nforecast)
 
@@ -87,10 +117,10 @@ if __name__ == '__main__':
    # Plot the original series and forecast
    plt.figure(figsize=(10, 5))
    plt.plot(y, label='Actual', color='blue')
-   plt.plot(range(len(y) - 12, len(y)), ytheta, label='Theta Forecast')
-   plt.plot(range(len(y) - 12, len(y)), yHW, label='Holt-Winters Forecast')
-   plt.plot(range(len(y) - 12, len(y)), yRF, label='Random forest Forecast')
-   plt.plot(range(len(y) - 12, len(y)), ySTL, label='STL Forecast')
+   plt.plot(range(len(y) - nforecast, len(y)), ytheta, label='Theta Forecast')
+   plt.plot(range(len(y) - nforecast, len(y)), yHW, label='Holt-Winters Forecast')
+   plt.plot(range(len(y) - nforecast, len(y)), yRF, label='Random forest Forecast')
+   plt.plot(range(len(y) - nforecast, len(y)), ySTL, label='STL Forecast')
    plt.xlabel('Year')
    plt.ylabel('y')
    plt.title('Theta / HW / RF Forecast')

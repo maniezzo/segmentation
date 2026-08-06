@@ -4,8 +4,10 @@ import ast   # abstract syntax tree, generate python code
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.forecasting.theta import ThetaModel
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from sklearn.ensemble import RandomForestRegressor
 from statsmodels.tsa.seasonal import STL
 from scipy.stats import linregress
+from models import go_RF
 
 
 # legge dati di input
@@ -34,8 +36,7 @@ def reconstruct_arima(t1, t2, model, y):
    pred = fitted.predict()
    return pred
 
-
-# home-made reconstruction, it might be wrong
+# UNUSED home-made reconstruction, it might be wrong
 def reconstruct_theta(t1, t2, y, m):
    y_train = np.array(y[t1:t2], dtype=float)
    n = len(y_train)
@@ -82,7 +83,7 @@ def reconstruct_theta(t1, t2, y, m):
 # THIS ONE home-made reconstruction for theta
 def reconstruct_theta2(t1, t2, y, m, coeff_seas):
    tstart = t1  # primo istante da prevedere
-   idCoeff1 = tstart % 12
+   idCoeff1 = tstart % m
    coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
    ysegm = y[t1:t2]
    coeff_stretch = coeff[np.arange(len(ysegm)+1) % len(coeff)]
@@ -104,7 +105,7 @@ def reconstruct_theta2(t1, t2, y, m, coeff_seas):
 # ricostruzione ETS Holt-Winters
 def reconstruct_HW(t1, t2, y, m, coeff_seas):
    tstart = t1  # primo istante da prevedere
-   idCoeff1 = tstart % 12
+   idCoeff1 = tstart % m
    coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
    ysegm = y[t1:t2]
    coeff_stretch = coeff[np.arange(len(ysegm)+1) % len(coeff)]
@@ -118,6 +119,36 @@ def reconstruct_HW(t1, t2, y, m, coeff_seas):
    ypred = hwfit.predict(t1,t2)
    ypred += coeff_stretch
    
+   return ypred
+
+# ricostruzione Random forest
+def reconstruct_RF(t1, t2, y, m, coeff_seas):
+   tstart = t1  # primo istante da prevedere
+   ysegm = y[t1:t2+1]
+   
+   ysub = ysegm
+   rffit, _ = go_RF(ysub, 1, 6)  # keep this if you still need the recursive forecast elsewhere
+   
+   y = np.asarray(ysub, dtype=float).reshape(-1)
+   lags = 12 if len(y) < 24 else 18
+   
+   X = np.array([y[i - lags:i] for i in range(lags, len(y))])
+   Y = y[lags:]
+   
+   oob_model = RandomForestRegressor(
+      n_estimators=100,
+      random_state=42,
+      oob_score=True,
+      bootstrap=True  # required for OOB; default is already True but be explicit
+   )
+   oob_model.fit(X, Y)
+   
+   ypred = oob_model.oob_prediction_  # aligned to ysub[lags:], one prediction per row of X
+   idCoeff1 = (tstart+lags) % m
+   coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
+   coeff_stretch = coeff[np.arange(len(ypred)) % len(coeff)]
+   ypred += coeff_stretch
+   ypred = np.concatenate(([None]*lags,ypred))
    return ypred
 
 # destagionalizzazione serie
@@ -136,19 +167,20 @@ def deseason(y,m=12):
    return coeff_seas,trend,resid
 
 # plot della soluzione: nome serie, lista var in sol, df segmenti, df punti serie
-def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, model):
+def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, m, model):
+   nforecast = len(yfore)
    ymin = dfpoints.min()
    ymax = dfpoints.max()
    yrange = ymax - ymin
-   y = dfpoints.values.ravel()
+   y = np.asarray(dfpoints, dtype=float)
    coeff_seas, trend, resid = deseason(y)
    y = trend+resid  # serie destagionalizzata
    m = 1
    
    fig, ax = plt.subplots(figsize=(10, 6))
    ax.plot(dfpoints, marker='.', linewidth=0, color='blue')
-   ax.plot(range(len(dfpoints)-6,len(dfpoints)),yBase,color="green")
-   ax.plot(range(len(dfpoints)-6,len(dfpoints)),yfore,color="red")
+   ax.plot(range(len(dfpoints)-nforecast,len(dfpoints)),yBase,color="green")
+   ax.plot(range(len(dfpoints)-nforecast,len(dfpoints)),yfore,color="red")
    for i in lstVar:
       t1, t2, dfmodel = dfModel.iloc[i, 0], dfModel.iloc[i, 1], dfModel.iloc[i, 4]
       x = range(t1, t2+1)  # estremi inclusi
@@ -156,6 +188,8 @@ def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, model):
          ypred = reconstruct_theta2(t1, t2, y, m, coeff_seas)
       elif (model == "HW"):
          ypred = reconstruct_HW(t1, t2, y, m, coeff_seas)
+      elif (model == "RF"):
+         ypred = reconstruct_RF(t1, t2, y, m, coeff_seas)
       elif (model == "ARIMA"):
          model = ast.literal_eval(dfmodel)
          ypred = reconstruct_arima(t1, t2, model, y)
