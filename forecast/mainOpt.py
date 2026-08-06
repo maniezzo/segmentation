@@ -2,7 +2,7 @@ import pandas as pd, util, time
 import numpy as np
 from optGurobi import go_Gurobi
 from Dinkelbach import solve_spp_average_cost
-from models import go_HW,go_theta,go_RF
+from models import go_HW,go_theta,go_RF,go_AR1
 
 def go_opt(name, dfModels, dfpoints, m, nforecast):
    # m; stagionalità serie originale (12 o 4)
@@ -27,7 +27,7 @@ def go_opt(name, dfModels, dfpoints, m, nforecast):
    lstIntervals = []
    for i in range(len(dfModels)): lstIntervals.append((dfModels.iloc[i, 0], dfModels.iloc[i, 1]))
    
-   modelNames = ["HW","theta","RF"]
+   modelNames = ["AR1","HW","theta","RF"]
    for idModel in range(len(modelNames)):
       model = modelNames[idModel]
       lstCosts = []
@@ -52,8 +52,25 @@ def go_opt(name, dfModels, dfpoints, m, nforecast):
       # ----------------------- results output section
       tend = time.time()
       tcpuSeg = tend-tstart
+      if (idModel == 0):  # ------------------------------ AR1
+         lstVarAR1 = lstVar[:]
+         yTrain = y[:tstart]
+         hwfit, yBase = go_AR1(yTrain, 1, nforecast)
+         yBase = yBase + coeff[:len(yBase)]
+         diff = np.asarray(dfpoints, dtype=float)[-nforecast:] - yBase
+         rmseBaseAR1 = np.sqrt(np.dot(diff, diff) / len(yBase))
+         
+         lastInt = lstVar[-1]
+         t0 = lstIntervals[lastInt][0]
+         yTest = y[t0:-nforecast]
+         hwfit, yFore = go_AR1(yTest, 1, nforecast)
+         yFore = yFore + coeff[:len(yFore)]
+         diff = np.asarray(dfpoints, dtype=float)[-nforecast:] - yFore
+         rmseForeAR1 = np.sqrt(np.dot(diff, diff) / len(yFore))
+         print(f"HW: full {rmseBaseAR1:.2f} fore {rmseForeAR1:.2f}")
+         util.plotSol(name, lstVarAR1, dfModels, dfpoints, yBase, yFore, m, model=model)
       
-      if (idModel == 0):  # ------------------------------ HW
+      if (idModel == 1):  # ------------------------------ HW
          lstVarHW = lstVar[:]
          yTrain = y[:tstart]
          hwfit, yBase = go_HW(yTrain, 1, nforecast)
@@ -72,7 +89,7 @@ def go_opt(name, dfModels, dfpoints, m, nforecast):
          util.plotSol(name, lstVarHW, dfModels, dfpoints, yBase, yFore, m, model=model)
 
       # ------------------------------------- theta
-      if(idModel==1):
+      if(idModel==2):
          lstVarTh = lstVar[:]
          yTrain = y[:tstart]
          _,yBase = go_theta(yTrain, 1, nforecast)
@@ -90,7 +107,7 @@ def go_opt(name, dfModels, dfpoints, m, nforecast):
          print(f"Theta: full {rmseBaseTh:.2f} fore {rmseForeTh:.2f}")
          util.plotSol(name, lstVarTh, dfModels, dfpoints, yBase, yFore, m, model=model)
          
-      if (idModel == 2):  # ------------------------------ RF
+      if (idModel == 3):  # ------------------------------ RF
          lstVarRF = lstVar[:]
          yTrain = y[:tstart]
          hwfit, yBase = go_RF(yTrain, 1, nforecast)
@@ -109,11 +126,13 @@ def go_opt(name, dfModels, dfpoints, m, nforecast):
          util.plotSol(name, lstVarRF, dfModels, dfpoints, yBase, yFore, m, model=model)
    
    print(f'fine, t.cpu SPP = {tcpuSeg:.2f}')
+   print(f"{name}, n.intervals {len(lstVarAR1)} RMSE base hw = {rmseBaseAR1:.2f}, RMSE fore hw = {rmseForeAR1:.2f}")
    print(f"{name}, n.intervals {len(lstVarHW)} RMSE base hw = {rmseBaseSLS:.2f}, RMSE fore hw = {rmseForeSLS:.2f}")
    print(f"{name}, n.intervals {len(lstVarTh)} RMSE base th = {rmseBaseTh:.2f}, RMSE fore th = {rmseForeTh:.2f}")
    print(f"{name}, n.intervals {len(lstVarRF)} RMSE base rf = {rmseBaseRF:.2f}, RMSE fore rf = {rmseForeRF:.2f}")
    with open('data/results.txt', 'a') as f:
       f.write(f"{name},")
+      f.write(f" nint {len(lstVarAR1)} RMSE base ar = {rmseBaseAR1:.2f}, RMSE fore ar = {rmseForeAR1:.2f}")
       f.write(f" nint {len(lstVarHW)} RMSE base hw = {rmseBaseSLS:.2f}, RMSE fore hw = {rmseForeSLS:.2f}")
       f.write(f" nint {len(lstVarTh)} RMSE base th = {rmseBaseTh:.2f}, RMSE fore th = {rmseForeTh:.2f} ")
       f.write(f" nint {len(lstVarRF)} RMSE base RF = {rmseBaseRF:.2f}, RMSE fore RF = {rmseForeRF:.2f}\n")

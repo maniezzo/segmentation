@@ -5,6 +5,21 @@ from statsmodels.datasets import get_rdataset
 from statsmodels.tsa.forecasting.theta import ThetaModel
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from sklearn.ensemble import RandomForestRegressor
+from statsmodels.tsa.ar_model import AutoReg
+
+# AR(1)
+def go_AR1(y, m, nforecast):
+    # m is unused, kept only for compatibility
+    model = AutoReg(y, lags=1, old_names=False)
+    arfit = model.fit()
+
+    # make forecast
+    yfore = arfit.predict(
+        start=len(y),
+        end=len(y) + nforecast - 1
+    )
+
+    return arfit, yfore
 
 # random forest
 def go_RF(y, m, nforecast):
@@ -30,7 +45,8 @@ def go_RF(y, m, nforecast):
    """
    y = np.asarray(y, dtype=float).reshape(-1)
    # Choose the number of lagged observations.
-   lags = 12 if len(y) < 24 else 18
+   #lags = 12 if len(y) < 24 else 18
+   lags = 12
    
    if len(y) <= lags:
       raise ValueError(

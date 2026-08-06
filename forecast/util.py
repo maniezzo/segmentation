@@ -7,7 +7,7 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from sklearn.ensemble import RandomForestRegressor
 from statsmodels.tsa.seasonal import STL
 from scipy.stats import linregress
-from models import go_RF
+from models import go_RF,go_AR1
 
 
 # legge dati di input
@@ -102,6 +102,22 @@ def reconstruct_theta2(t1, t2, y, m, coeff_seas):
    preds = [p if p is None else p + c for p, c in zip(preds, coeff_stretch)]
    return preds
 
+
+# ricostruzione AR1
+def reconstruct_AR1(t1, t2, y, m, coeff_seas):
+   tstart = t1  # primo istante da prevedere
+   idCoeff1 = tstart % m
+   coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
+   ysegm = y[t1:t2]
+   coeff_stretch = coeff[np.arange(len(ysegm) + 1) % len(coeff)]
+   
+   # no seasonality (Double Exponential Smoothing)
+   arfit, _ = go_AR1(ysegm, 1, 6)  # keep this if you still need the recursive forecast elsewhere
+   ypred = arfit.predict(t1, t2)
+   ypred += coeff_stretch
+   
+   return ypred
+
 # ricostruzione ETS Holt-Winters
 def reconstruct_HW(t1, t2, y, m, coeff_seas):
    tstart = t1  # primo istante da prevedere
@@ -130,7 +146,8 @@ def reconstruct_RF(t1, t2, y, m, coeff_seas):
    rffit, _ = go_RF(ysub, 1, 6)  # keep this if you still need the recursive forecast elsewhere
    
    y = np.asarray(ysub, dtype=float).reshape(-1)
-   lags = 12 if len(y) < 24 else 18
+   #lags = 12 if len(y) < 24 else 18
+   lags = 12
    
    X = np.array([y[i - lags:i] for i in range(lags, len(y))])
    Y = y[lags:]
@@ -186,6 +203,8 @@ def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, m, model):
       x = range(t1, t2+1)  # estremi inclusi
       if (model == "theta"):
          ypred = reconstruct_theta2(t1, t2, y, m, coeff_seas)
+      elif (model == "AR1"):
+         ypred = reconstruct_AR1(t1, t2, y, m, coeff_seas)
       elif (model == "HW"):
          ypred = reconstruct_HW(t1, t2, y, m, coeff_seas)
       elif (model == "RF"):
@@ -203,5 +222,5 @@ def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, m, model):
    plt.ylim(ymin - 0.5 * yrange, ymax + 0.5 * yrange)
    plt.title(f"{name} - {model}")
    plt.savefig(f"data/{name}{model}.eps", format="eps")
-   plt.show()
+   #plt.show()
    return

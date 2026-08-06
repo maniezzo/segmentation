@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import sarimaModels as sm
 import shortSeriesModels as ssm
-from models import go_HW,go_theta,go_RF
+from models import go_HW,go_theta,go_RF,go_AR1
 from model_result import ModelResult
 from statsmodels.tsa.seasonal import STL
 from util import deseason
@@ -14,11 +14,12 @@ def read_series(idSeries):
    ds = pd.to_numeric(df.iloc[idSeries,6:].dropna(), errors="coerce")
    return df.iloc[idSeries,0],ds
 
-# modelli HW a ETS, costi come rmse previsioni
+# modelli AR!, HW a ETS, costi come rmse previsioni
 def forecast_cost(model, series, m, validation):
    if(model=="HW"):      _,ypred = go_HW(series[:-validation],m,validation)
    elif(model=="theta"): _,ypred = go_theta(series[:-validation],m,validation)
    elif(model=="RF"):    _,ypred = go_RF(series[:-validation],m,validation)
+   elif(model=="AR1"):   _,ypred = go_AR1(series[:-validation],m,validation)
    diff = series[-validation:] - ypred
    rmse = np.sqrt(np.dot(diff, diff) / ypred.size)
    res = ModelResult(
@@ -203,7 +204,7 @@ def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
       ydeseas = res['deseasonalized']
       coeff_seas = res['seasonal']  # first full seasonal cycle from STL
       
-      lstModels = ["HW", "theta", "RF"]
+      lstModels = ["AR1", "HW", "theta", "RF"]
       tstart = time.perf_counter()
       lstResults = []
       # HW would need burn-in for internal initializations
@@ -219,7 +220,7 @@ def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
             for t2 in range(t1+minLength, len(ydeseas) + 1 - validation):
                print(f"t {t1} - {t2}")
                if(idModel==0):
-                  lstResults.append([t1,t2,np.nan,np.nan,np.nan])
+                  lstResults.append([t1,t2,np.nan,np.nan,np.nan,np.nan])
                if(lstResults[cont][0] != t1 or lstResults[cont][1] != t2):
                   input("Press Enter to continue...")
                   
@@ -234,7 +235,7 @@ def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
       tcpu = time.perf_counter() - tstart
       print(f"tcpu segmentation {tcpu}")
       df = pd.DataFrame(lstResults)
-      df.columns = ["t1", "t2", "HW", "theta", "RF"]
+      df.columns = ["t1", "t2", "AR1", "HW", "theta", "RF"]
       df.to_csv(f"data/{name}models.csv")
 
 if __name__ == '__main__':

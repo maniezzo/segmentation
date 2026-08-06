@@ -17,7 +17,7 @@ if __name__ == '__main__':
    
          nameCheck,dfpoints = util.read_series(filename)
          mainSegments.go_segment(nameCheck, dfpoints, m, validation)  # genera i segmenti se non ci sono già
-         dfModels = pd.read_csv("data/" + nameCheck + "models.csv",usecols=["t1","t2","HW","theta","RF"],)
+         dfModels = pd.read_csv("data/" + nameCheck + "models.csv",usecols=["t1","t2", "AR1","HW","theta","RF"],)
          mainOpt.go_opt(nameCheck, dfModels, dfpoints, m, validation)
 
    print("fine: >>>>>>>>>>>>>>> LEGGI note.txt <<<<<<<<<<<<<<<<")
