@@ -1,3 +1,63 @@
+c:/git/segmentation/data/M3/,M3month.csv,N2701	
+c:/git/segmentation/data/M3/,M3month.csv,N2737	
+c:/git/segmentation/data/M3/,M3month.csv,N2743	
+c:/git/segmentation/data/M3/,M3month.csv,N2688	
+c:/git/segmentation/data/M3/,M3month.csv,N2721	
+c:/git/segmentation/data/M3/,M3month.csv,N2841	
+c:/git/segmentation/data/M3/,M3month.csv,N2554	
+c:/git/segmentation/data/M3/,M3month.csv,N2615	
+c:/git/segmentation/data/M3/,M3month.csv,N2522	
+c:/git/segmentation/data/M3/,M3month.csv,N2544	
+c:/git/segmentation/data/M3/,M3month.csv,N2208	
+c:/git/segmentation/data/M3/,M3month.csv,N2186	
+c:/git/segmentation/data/M3/,M3month.csv,N1979	
+c:/git/segmentation/data/M3/,M3month.csv,N2130	
+c:/git/segmentation/data/M3/,M3month.csv,N2144	
+c:/git/segmentation/data/M3/,M3month.csv,N2465	
+c:/git/segmentation/data/M3/,M3month.csv,N2511	
+c:/git/segmentation/data/M3/,M3month.csv,N2257	
+c:/git/segmentation/data/M3/,M3month.csv,N2355	
+c:/git/segmentation/data/M3/,M3month.csv,N2373	
+c:/git/segmentation/data/M3/,M3month.csv,N1861	
+c:/git/segmentation/data/M3/,M3month.csv,N1747	
+c:/git/segmentation/data/M3/,M3month.csv,N1790	
+c:/git/segmentation/data/M3/,M3month.csv,N1789	
+c:/git/segmentation/data/M3/,M3month.csv,N1751	
+c:/git/segmentation/data/M3/,M3month.csv,N2780	
+c:/git/segmentation/data/M3/,M3month.csv,N2783	
+
+c:/git/segmentation/data/M4/,M4-selected.csv,Q12635	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q12163	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q12036	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q12726	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q11722	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q22725	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q22366	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q19569	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q20713	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q23085	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q14875	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q13248	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q14559	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q14720	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q15440	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q1757	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q206	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q4505	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q2829	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q3365	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q10783	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q8960	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q11058	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q8881	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q9760	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q23500	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q23460	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q23631	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q23439	
+c:/git/segmentation/data/M4/,M4-selected.csv,Q23680	
+
+
 c:/git/segmentation/data/M3/,,N1879
 c:/git/segmentation/data/M3/,M3month.csv,N1906
 c:/git/segmentation/data/M3/,M3month.csv,N1679 
@@ -16,12 +76,64 @@ c:/git/segmentation/data/M4/,M4-selected.csv,Q22221
 c:/git/segmentation/data/M4/,M4-selected.csv,Q5109
 c:/git/segmentation/data/M4/,M4-selected.csv,Q7774
 c:/git/segmentation/data/M4/,M4-selected.csv,Q8030
-c:/git/segmentation/data/M5/,M5_small.csv,5859
-c:/git/segmentation/data/M5/,M5_small.csv,18055
-c:/git/segmentation/data/M5/,M5_small.csv,23793
-c:/git/segmentation/data/M5/,M5_small.csv,6344
-c:/git/segmentation/data/M5/,M5_small.csv,15559
-c:/git/segmentation/data/M5/,M5_small.csv,27444
-c:/git/segmentation/data/M5/,M5_small.csv,6776
-c:/git/segmentation/data/M5/,M5_small.csv,13272
-c:/git/segmentation/data/M5/,M5_small.csv,28437
+
+
+N2700	DEMOGRAPHIC 	135
+N2737	DEMOGRAPHIC 	134
+N2743	DEMOGRAPHIC 	134
+N2688	DEMOGRAPHIC 	135
+N2721	DEMOGRAPHIC 	135
+N2841	FINANCE     	104
+N2554	FINANCE     	133
+N2615	FINANCE     	134
+N2522	FINANCE     	143
+N2544	FINANCE     	134
+N2208	INDUSTRY    	134
+N2186	INDUSTRY    	134
+N1979	INDUSTRY    	144
+N2130	INDUSTRY    	144
+N2144	INDUSTRY    	144
+N2465	MACRO       	132
+N2511	MACRO       	108
+N2257	MACRO       	134
+N2355	MACRO       	134
+N2373	MACRO       	134
+N1861	MICRO       	126
+N1747	MICRO       	126
+N1790	MICRO       	126
+N1789	MICRO       	126
+N1751	MICRO       	126
+N2780	OTHER       	120
+N2783	OTHER       	120
+
+Q12635	Demographic	122
+Q12163	Demographic	115
+Q12036	Demographic	150
+Q12726	Demographic	161
+Q11722	Demographic	184
+Q22725	Finance	114
+Q22366	Finance	122
+Q19569	Finance	123
+Q20713	Finance	102
+Q23085	Finance	109
+Q14875	Industry	154
+Q13248	Industry	271
+Q14559	Industry	115
+Q14720	Industry	115
+Q15440	Industry	118
+Q1757	Macro	165
+Q206	Macro	108
+Q4505	Macro	162
+Q2829	Macro	116
+Q3365	Macro	181
+Q10783	Micro	118
+Q8960	Micro	103
+Q11058	Micro	114
+Q8881	Micro	167
+Q9760	Micro	106
+Q23500	Other	122
+Q23460	Other	122
+Q23631	Other	338
+Q23439	Other	122
+Q23680	Other	194
+
