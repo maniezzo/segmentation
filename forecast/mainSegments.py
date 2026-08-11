@@ -237,7 +237,7 @@ def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
       df = pd.DataFrame(lstResults)
       df.columns = ["t1", "t2", "AR1", "HW", "theta", "RF"]
       df.to_csv(f"data/{name}models_{validation}.csv")
-      df.to_pickle(f"data/{name}models_{validation}.pkl")
+      #df.to_pickle(f"data/{name}models_{validation}.pkl")
 
 
 if __name__ == '__main__':

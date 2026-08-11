@@ -4,7 +4,7 @@ from optGurobi import go_Gurobi
 from Dinkelbach import solve_spp_average_cost
 from models import go_HW,go_theta,go_RF,go_AR1
 
-def go_opt(name, dfModels, dfpoints, m, nforecast):
+def go_opt(name, dfModels, dfpoints, m, nforecast, lstResults):
    # m; stagionalità serie originale (12 o 4)
    isAIC      = False
    isForecast = True    # segmentazione basata su efficacia predittiva
@@ -17,6 +17,9 @@ def go_opt(name, dfModels, dfpoints, m, nforecast):
    tstart   = len(y) - nforecast  # primo istante da prevedere
    idCoeff1 = tstart % m
    coeff    = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
+   
+   reps = (nforecast + len(coeff) - 1) // len(coeff) # Calculate needed repetitions
+   coeff = np.tile(coeff, reps)   # Vectorized concatenation/tiling
    
    # -------------------------- soluzione AIC, no forecast. Backward compatibility (if it worked)
    if(isAIC):
@@ -136,6 +139,28 @@ def go_opt(name, dfModels, dfpoints, m, nforecast):
       f.write(f" nint {len(lstVarHW)} RMSE base hw = {rmseBaseSLS:.2f}, RMSE fore hw = {rmseForeSLS:.2f}")
       f.write(f" nint {len(lstVarTh)} RMSE base th = {rmseBaseTh:.2f}, RMSE fore th = {rmseForeTh:.2f} ")
       f.write(f" nint {len(lstVarRF)} RMSE base RF = {rmseBaseRF:.2f}, RMSE fore RF = {rmseForeRF:.2f}\n")
+   lstResults.append({"name":name,
+                      "npred":nforecast,
+                      "npoints":len(dfpoints),
+                      "nsegm":len(dfModels),
+                      "nIntAR":len(lstVarAR1),
+                      "RMSEBaseAR":rmseBaseAR1,
+                      "RMSEForeAR":rmseForeAR1,
+                      "deltaAR":(rmseForeAR1-rmseBaseAR1)/rmseBaseAR1,
+                      "nIntHW":len(lstVarHW),
+                      "RMSEBaseHW":rmseBaseSLS,
+                      "RMSEForeHW":rmseForeSLS,
+                      "deltaHW":(rmseForeSLS-rmseBaseSLS)/rmseBaseSLS,
+                      "nIntTh":len(lstVarTh),
+                      "RMSEBaseTh":rmseBaseTh,
+                      "RMSEForeTH":rmseForeTh,
+                      "deltaTh":(rmseForeTh-rmseBaseTh)/rmseBaseTh,
+                      "nIntRF":len(lstVarRF),
+                      "RMSEBaseRF":rmseBaseRF,
+                      "RMSEForeRF":rmseForeRF,
+                      "deltaRF":(rmseForeRF-rmseBaseRF)/rmseBaseRF,
+                      })
+   return lstResults
 
 if __name__ == "__main__":
    name = "N1679" # "N1930" "N1679" "N1402"

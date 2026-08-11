@@ -10,7 +10,7 @@ from scipy.stats import linregress
 from models import go_RF,go_AR1
 
 
-# legge dati di input
+# legge dati di input, ritorna la serie normalizzata
 def read_series(filedata):
    basedir, filename, name, m, validation = filedata.split(',')
    if filename != '':
@@ -22,8 +22,16 @@ def read_series(filedata):
    else:
       # leggo la serie come colonna da un file specifico
       filename = os.path.join(basedir, f"{name}.csv")
-      ds = pd.read_csv(filename, usecols=[1]).values.flatten() # questo è un array (non sembra fagli male)
-   return name,ds,int(m),int(validation)
+      ds = pd.read_csv(filename, usecols=[1]).values.flatten() # questo è un array (non sembra fargli male)
+   ds,min,max = normalize_minmax(ds)
+   return name,ds,int(m),int(validation),min,max
+
+# min-max scaling
+def normalize_minmax(ds):
+   min = np.min(ds)
+   max = np.max(ds)
+   ds = (ds - min) / (max - min)
+   return ds,min,max
 
 # predizioni arima dato il modello
 def reconstruct_arima(t1, t2, model, y):
