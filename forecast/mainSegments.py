@@ -194,7 +194,7 @@ def deseasonalize_if_needed(x, period=12, threshold=0.6):
 
 def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
    
-   if os.path.isfile(f'data/{name}models.csv'):
+   if os.path.isfile(f'data/{name}models_{validation}.csv'):
       print("Segment file already exists. ")
    else:
       print("Segment file does not already exist. ")
@@ -236,7 +236,9 @@ def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
       print(f"tcpu segmentation {tcpu}")
       df = pd.DataFrame(lstResults)
       df.columns = ["t1", "t2", "AR1", "HW", "theta", "RF"]
-      df.to_csv(f"data/{name}models.csv")
+      df.to_csv(f"data/{name}models_{validation}.csv")
+      df.to_pickle(f"data/{name}models_{validation}.pkl")
+
 
 if __name__ == '__main__':
    warnings.filterwarnings("ignore", category = UserWarning)

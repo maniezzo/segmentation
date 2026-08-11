@@ -131,7 +131,7 @@ def go_opt(name, dfModels, dfpoints, m, nforecast):
    print(f"{name}, n.intervals {len(lstVarTh)} RMSE base th = {rmseBaseTh:.2f}, RMSE fore th = {rmseForeTh:.2f}")
    print(f"{name}, n.intervals {len(lstVarRF)} RMSE base rf = {rmseBaseRF:.2f}, RMSE fore rf = {rmseForeRF:.2f}")
    with open('data/results.txt', 'a') as f:
-      f.write(f"{name} points {len(dfpoints)} segm {len(dfModels)} ")
+      f.write(f"{name} npred {nforecast} points {len(dfpoints)} segm {len(dfModels)} ")
       f.write(f" nint {len(lstVarAR1)} RMSE base ar = {rmseBaseAR1:.2f}, RMSE fore ar = {rmseForeAR1:.2f}")
       f.write(f" nint {len(lstVarHW)} RMSE base hw = {rmseBaseSLS:.2f}, RMSE fore hw = {rmseForeSLS:.2f}")
       f.write(f" nint {len(lstVarTh)} RMSE base th = {rmseBaseTh:.2f}, RMSE fore th = {rmseForeTh:.2f} ")

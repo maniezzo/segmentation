@@ -12,9 +12,9 @@ from models import go_RF,go_AR1
 
 # legge dati di input
 def read_series(filedata):
-   basedir, filename, name = filedata.split(',')
+   basedir, filename, name, m, validation = filedata.split(',')
    if filename != '':
-      # leggo la serie come riga da un benchmarck
+      # leggo la serie come riga da un benchmark
       filename = os.path.join(basedir, filename)
       df = pd.read_csv(filename)
       idSeries = np.where(df['Series'] == name)[0][0]
@@ -23,7 +23,7 @@ def read_series(filedata):
       # leggo la serie come colonna da un file specifico
       filename = os.path.join(basedir, f"{name}.csv")
       ds = pd.read_csv(filename, usecols=[1]).values.flatten() # questo è un array (non sembra fagli male)
-   return name,ds
+   return name,ds,int(m),int(validation)
 
 # predizioni arima dato il modello
 def reconstruct_arima(t1, t2, model, y):
@@ -196,8 +196,8 @@ def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, m, model):
    
    fig, ax = plt.subplots(figsize=(10, 6))
    ax.plot(dfpoints, marker='.', linewidth=0, color='blue')
-   ax.plot(range(len(dfpoints)-nforecast,len(dfpoints)),yBase,color="green")
-   ax.plot(range(len(dfpoints)-nforecast,len(dfpoints)),yfore,color="red")
+   ax.plot(range(len(dfpoints)-nforecast,len(dfpoints)),yBase,color="green",label="Base")
+   ax.plot(range(len(dfpoints)-nforecast,len(dfpoints)),yfore,color="red",label="Fore")
    for i in lstVar:
       t1, t2, dfmodel = dfModel.iloc[i, 0], dfModel.iloc[i, 1], dfModel.iloc[i, 4]
       x = range(t1, t2+1)  # estremi inclusi
@@ -220,7 +220,8 @@ def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, m, model):
       ax.vlines(x=t2, ymin=0, ymax=ymax + 0.5 * yrange, ls='dashed', color="lightgrey")
    # plt.legend()
    plt.ylim(ymin - 0.5 * yrange, ymax + 0.5 * yrange)
-   plt.title(f"{name} - {model}")
-   plt.savefig(f"data/{name}{model}.eps", format="eps")
+   plt.title(f"{name} - {model} - {nforecast} forecasts")
+   plt.legend()
+   plt.savefig(f"data/{name}{model}_{nforecast}.eps", format="eps")
    #plt.show()
    return
