@@ -103,7 +103,6 @@ def sarima_cost(series):
          print(f'Log likelihood: {out["loglik"]}')
          print(f'AIC check: {out["aic"]}')
    return res
-
 '''
 deseasoning pipeline (v. aaatobackup/tematiche/forecast/data):
 1) Estimate trend and seasonality jointly with STL using robust=True.
@@ -193,7 +192,6 @@ def deseasonalize_if_needed(x, period=12, threshold=0.6):
 
 
 def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
-   
    if os.path.isfile(f'data/{name}models_{validation}.csv'):
       print("Segment file already exists. ")
    else:

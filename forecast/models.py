@@ -26,22 +26,13 @@ def go_RF(y, m, nforecast):
    """
    Train a Random Forest on the complete input series and recursively
    forecast the next nforecast out-of-sample observations.
-
    Parameters
-   ----------
-   y : array-like
-       Historical time series.
-   m : int
-       Retained for compatibility. Currently unused.
-   nforecast : int
-       Number of future observations to forecast.
-
+      y : array-like, Historical time series.
+      m : int, Retained for compatibility. Currently unused.
+      nforecast : int, Number of future observations to forecast.
    Returns
-   -------
-   model : RandomForestRegressor
-       Fitted Random Forest model.
-   yfore : np.ndarray
-       Recursive out-of-sample forecasts.
+      model : RandomForestRegressor, Fitted Random Forest model.
+      yfore : np.ndarray, Recursive out-of-sample forecasts.
    """
    y = np.asarray(y, dtype=float).reshape(-1)
    # Choose the number of lagged observations.

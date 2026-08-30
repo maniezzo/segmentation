@@ -50,28 +50,22 @@ def solve_spp_average_cost(
       verbose: bool = True,
 ) -> dict:
    """
-   Each feasible solution selects a subset S of sets such that every
-   element is covered exactly once.
+   Each feasible solution selects a subset S of sets such that every element is covered exactly once.
    The objective is to minimise the average cost of the selected sets.
-
        min  (1/|S|) * sum_{j in S} cost[j]
-
    Parameters
-   ----------
-   lstIntervals : list of tuples; (t1,t2))
-   lstCosts     : cost[j] for set j
-   nrows   : total number of elements to be covered (universe size)
-   eps          : convergence tolerance on g(lambda) = min sum(c_j - lambda)*x_j
-   max_iter     : maximum Dinkelbach iterations
-   verbose      : print iteration log
-
+      lstIntervals : list of tuples; (t1,t2))
+      lstCosts     : cost[j] for set j
+      nrows   : total number of elements to be covered (universe size)
+      eps          : convergence tolerance on g(lambda) = min sum(c_j - lambda)*x_j
+      max_iter     : maximum Dinkelbach iterations
+      verbose      : print iteration log
    Returns
-   -------
-   dict with keys:
-       'lambda_star'   : optimal average cost
-       'selected_sets' : indices of sets in the optimal partition
-       'iterations'    : number of Dinkelbach iterations
-       'status'        : 'optimal' | 'max_iter_reached' | 'infeasible'
+      dict with keys:
+          'lambda_star'   : optimal average cost
+          'selected_sets' : indices of sets in the optimal partition
+          'iterations'    : number of Dinkelbach iterations
+          'status'        : 'optimal' | 'max_iter_reached' | 'infeasible'
    """
    ncols = len(lstIntervals)
    

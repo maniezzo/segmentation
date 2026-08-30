@@ -111,8 +111,8 @@ def reconstruct_theta2(t1, t2, y, m, coeff_seas):
    return preds
 
 
-# ricostruzione AR1
-def reconstruct_AR1(t1, t2, y, m, coeff_seas):
+# ricostruzione AR1, qui nforecast (out of sample) inutilizzato
+def reconstruct_AR1(t1, t2, y, m, coeff_seas,nforecast=6):
    tstart = t1  # primo istante da prevedere
    idCoeff1 = tstart % m
    coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
@@ -120,8 +120,8 @@ def reconstruct_AR1(t1, t2, y, m, coeff_seas):
    coeff_stretch = coeff[np.arange(len(ysegm) + 1) % len(coeff)]
    
    # no seasonality (Double Exponential Smoothing)
-   arfit, _ = go_AR1(ysegm, 1, 6)  # keep this if you still need the recursive forecast elsewhere
-   ypred = arfit.predict(t1, t2)
+   arfit, _ = go_AR1(ysegm, 0, nforecast)  # keep this if you still need the recursive forecast elsewhere
+   ypred = arfit.predict(0, t2-t1)
    ypred += coeff_stretch
    
    return ypred
@@ -200,7 +200,7 @@ def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, m, model):
    y = np.asarray(dfpoints, dtype=float)
    coeff_seas, trend, resid = deseason(y)
    y = trend+resid  # serie destagionalizzata
-   m = 1
+   #m = 1
    
    fig, ax = plt.subplots(figsize=(10, 6))
    ax.plot(dfpoints, marker='.', linewidth=0, color='blue')
