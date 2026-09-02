@@ -1,7 +1,5 @@
-c:/git/segmentation/data/home/,homeBenchmark.csv,steps,7,12
+c:/git/segmentation/data/M3/,M3month.csv,N2700,12,12
 
-
-c:/git/segmentation/data/M3/,M3month.csv,N2700,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2737,12,18	
 c:/git/segmentation/data/M3/,M3month.csv,N2743,12,18	
 c:/git/segmentation/data/M3/,M3month.csv,N2688,12,18	

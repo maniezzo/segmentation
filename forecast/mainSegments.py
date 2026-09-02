@@ -207,6 +207,8 @@ def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
       else:
          yseries = np.array(dfpoints)
       
+      if(m==12): minLength = 24
+      
       lstModels = ["AR1", "HW", "theta", "RF"]
       tstart = time.perf_counter()
       lstResults = []
