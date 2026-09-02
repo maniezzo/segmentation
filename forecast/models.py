@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestRegressor
 from statsmodels.tsa.ar_model import AutoReg
 
 # AR(1)
-def go_AR1(y, m, nforecast):
+def go_AR1(y, nforecast, m):
     # m is unused, kept only for compatibility
     model = AutoReg(y, lags=1, old_names=False)
     arfit = model.fit()
@@ -22,7 +22,7 @@ def go_AR1(y, m, nforecast):
     return arfit, yfore
 
 # random forest
-def go_RF(y, m, nforecast):
+def go_RF(y, nforecast, m):
    """
    Train a Random Forest on the complete input series and recursively
    forecast the next nforecast out-of-sample observations.
@@ -37,7 +37,7 @@ def go_RF(y, m, nforecast):
    y = np.asarray(y, dtype=float).reshape(-1)
    # Choose the number of lagged observations.
    #lags = 12 if len(y) < 24 else 18
-   lags = 12
+   lags = 12 # hardwired, also in reconstruct
    
    if len(y) <= lags:
       raise ValueError(
@@ -76,21 +76,24 @@ def go_RF(y, m, nforecast):
    return model, yfore
 
 # ETS, Holt Winters
-def go_HW(y,m,nforecast):
-   # no seasonality (Double Exponential Smoothing)
-   model = ExponentialSmoothing(y,
-       trend    = "add",
-       seasonal = None,
-       initialization_method = "estimated")
-   hwfit = model.fit()
-   # make forecast
-   yfore = hwfit.predict(len(y), len(y)+nforecast-1)
-   return hwfit,yfore
+def go_HW(y,nforecast,m):
+    y = np.asarray(y, dtype=float).reshape(-1)
+    model = ExponentialSmoothing(
+        y,
+        trend="add",
+        seasonal="add",
+        seasonal_periods=m,
+        initialization_method="estimated"
+    )
+    hwfit = model.fit(optimized=True)
+    yfore = hwfit.forecast(nforecast)
+
+    return hwfit, np.asarray(yfore)
 
 # Theta
-def go_theta(y,m,nforecast):
+def go_theta(y,nforecast,m):
    # Fit the Theta model
-   theta_model = ThetaModel(y, deseasonalize=False) # lavoro su dati destagionalizzati
+   theta_model = ThetaModel(y, deseasonalize=True, period=m) # lavoro su dati non destagionalizzati
    fit = theta_model.fit()
    #print(fit.summary())
    yfore = fit.forecast(steps=nforecast)  # Forecast nforecast points ahead
@@ -111,13 +114,13 @@ if __name__ == '__main__':
    last_seasonal_cycle = stl.seasonal[-m:]
    forecast_seasonal = np.tile(last_seasonal_cycle, (len(forecast_deseasoned) // m + 1))[:len(forecast_deseasoned)]
    
-   _,ytheta  = go_theta(deseasoned,m,nforecast)
-   hwfit,yHW = go_HW(deseasoned,m,nforecast)
-   rffit,yRF = go_RF(deseasoned,m,nforecast)
+   _,ytheta  = go_theta(deseasoned,nforecast,m=m)
+   hwfit,yHW = go_HW(deseasoned,nforecast,m=m)
+   rffit,yRF = go_RF(deseasoned,nforecast,m=m)
 
    # Reseasonalize
    ySTL = forecast_deseasoned + forecast_seasonal
-   ytheta += forecast_seasonal
+   #ytheta += forecast_seasonal
    yHW += forecast_seasonal
    yRF += forecast_seasonal
 

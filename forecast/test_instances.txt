@@ -1,6 +1,7 @@
-c:/git/segmentation/data/M3/,M3month.csv,N2700,12,18
+c:/git/segmentation/data/home/,homeBenchmark.csv,steps,7,12
 
-c:/git/segmentation/data/M3/,M3month.csv,N2701,12,18
+
+c:/git/segmentation/data/M3/,M3month.csv,N2700,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2737,12,18	
 c:/git/segmentation/data/M3/,M3month.csv,N2743,12,18	
 c:/git/segmentation/data/M3/,M3month.csv,N2688,12,18	
@@ -9,7 +10,6 @@ c:/git/segmentation/data/M3/,M3month.csv,N2841,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2554,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2615,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2522,12,18
-c:/git/segmentation/data/M3/,M3month.csv,N2544,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2544,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2208,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2186,12,18
@@ -28,6 +28,9 @@ c:/git/segmentation/data/M3/,M3month.csv,N1789,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N1751,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2780,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2783,12,18
+c:/git/segmentation/data/M3/,M3month.csv,N2778,12,18
+c:/git/segmentation/data/M3/,M3month.csv,N2785,12,18
+c:/git/segmentation/data/M3/,M3month.csv,N2799,12,18
 
 c:/git/segmentation/data/M4/,M4-selected.csv,Q12635,4,12	
 c:/git/segmentation/data/M4/,M4-selected.csv,Q12163,4,12	
@@ -108,6 +111,9 @@ N1789	MICRO       	126
 N1751	MICRO       	126
 N2780	OTHER       	120
 N2783	OTHER       	120
+N2778	OTHER       	96
+N2785	OTHER       	96
+N2799	OTHER       	96
 
 Q12635	Demographic	122
 Q12163	Demographic	115
