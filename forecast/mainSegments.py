@@ -222,8 +222,8 @@ def go_segment(name, dfpoints, m, validation, minLength = 18, burnin = 0):
    
          cont = 0
          for t1 in range (0,len(yseries)-minLength):
+            print(f"{model}) t1: {t1} ->")
             for t2 in range(t1+minLength, len(yseries) + 1 - validation):
-               print(f"{model}) t {t1} - {t2}")
                if(idModel==0):
                   lstResults.append([t1,t2,np.nan,np.nan,np.nan,np.nan])
                if(lstResults[cont][0] != t1 or lstResults[cont][1] != t2):

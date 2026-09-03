@@ -1,5 +1,6 @@
 import numpy as np, pandas as pd,os
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import ast   # abstract syntax tree, generate python code
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.forecasting.theta import ThetaModel
@@ -54,12 +55,13 @@ def reconstruct_theta2(t1, t2, y, m, coeff_seas):
    ysegm = y[t1:t2]
    coeff_stretch = coeff[np.arange(len(ysegm)+1) % len(coeff)]
 
-   burnin = m
-   if (m < 6): burnin = 6  # proprio il minimo numero di osservazioni
-   preds = [None] * burnin
+   burnin = 0  # non l'ho usato
+   #burnin = m
+   #if (m < 6): burnin = 6  # proprio il minimo numero di osservazioni
    period = max(1, m)
+   preds = [None] * (2*period+burnin)
    
-   for i in range(t1 + burnin, t2+1):  # estremi inclusi
+   for i in range(t1 + 2*period+burnin, t2+1):  # estremi inclusi
       y_train = y[t1:i]
       fitted = ThetaModel(y_train, period=period).fit()
       pred = fitted.forecast(steps=1).iloc[0]
@@ -86,19 +88,22 @@ def reconstruct_AR1(t1, t2, y, m, coeff_seas,nforecast=6):
 # ricostruzione ETS Holt-Winters
 def reconstruct_HW(t1, t2, y, m, coeff_seas):
    tstart = t1  # primo istante da prevedere
-   idCoeff1 = tstart % m
-   coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
-   ysegm = y[t1:t2]
-   coeff_stretch = coeff[np.arange(len(ysegm)+1) % len(coeff)]
+   ysegm = y[t1:t2+1] # estremi inclusi
+   #idCoeff1 = tstart % m
+   #coeff = np.roll(coeff_seas, -idCoeff1)  # Rotate LEFT by idCoeff1 positions (negative means left)
+   #coeff_stretch = coeff[np.arange(len(ysegm)+1) % len(coeff)]
    
    # no seasonality (Double Exponential Smoothing)
-   model = ExponentialSmoothing(y,
-       trend    = "add",
-       seasonal = None,
-       initialization_method = "estimated")
+   model = ExponentialSmoothing(
+      ysegm,
+      trend="add",
+      seasonal="add",
+      seasonal_periods=m,
+      initialization_method="estimated"
+   )
    hwfit = model.fit()
-   ypred = hwfit.predict(t1,t2)
-   ypred += coeff_stretch
+   ypred = hwfit.fittedvalues # ricostruisce il segmento, crede che parta da t1=0
+   #ypred += coeff_stretch
    
    return ypred
 
@@ -188,8 +193,15 @@ def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, m, model):
       ax.vlines(x=t2, ymin=0, ymax=ymax + 0.5 * yrange, ls='dashed', color="lightgrey")
    # plt.legend()
    plt.ylim(ymin - 0.5 * yrange, ymax + 0.5 * yrange)
-   plt.title(f"{name} - {model} - {nforecast} forecasts")
-   plt.legend()
-   plt.savefig(f"data/{name}{model}_{nforecast}.eps", format="eps")
+
+   # At most approximately 12 readable x-axis intervals
+   ax.xaxis.set_major_locator( MaxNLocator(nbins=20, integer=True) )
+   ax.tick_params(axis="x", labelrotation=45)
+   ax.set_title(f"{name} - {model} - {nforecast} forecasts")
+   ax.legend()
+
+   fig.tight_layout()
+   fig.savefig(f"data/{name}{model}_{nforecast}.eps", format="eps")
    #plt.show()
-   return
+   plt.close(fig)
+   return fig, ax
