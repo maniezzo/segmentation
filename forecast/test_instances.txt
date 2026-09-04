@@ -1,4 +1,4 @@
-c:/git/segmentation/data/M3/,M3month.csv,N2465,12,18
+c:/git/segmentation/data/M4/,M4_Quarterly.csv,Q12635,4,12	
 
 
 c:/git/segmentation/data/M3/,M3month.csv,N2700,12,12
@@ -32,36 +32,36 @@ c:/git/segmentation/data/M3/,M3month.csv,N2778,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2785,12,18
 c:/git/segmentation/data/M3/,M3month.csv,N2799,12,18
 
-c:/git/segmentation/data/M4/,M4-selected.csv,Q12635,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q12163,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q12036,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q12726,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q11722,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q22725,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q22366,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q19569,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q20713,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q23085,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q14875,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q13248,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q14559,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q14720,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q15440,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q1757,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q206,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q4505,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q2829,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q3365,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q10783,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q8960,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q11058,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q8881,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q9760,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q23500,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q23460,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q23631,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q23439,4,12	
-c:/git/segmentation/data/M4/,M4-selected.csv,Q23680,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q12635,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q12163,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q12036,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q12726,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q11722,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q22725,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q22366,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q19569,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q20713,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q23085,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q14875,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q13248,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q14559,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q14720,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q15440,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q1757,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q206,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q4505,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q2829,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q3365,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q10783,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q8960,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q11058,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q8881,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q9760,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q23500,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q23460,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q23631,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q23439,4,12	
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q23680,4,12	
 
 
 c:/git/segmentation/data/M3/,,N1879
@@ -70,18 +70,18 @@ c:/git/segmentation/data/M3/,M3month.csv,N1679
 c:/git/segmentation/data/M3/,M3month.csv,N1930 
 c:/git/segmentation/data/M3/,M3month.csv,N1679 
 c:/git/segmentation/data/M3/,M3month.csv,N1402
-c:/git/segmentation/data/M4/,M4-selected.csv,Q14640
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q14640
 
-c:/git/segmentation/data/M4/,M4-selected.csv,Q15444
-c:/git/segmentation/data/M4/,M4-selected.csv,Q18148
-c:/git/segmentation/data/M4/,M4-selected.csv,Q18496
-c:/git/segmentation/data/M4/,M4-selected.csv,Q19604
-c:/git/segmentation/data/M4/,M4-selected.csv,Q19637
-c:/git/segmentation/data/M4/,M4-selected.csv,Q2002
-c:/git/segmentation/data/M4/,M4-selected.csv,Q22221
-c:/git/segmentation/data/M4/,M4-selected.csv,Q5109
-c:/git/segmentation/data/M4/,M4-selected.csv,Q7774
-c:/git/segmentation/data/M4/,M4-selected.csv,Q8030
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q15444
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q18148
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q18496
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q19604
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q19637
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q2002
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q22221
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q5109
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q7774
+c:/git/segmentation/data/M4/M4_Quarterly.csv,Q8030
 
 
 N2700	DEMOGRAPHIC 	135
