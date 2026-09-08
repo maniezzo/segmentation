@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np, pandas as pd,os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -205,3 +207,69 @@ def plotSol(name, lstVar, dfModel, dfpoints, yBase, yfore, m, model):
    #plt.show()
    plt.close(fig)
    return fig, ax
+
+def make_tables(fileName):
+   # Read the CSV file
+   df = pd.read_csv(fileName)
+
+   # Remove leading/trailing spaces from category names
+   df["categ"] = df["categ"].str.strip()
+
+   # Select the first and last 30 rows
+   first_30 = df.head(30)
+   last_30 = df.tail(30)
+
+   # Delta columns and methods
+   methods = ["AR", "HW", "Th", "RF"]
+
+   def create_summary_table(data):
+      """
+      Create one summary row per category.
+      """
+
+      # Basic aggregation
+      summary = (
+         data.groupby("categ")
+         .agg(
+            avg_npoints=("npoints", "mean"),
+            avg_nsegm=("nsegm", "mean"),
+         )
+      )
+
+      # Add statistics for each delta column
+      for method in methods:
+         delta_col = f"delta{method}"
+
+         grouped_delta = data.groupby("categ")[delta_col]
+
+         summary[f"{method}_avg_delta"] = grouped_delta.mean()
+         summary[f"{method}_std_delta"] = grouped_delta.std()
+         summary[f"{method}_range_delta"] = (
+                 grouped_delta.max() - grouped_delta.min()
+         )
+
+      # Move categ from the index to a normal column
+      summary = summary.reset_index()
+
+      return summary
+
+   # Create the two summary tables
+   table_first_30 = create_summary_table(first_30)
+   table_last_30 = create_summary_table(last_30)
+
+   # Optional: round numerical values for easier reading
+   table_first_30 = table_first_30.round(4)
+   table_last_30 = table_last_30.round(4)
+
+   # Print the tables
+   print("Summary for the first 30 rows:")
+   print(table_first_30.to_string(index=False))
+
+   print("\nSummary for the last 30 rows:")
+   print(table_last_30.to_string(index=False))
+   return
+
+if __name__ == "__main__":
+   fileName = "data/results_18.csv"
+   make_tables(fileName)
+   print("Fine")
